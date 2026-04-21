@@ -1,20 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const sessionId = request.nextUrl.searchParams.get("session_id");
+export async function GET() {
+  return NextResponse.json(
+    { error: "Checkout disabled temporarily" },
+    { status: 503 }
+  );
+}
 
-  if (!sessionId) {
-    return NextResponse.json({ error: "Missing session_id" }, { status: 400 });
-  }
-
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-  return NextResponse.json({
-    id: session.id,
-    payment_status: session.payment_status,
-    status: session.status,
-    metadata: session.metadata,
-    customer_details: session.customer_details,
-  });
+export async function POST() {
+  return NextResponse.json(
+    { error: "Checkout disabled temporarily" },
+    { status: 503 }
+  );
 }
