@@ -4,6 +4,16 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
 
+type ScoreMarket = {
+  score: string;
+  modelProbability: number;
+  bookmaker?: string | null;
+  odds?: number | null;
+  marketProbability?: number | null;
+  edge?: number | null;
+  valueLabel: "STRONG_VALUE" | "SMALL_VALUE" | "NO_VALUE" | "NO_ODDS";
+};
+
 type PredictionMatch = {
   fixtureId: number;
   home: string;
@@ -25,6 +35,7 @@ type PredictionMatch = {
       score: string;
       probability: number;
     }>;
+    scoreMarkets?: ScoreMarket[];
     insights: string[];
   };
 };
@@ -111,6 +122,44 @@ function getPredictionAccent(match: PredictionMatch) {
   return "text-yellow-300";
 }
 
+function ValueBadge({
+  valueLabel,
+  edge,
+}: {
+  valueLabel: ScoreMarket["valueLabel"];
+  edge?: number | null;
+}) {
+  if (valueLabel === "STRONG_VALUE") {
+    return (
+      <span className="rounded-full bg-green-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-green-300">
+        Strong Value {edge !== null && edge !== undefined ? `+${edge}%` : ""}
+      </span>
+    );
+  }
+
+  if (valueLabel === "SMALL_VALUE") {
+    return (
+      <span className="rounded-full bg-yellow-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-yellow-300">
+        Small Value {edge !== null && edge !== undefined ? `+${edge}%` : ""}
+      </span>
+    );
+  }
+
+  if (valueLabel === "NO_ODDS") {
+    return (
+      <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300">
+        No Odds
+      </span>
+    );
+  }
+
+  return (
+    <span className="rounded-full bg-slate-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300">
+      No Value
+    </span>
+  );
+}
+
 export default function PredictionsPage() {
   const [matches, setMatches] = useState<PredictionMatch[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,8 +198,8 @@ export default function PredictionsPage() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Match outcome predictions with win probabilities, confidence, and
-            the three most likely scorelines.
+            Match outcome predictions with win probabilities, confidence, top 3
+            likely scores, and value betting comparisons against the market.
           </p>
 
           <div className="mt-2 text-sm text-slate-400">
@@ -193,7 +242,7 @@ export default function PredictionsPage() {
             <div className="text-xs uppercase tracking-wide text-slate-400">
               Model status
             </div>
-            <div className="mt-2 text-lg font-bold">Poisson score mode</div>
+            <div className="mt-2 text-lg font-bold">Value betting mode</div>
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-[#111827] p-4">
@@ -201,7 +250,7 @@ export default function PredictionsPage() {
               Prediction type
             </div>
             <div className="mt-2 text-lg font-bold">
-              Home win / Draw / Away win
+              Outcome + score value
             </div>
           </div>
 
@@ -236,6 +285,7 @@ function PredictionCard({
 }) {
   const predictionLabel = getPredictionLabel(match);
   const predictionAccent = getPredictionAccent(match);
+  const scoreMarkets = match.prediction.scoreMarkets || [];
 
   return (
     <div className="rounded-2xl border border-white/10 bg-[#111827] p-4 shadow-xl">
@@ -302,18 +352,54 @@ function PredictionCard({
 
         <div className="pt-2">
           <div className="mb-2 text-xs uppercase tracking-wide text-slate-300">
-            3 most likely scores
+            Top 3 likely scores + value
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            {match.prediction.likelyScores.map((item, index) => (
+          <div className="space-y-2">
+            {scoreMarkets.map((item, index) => (
               <div
                 key={`${match.fixtureId}-${index}`}
-                className="rounded-lg bg-black/20 px-3 py-2 text-center"
+                className="rounded-lg bg-black/20 px-3 py-3"
               >
-                <div className="text-sm font-bold text-white">{item.score}</div>
-                <div className="mt-1 text-[11px] text-slate-400">
-                  {item.probability}%
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-lg font-bold text-white">
+                    {item.score}
+                  </div>
+                  <ValueBadge
+                    valueLabel={item.valueLabel}
+                    edge={item.edge ?? null}
+                  />
+                </div>
+
+                <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-slate-300">
+                  <div>
+                    <div className="text-slate-500">Model probability</div>
+                    <div>{item.modelProbability}%</div>
+                  </div>
+
+                  <div>
+                    <div className="text-slate-500">Market probability</div>
+                    <div>
+                      {item.marketProbability !== null &&
+                      item.marketProbability !== undefined
+                        ? `${item.marketProbability}%`
+                        : "—"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-slate-500">Best odds</div>
+                    <div>
+                      {item.odds !== null && item.odds !== undefined
+                        ? item.odds
+                        : "—"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-slate-500">Bookmaker</div>
+                    <div>{item.bookmaker || "—"}</div>
+                  </div>
                 </div>
               </div>
             ))}
