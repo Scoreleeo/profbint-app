@@ -116,7 +116,13 @@ export function buildPrediction(
 
   const pointsGap = features.pointsGap;
   const goalDifferenceGap = features.goalDifferenceGap;
-  const formGap = features.home.weightedRecentPoints - features.away.weightedRecentPoints;
+  const formGap =
+    features.home.weightedRecentPoints - features.away.weightedRecentPoints;
+
+  const awayIsClearlyStronger =
+    features.pointsGap < -8 &&
+    features.goalDifferenceGap < -8 &&
+    formGap < -0.6;
 
   if (Math.abs(pointsGap) >= 10) {
     if (pointsGap > 0) {
@@ -146,6 +152,11 @@ export function buildPrediction(
       awayXG += 0.04;
       homeXG -= 0.03;
     }
+  }
+
+  if (awayIsClearlyStronger) {
+    homeXG -= 0.08;
+    awayXG += 0.12;
   }
 
   if (context?.lastMeeting?.includes("0-0")) {
@@ -239,13 +250,17 @@ export function buildPrediction(
   const edge = Math.abs(homeProb - awayProb);
 
   let confidence = Math.round(
-    50 +
-      edge * 0.6 +
-      expectedGoalGap * 10 +
-      Math.abs(pointsGap) * 0.04
+    49 +
+      edge * 0.52 +
+      expectedGoalGap * 8.5 +
+      Math.abs(pointsGap) * 0.03
   );
 
-  confidence = clamp(confidence, 52, 78);
+  if (drawProbRounded >= 28) {
+    confidence -= 3;
+  }
+
+  confidence = clamp(confidence, 50, 76);
 
   const insights: string[] = [];
 

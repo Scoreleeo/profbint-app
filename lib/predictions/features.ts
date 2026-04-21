@@ -255,7 +255,9 @@ export function buildMatchFeatures(input: {
   const pointsGap = home.tablePoints - away.tablePoints;
   const goalDifferenceGap = home.goalDifference - away.goalDifference;
   const rankGap = away.tableRank - home.tableRank;
-  const homeAdvantage = 0.16;
+
+  // Calibrated down slightly to reduce home bias.
+  const homeAdvantage = 0.12;
 
   const homeAttackStrength =
     home.homeAwayGoalsForPerGame * 0.65 +
