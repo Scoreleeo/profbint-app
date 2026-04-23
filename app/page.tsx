@@ -308,7 +308,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0b1220] text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[#0b1220] text-white">
       <LiveTicker matches={data?.live || []} />
 
       <div className="border-b border-white/10 bg-[#08101c]">
@@ -337,19 +337,19 @@ export default function HomePage() {
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
-                <a
+                <Link
                   href="/predictions"
                   className="rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
                 >
                   View AI Predictions
-                </a>
+                </Link>
 
-                <a
+                <Link
                   href="/predictions"
                   className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
                 >
                   Premium Insights →
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -406,12 +406,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            <a
+            <Link
               href="/predictions"
               className="inline-flex rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-400"
             >
               View →
-            </a>
+            </Link>
           </div>
         </section>
 
@@ -551,40 +551,46 @@ export default function HomePage() {
                 ) : (
                   <div className="space-y-3">
                     {data.fixtures.map((match) => (
-  <Link
-    key={match.fixtureId}
-    href={`/match/${match.fixtureId}`}
-    className="block rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
-  >
-    <div className="text-sm text-slate-400">
-      {match.leagueName}
-    </div>
+                      <Link
+                        key={match.fixtureId}
+                        href={`/match/${match.fixtureId}`}
+                        className="block rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
+                      >
+                        <div className="text-sm text-slate-400">
+                          {match.leagueName}
+                        </div>
 
-    <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-      <div className="flex min-w-0 items-center gap-2">
-        <TeamLogo src={match.homeLogo} alt={match.homeTeam} />
-        <span className="truncate font-medium">
-          {match.homeTeam}
-        </span>
-      </div>
+                        <div className="mt-2 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <TeamLogo
+                              src={match.homeLogo}
+                              alt={match.homeTeam}
+                            />
+                            <span className="truncate font-medium">
+                              {match.homeTeam}
+                            </span>
+                          </div>
 
-      <span className="text-sm font-semibold uppercase text-slate-400">
-        vs
-      </span>
+                          <span className="text-sm font-semibold uppercase text-slate-400">
+                            vs
+                          </span>
 
-      <div className="flex min-w-0 items-center justify-end gap-2">
-        <span className="truncate text-right font-medium">
-          {match.awayTeam}
-        </span>
-        <TeamLogo src={match.awayLogo} alt={match.awayTeam} />
-      </div>
-    </div>
+                          <div className="flex min-w-0 items-center justify-end gap-2">
+                            <span className="truncate text-right font-medium">
+                              {match.awayTeam}
+                            </span>
+                            <TeamLogo
+                              src={match.awayLogo}
+                              alt={match.awayTeam}
+                            />
+                          </div>
+                        </div>
 
-    <div className="mt-2 text-sm text-slate-300">
-      {formatDate(match.date)}
-    </div>
-  </Link>
-))}
+                        <div className="mt-2 text-sm text-slate-300">
+                          {formatDate(match.date)}
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 )}
               </SectionCard>
@@ -599,11 +605,11 @@ export default function HomePage() {
                 ) : (
                   <div className="space-y-3">
                     {data.results.map((match) => (
-  <Link
-    key={match.fixtureId}
-    href={`/report/${match.fixtureId}`}
-    className="block rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
-  >
+                      <Link
+                        key={match.fixtureId}
+                        href={`/report/${match.fixtureId}`}
+                        className="block rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
+                      >
                         <div className="text-sm text-slate-400">
                           {match.leagueName}
                         </div>
@@ -690,7 +696,9 @@ export default function HomePage() {
                           <div className={titleClasses}>{article.title}</div>
 
                           {article.summary ? (
-                            <div className={summaryClasses}>{article.summary}</div>
+                            <div className={summaryClasses}>
+                              {article.summary}
+                            </div>
                           ) : null}
 
                           {article.date ? (
@@ -727,6 +735,29 @@ export default function HomePage() {
             </div>
           </>
         ) : null}
+
+        <footer className="mt-10 border-t border-white/10 pt-6 pb-2">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-center">
+            <Link
+              href="/"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Home
+            </Link>
+            <Link
+              href="/predictions"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Predictions
+            </Link>
+            <Link
+              href="/legal"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Legal & Disclaimer
+            </Link>
+          </div>
+        </footer>
       </div>
     </main>
   );
