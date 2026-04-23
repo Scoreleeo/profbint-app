@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
@@ -186,7 +187,7 @@ export default function PredictionsPage() {
   }, [leagueId]);
 
   return (
-    <main className="min-h-screen bg-[#0b1220] p-6 text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[#0b1220] p-6 text-white">
       <div className="mx-auto max-w-7xl space-y-6">
         <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] p-6 shadow-2xl">
           <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-300">
@@ -267,12 +268,47 @@ export default function PredictionsPage() {
             <p className="text-slate-300">Loading predictions...</p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {matches.map((match) => (
-              <PredictionCard key={match.fixtureId} match={match} />
-            ))}
-          </div>
+          <>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {matches.map((match) => (
+                <PredictionCard key={match.fixtureId} match={match} />
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-[#111827] p-4 text-center shadow-xl">
+              <p className="text-xs leading-6 text-slate-400">
+                Predictions are for informational purposes only and do not
+                guarantee outcomes.{" "}
+                <Link href="/legal" className="underline hover:text-white">
+                  See full disclaimer
+                </Link>
+              </p>
+            </div>
+          </>
         )}
+
+        <footer className="mt-10 border-t border-white/10 pt-6 pb-2">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-center">
+            <Link
+              href="/"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Home
+            </Link>
+            <Link
+              href="/predictions"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Predictions
+            </Link>
+            <Link
+              href="/legal"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Legal & Disclaimer
+            </Link>
+          </div>
+        </footer>
       </div>
     </main>
   );
