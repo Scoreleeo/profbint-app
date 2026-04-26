@@ -107,13 +107,53 @@ function ProbabilityBar({
 }
 
 function getDrawPredictionLabel(match: PredictionMatch) {
-  const firstDrawScore = match.prediction.likelyScores.find((item) => {
-    const parts = item.score.split("-").map((part) => Number(part.trim()));
-    return parts.length === 2 && parts[0] === parts[1];
+  const drawProbability = match.prediction.probabilities.draw;
+  const homeProbability = match.prediction.probabilities.home;
+  const awayProbability = match.prediction.probabilities.away;
+  const homeAwayGap = Math.abs(homeProbability - awayProbability);
+
+  const hasNoScoreDraw = match.prediction.likelyScores.some((item) => {
+    return item.score.trim() === "0-0";
   });
 
-  if (firstDrawScore?.score === "0-0") {
+  const hasLowScoreDraw = match.prediction.likelyScores.some((item) => {
+    const parts = item.score.split("-").map((part) => Number(part.trim()));
+    return (
+      parts.length === 2 &&
+      parts[0] === parts[1] &&
+      parts[0] <= 1 &&
+      parts[1] <= 1
+    );
+  });
+
+  const hasHighScoreDraw = match.prediction.likelyScores.some((item) => {
+    const parts = item.score.split("-").map((part) => Number(part.trim()));
+    return (
+      parts.length === 2 &&
+      parts[0] === parts[1] &&
+      parts[0] >= 2 &&
+      parts[1] >= 2
+    );
+  });
+
+  if (hasNoScoreDraw) {
     return "No Score Draw";
+  }
+
+  if (hasHighScoreDraw) {
+    return "Score Draw";
+  }
+
+  if (hasLowScoreDraw && drawProbability >= 24) {
+    return "No Score Draw";
+  }
+
+  if (drawProbability >= 26 && homeAwayGap <= 10) {
+    return "No Score Draw";
+  }
+
+  if (drawProbability >= 30) {
+    return "Score Draw";
   }
 
   return "Score Draw";
@@ -189,8 +229,8 @@ function getBestOptions(match: PredictionMatch): PredictionOption[] {
   const secondary = sortedOptions[1];
 
   const shouldShowSecondOption =
-    secondary.probability >= 24 ||
-    primary.probability - secondary.probability <= 14 ||
+    secondary.probability >= 22 ||
+    primary.probability - secondary.probability <= 16 ||
     secondary.type === "draw";
 
   if (shouldShowSecondOption) {
@@ -269,6 +309,18 @@ function buildMatchInsights(match: PredictionMatch, options: PredictionOption[])
   } else {
     generatedInsights.push(
       "Draw risk is relatively controlled compared with the win probabilities."
+    );
+  }
+
+  if (options.some((option) => option.label === "No Score Draw")) {
+    generatedInsights.push(
+      "No score draw appears when the model sees a tight match with meaningful draw risk and limited separation between both sides."
+    );
+  }
+
+  if (options.some((option) => option.label === "Score Draw")) {
+    generatedInsights.push(
+      "Score draw appears when the draw is relevant but the match profile suggests a better chance of both teams contributing."
     );
   }
 
@@ -521,7 +573,10 @@ function PredictionCard({
 
         <div className="grid min-w-0 gap-2 pt-1 sm:grid-cols-2">
           {bestOptions.map((option, index) => (
-            <div key={`${option.label}-${index}`} className="rounded-lg bg-black/20 px-3 py-2">
+            <div
+              key={`${option.label}-${index}`}
+              className="rounded-lg bg-black/20 px-3 py-2"
+            >
               <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                 {index === 0 ? "Primary" : "Backup"}
               </div>
