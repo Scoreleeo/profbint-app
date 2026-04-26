@@ -96,7 +96,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-3xl border border-white/10 bg-[#111827] shadow-xl">
+    <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#111827] shadow-xl sm:rounded-3xl">
       <div className="border-b border-white/10 px-4 py-4 sm:px-5">
         <h2 className="text-lg font-bold text-white sm:text-xl">{title}</h2>
       </div>
@@ -166,14 +166,14 @@ function LiveTicker({
         ];
 
   return (
-    <div className="sticky top-0 z-50 w-full overflow-hidden border-b border-red-400/20 bg-[#09111d]/95 backdrop-blur">
-      <div className="flex min-w-0 items-center gap-3 px-3 py-2 sm:gap-4 sm:px-4">
-        <div className="shrink-0 rounded-full bg-red-500 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white sm:text-xs">
+    <div className="sticky top-0 z-50 w-full max-w-full overflow-hidden border-b border-red-400/20 bg-[#09111d]/95 backdrop-blur">
+      <div className="flex min-w-0 max-w-full items-center gap-2 px-3 py-2 sm:gap-4 sm:px-4">
+        <div className="shrink-0 rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:px-3 sm:text-xs">
           Live
         </div>
 
-        <div className="relative min-w-0 flex-1 overflow-hidden">
-          <div className="ticker-track flex min-w-max items-center gap-5 sm:gap-8">
+        <div className="relative min-w-0 max-w-full flex-1 overflow-hidden">
+          <div className="ticker-track flex min-w-max items-center gap-4 sm:gap-8">
             {items.map((match, index) => {
               const isFlashing =
                 match.fixtureId !== 0 && flashingIds.includes(match.fixtureId);
@@ -181,27 +181,27 @@ function LiveTicker({
               return (
                 <div
                   key={`${match.fixtureId}-${index}`}
-                  className="flex max-w-[92vw] shrink-0 items-center gap-2 rounded-lg px-1 py-1 text-xs text-white sm:max-w-none sm:gap-3 sm:px-2 sm:text-sm"
+                  className="flex max-w-[86vw] shrink-0 items-center gap-1.5 rounded-lg px-1 py-1 text-[11px] text-white sm:max-w-none sm:gap-3 sm:px-2 sm:text-sm"
                 >
-                  <span className="max-w-[90px] truncate text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:max-w-[160px] sm:text-xs">
+                  <span className="max-w-[72px] truncate text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:max-w-[160px] sm:text-xs">
                     {match.leagueName}
                   </span>
 
                   {match.fixtureId !== 0 ? (
                     <>
-                      <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                      <div className="flex min-w-0 items-center gap-1 sm:gap-2">
                         <TeamLogo
                           src={match.homeLogo}
                           alt={match.homeTeam}
-                          size={18}
+                          size={16}
                         />
-                        <span className="max-w-[76px] truncate font-medium sm:max-w-[150px]">
+                        <span className="max-w-[58px] truncate font-medium sm:max-w-[150px]">
                           {match.homeTeam}
                         </span>
                       </div>
 
                       <span
-                        className={`rounded-lg px-2 py-1 text-[11px] font-bold whitespace-nowrap transition sm:text-xs ${
+                        className={`rounded-lg px-1.5 py-1 text-[10px] font-bold whitespace-nowrap transition sm:px-2 sm:text-xs ${
                           isFlashing
                             ? "bg-red-500 text-white ticker-score-flash"
                             : "bg-white text-slate-950"
@@ -210,23 +210,23 @@ function LiveTicker({
                         {match.goals.home ?? 0} - {match.goals.away ?? 0}
                       </span>
 
-                      <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
-                        <span className="max-w-[76px] truncate font-medium sm:max-w-[150px]">
+                      <div className="flex min-w-0 items-center gap-1 sm:gap-2">
+                        <span className="max-w-[58px] truncate font-medium sm:max-w-[150px]">
                           {match.awayTeam}
                         </span>
                         <TeamLogo
                           src={match.awayLogo}
                           alt={match.awayTeam}
-                          size={18}
+                          size={16}
                         />
                       </div>
 
-                      <span className="text-[11px] font-semibold whitespace-nowrap text-red-400 sm:text-xs">
+                      <span className="text-[10px] font-semibold whitespace-nowrap text-red-400 sm:text-xs">
                         {match.elapsed ? `${match.elapsed}'` : "LIVE"}
                       </span>
                     </>
                   ) : (
-                    <span className="text-slate-300">
+                    <span className="truncate text-slate-300">
                       No live matches right now. Check back soon.
                     </span>
                   )}
@@ -320,26 +320,26 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-[#0b1220] text-white">
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
       <LiveTicker matches={data?.live || []} />
 
       <div className="border-b border-white/10 bg-[#08101c]">
-        <div className="mx-auto max-w-7xl px-4 py-5 sm:py-6 md:px-6 lg:px-8">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
+        <div className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
+          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
             Live Football Centre
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] shadow-2xl sm:rounded-[32px]">
-          <div className="grid gap-6 px-4 py-6 sm:px-6 sm:py-8 md:px-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
+      <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
+        <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] shadow-2xl sm:rounded-[32px]">
+          <div className="grid gap-5 px-4 py-6 sm:gap-6 sm:px-6 sm:py-8 md:px-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
             <div className="min-w-0">
-              <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-red-300 sm:text-xs">
+              <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-red-300 sm:text-xs">
                 Matchday coverage
               </div>
 
-              <h1 className="text-2xl font-black tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+              <h1 className="break-words text-2xl font-black tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
                 Pro Football Intel
               </h1>
 
@@ -348,7 +348,7 @@ export default function HomePage() {
                 predictions across Europe’s top leagues.
               </p>
 
-              <div className="mt-6 grid gap-3 sm:flex sm:flex-wrap">
+              <div className="mt-5 grid gap-3 sm:mt-6 sm:flex sm:flex-wrap">
                 <Link
                   href="/predictions"
                   className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
@@ -365,7 +365,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid min-w-0 grid-cols-2 gap-3">
               <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   League
@@ -375,14 +375,14 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Season
                 </div>
                 <div className="mt-2 text-sm font-bold sm:text-lg">{SEASON}</div>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Live Games
                 </div>
@@ -403,7 +403,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mt-5 rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-4 sm:mt-6 sm:p-5">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-4 sm:mt-6 sm:p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-wide text-red-300">
@@ -427,12 +427,12 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mt-5 overflow-hidden rounded-3xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:mt-6">
+        <section className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:mt-6 sm:rounded-3xl">
           <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
             Select competition
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:pb-0">
+          <div className="flex max-w-full gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:pb-0">
             {TOP_EURO_LEAGUES.map((league) => {
               const active = league.id === leagueId;
 
@@ -455,7 +455,7 @@ export default function HomePage() {
         </section>
 
         {loading ? (
-          <section className="mt-5 rounded-3xl border border-white/10 bg-[#111827] p-5 sm:mt-6 sm:p-6">
+          <section className="mt-5 rounded-2xl border border-white/10 bg-[#111827] p-5 sm:mt-6 sm:rounded-3xl sm:p-6">
             <div className="text-slate-300">
               Loading {selectedLeague.name} data...
             </div>
@@ -463,7 +463,7 @@ export default function HomePage() {
         ) : null}
 
         {error ? (
-          <section className="mt-5 rounded-3xl border border-red-400/20 bg-red-500/10 p-5 sm:mt-6 sm:p-6">
+          <section className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 p-5 sm:mt-6 sm:rounded-3xl sm:p-6">
             <div className="font-semibold text-red-200">{error}</div>
           </section>
         ) : null}
@@ -471,15 +471,17 @@ export default function HomePage() {
         {!loading && data ? (
           <>
             <section className="mt-5 sm:mt-6">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-lg font-bold sm:text-xl">Live Matches</h2>
+              <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
+                <h2 className="min-w-0 truncate text-lg font-bold sm:text-xl">
+                  Live Matches
+                </h2>
                 <span className="shrink-0 text-sm font-semibold text-red-400">
                   {data.live.length} LIVE
                 </span>
               </div>
 
               {data.live.length === 0 ? (
-                <div className="rounded-3xl border border-white/10 bg-[#111827] p-5 text-slate-300">
+                <div className="rounded-2xl border border-white/10 bg-[#111827] p-5 text-slate-300 sm:rounded-3xl">
                   No live matches right now.
                 </div>
               ) : (
@@ -489,7 +491,7 @@ export default function HomePage() {
                       key={match.fixtureId}
                       className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-4 shadow-lg transition hover:border-red-400/40"
                     >
-                      <div className="mb-2 flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide">
+                      <div className="mb-2 flex min-w-0 items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide">
                         <span className="min-w-0 truncate text-slate-400">
                           {match.leagueName}
                         </span>
@@ -498,7 +500,7 @@ export default function HomePage() {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+                      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
                         <div className="flex min-w-0 items-center gap-2">
                           <TeamLogo src={match.homeLogo} alt={match.homeTeam} />
                           <span className="min-w-0 truncate text-sm font-semibold sm:text-base">
@@ -506,7 +508,7 @@ export default function HomePage() {
                           </span>
                         </div>
 
-                        <div className="min-w-[58px] rounded-xl bg-white px-2 py-2 text-center text-xs font-black leading-none whitespace-nowrap text-slate-950 sm:min-w-[64px] sm:px-3 sm:text-sm">
+                        <div className="min-w-[52px] rounded-xl bg-white px-2 py-2 text-center text-xs font-black leading-none whitespace-nowrap text-slate-950 sm:min-w-[64px] sm:px-3 sm:text-sm">
                           {match.goals.home ?? 0} - {match.goals.away ?? 0}
                         </div>
 
@@ -523,7 +525,7 @@ export default function HomePage() {
               )}
             </section>
 
-            <div className="mt-5 grid gap-5 sm:mt-6 lg:grid-cols-2">
+            <div className="mt-5 grid min-w-0 gap-5 sm:mt-6 lg:grid-cols-2">
               <SectionCard title="Standings">
                 {data.standings.length === 0 ? (
                   <p className="text-slate-300">
@@ -576,7 +578,7 @@ export default function HomePage() {
                           {match.leagueName}
                         </div>
 
-                        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+                        <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
                           <div className="flex min-w-0 items-center gap-2">
                             <TeamLogo
                               src={match.homeLogo}
@@ -602,7 +604,7 @@ export default function HomePage() {
                           </div>
                         </div>
 
-                        <div className="mt-2 text-sm text-slate-300">
+                        <div className="mt-2 truncate text-sm text-slate-300">
                           {formatDate(match.date)}
                         </div>
                       </Link>
@@ -630,7 +632,7 @@ export default function HomePage() {
                           {match.leagueName}
                         </div>
 
-                        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+                        <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
                           <div className="flex min-w-0 items-center gap-2">
                             <TeamLogo
                               src={match.homeLogo}
@@ -641,7 +643,7 @@ export default function HomePage() {
                             </span>
                           </div>
 
-                          <span className="min-w-[58px] rounded-xl bg-slate-950 px-2 py-2 text-center text-xs font-black leading-none whitespace-nowrap sm:min-w-[64px] sm:px-3 sm:text-sm">
+                          <span className="min-w-[52px] rounded-xl bg-slate-950 px-2 py-2 text-center text-xs font-black leading-none whitespace-nowrap sm:min-w-[64px] sm:px-3 sm:text-sm">
                             {match.goals.home ?? 0} - {match.goals.away ?? 0}
                           </span>
 
@@ -672,7 +674,7 @@ export default function HomePage() {
                   <div className="space-y-5">
                     <div className="mb-1 flex items-center gap-2">
                       <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500"></div>
-                      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-red-400">
+                      <span className="text-xs font-semibold uppercase tracking-[0.18em] text-red-400 sm:tracking-[0.2em]">
                         Live Updates
                       </span>
                     </div>
@@ -682,12 +684,12 @@ export default function HomePage() {
                       const kind = article.kind?.toLowerCase() || "news";
 
                       const cardClasses = isFeatured
-                        ? "block overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] p-5 shadow-lg transition hover:border-red-400/30 hover:bg-white/[0.04] sm:p-7 md:p-8"
+                        ? "block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] p-5 shadow-lg transition hover:border-red-400/30 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-7 md:p-8"
                         : "block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-white/20 hover:bg-white/10 sm:p-5";
 
                       const titleClasses = isFeatured
-                        ? "mt-4 max-w-4xl text-2xl font-black leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl"
-                        : "mt-2 text-lg font-bold leading-tight text-white md:text-xl";
+                        ? "mt-4 max-w-4xl break-words text-xl font-black leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl"
+                        : "mt-2 break-words text-lg font-bold leading-tight text-white md:text-xl";
 
                       const summaryClasses = isFeatured
                         ? "mt-4 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base md:text-lg md:leading-7"
@@ -704,7 +706,7 @@ export default function HomePage() {
                               {kind}
                             </span>
 
-                            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+                            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 sm:tracking-[0.22em]">
                               {article.source || "Football News"}
                             </span>
                           </div>
