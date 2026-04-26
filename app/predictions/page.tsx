@@ -166,9 +166,9 @@ function getPredictionAccentByType(type: PredictionOption["type"]) {
 }
 
 function getPredictionBadgeByType(type: PredictionOption["type"]) {
-  if (type === "home") return "bg-green-500/15 text-green-300";
-  if (type === "away") return "bg-blue-500/15 text-blue-300";
-  return "bg-yellow-500/15 text-yellow-300";
+  if (type === "home") return "border-green-400/20 bg-green-500/15 text-green-300";
+  if (type === "away") return "border-blue-400/20 bg-blue-500/15 text-blue-300";
+  return "border-yellow-400/20 bg-yellow-500/15 text-yellow-300";
 }
 
 function getPredictionBorderByType(type: PredictionOption["type"]) {
@@ -242,6 +242,35 @@ function getBestOptions(match: PredictionMatch): PredictionOption[] {
 
 function buildOptionsLabel(options: PredictionOption[]) {
   return options.map((option) => option.label).join(" / ");
+}
+
+function PredictionOptionPills({
+  options,
+}: {
+  options: PredictionOption[];
+}) {
+  return (
+    <div className="mt-1 flex min-w-0 max-w-full items-center gap-1 overflow-hidden whitespace-nowrap">
+      {options.map((option, index) => (
+        <div
+          key={`${option.label}-${index}`}
+          className="flex min-w-0 items-center gap-1"
+        >
+          <span
+            className={`inline-flex shrink min-w-0 max-w-[128px] items-center justify-center truncate rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-wide sm:max-w-[150px] sm:px-2.5 sm:text-[11px] ${getPredictionBadgeByType(
+              option.type
+            )}`}
+          >
+            {option.label}
+          </span>
+
+          {index < options.length - 1 ? (
+            <span className="shrink-0 text-xs font-black text-slate-500">/</span>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function buildMatchInsights(match: PredictionMatch, options: PredictionOption[]) {
@@ -523,8 +552,6 @@ function PredictionCard({
 }) {
   const bestOptions = getBestOptions(match);
   const primaryOption = bestOptions[0];
-  const predictionLabel = buildOptionsLabel(bestOptions);
-  const predictionAccent = getPredictionAccentByType(primaryOption.type);
   const predictionBorder = getPredictionBorderByType(primaryOption.type);
   const matchInsights = buildMatchInsights(match, bestOptions);
 
@@ -559,13 +586,11 @@ function PredictionCard({
 
       <div className={`mt-4 space-y-3 rounded-xl border p-3 text-sm ${predictionBorder}`}>
         <div className="flex min-w-0 items-center justify-between gap-3">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="text-[11px] uppercase tracking-wide text-slate-400">
               Best options
             </div>
-            <div className={`break-words text-lg font-black sm:text-xl ${predictionAccent}`}>
-              {predictionLabel}
-            </div>
+            <PredictionOptionPills options={bestOptions} />
           </div>
 
           <ConfidenceBadge confidence={match.prediction.confidence} />
