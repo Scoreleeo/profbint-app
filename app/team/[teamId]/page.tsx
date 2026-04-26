@@ -64,8 +64,28 @@ export default async function TeamPage({ params, searchParams }: Props) {
 
   const data = await getTeamFixtures(parsedTeamId, leagueId, season);
 
-  const teamName = query.name || "Team fixtures";
-const teamLogo = query.logo || undefined;
+  const firstMatch = data.matches[0];
+
+const teamMatch = data.matches.find((match) => {
+  return (
+    String(match.homeTeamId) === String(parsedTeamId) ||
+    String(match.awayTeamId) === String(parsedTeamId)
+  );
+});
+
+const teamName =
+  teamMatch && String(teamMatch.homeTeamId) === String(parsedTeamId)
+    ? teamMatch.homeTeam
+    : teamMatch && String(teamMatch.awayTeamId) === String(parsedTeamId)
+      ? teamMatch.awayTeam
+      : firstMatch?.homeTeam || firstMatch?.awayTeam || "Team fixtures";
+
+const teamLogo =
+  teamMatch && String(teamMatch.homeTeamId) === String(parsedTeamId)
+    ? teamMatch.homeLogo
+    : teamMatch && String(teamMatch.awayTeamId) === String(parsedTeamId)
+      ? teamMatch.awayLogo
+      : undefined;
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
