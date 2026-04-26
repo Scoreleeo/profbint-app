@@ -63,6 +63,23 @@ function TeamBadge({
   );
 }
 
+function formatUKDateTime(value: string) {
+  try {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/London",
+      weekday: "short",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
 export default async function MatchPage({ params }: Props) {
   const { fixtureId } = await params;
 
@@ -110,14 +127,16 @@ export default async function MatchPage({ params }: Props) {
 
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-4 md:gap-6">
               <TeamBadge name={detail.homeTeam} logo={detail.homeLogo} />
-              <div className="max-w-[116px] rounded-2xl border border-white/10 bg-white/5 px-2.5 py-3 text-center sm:max-w-none sm:px-6 sm:py-4">
+
+              <div className="max-w-[128px] rounded-2xl border border-white/10 bg-white/5 px-2.5 py-3 text-center sm:max-w-none sm:px-6 sm:py-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Kickoff
                 </div>
-                <div className="mt-2 text-xs font-black sm:text-lg">
-                  {new Date(detail.date).toLocaleString()}
+                <div className="mt-2 text-xs font-black leading-5 sm:text-lg">
+                  {formatUKDateTime(detail.date)}
                 </div>
               </div>
+
               <TeamBadge
                 name={detail.awayTeam}
                 logo={detail.awayLogo}
