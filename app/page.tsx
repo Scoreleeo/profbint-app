@@ -536,7 +536,7 @@ export default function HomePage() {
                     {data.standings.map((row) => (
                       <Link
   key={row.teamId}
-  href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}`}
+  href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}`}
   className="flex min-h-[60px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
 >
                         <div className="flex min-w-0 items-center gap-3">

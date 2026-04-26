@@ -64,11 +64,8 @@ export default async function TeamPage({ params, searchParams }: Props) {
 
   const data = await getTeamFixtures(parsedTeamId, leagueId, season);
 
-  const firstMatch = data.matches[0];
-  const teamName =
-    firstMatch?.homeTeam || firstMatch?.awayTeam || "Team fixtures";
-  const teamLogo =
-    firstMatch?.homeTeam === teamName ? firstMatch?.homeLogo : firstMatch?.awayLogo;
+  const teamName = query.name || "Team fixtures";
+const teamLogo = query.logo || undefined;
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
