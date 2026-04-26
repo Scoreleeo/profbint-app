@@ -49,7 +49,7 @@ function TeamLogo({
   alt: string;
 }) {
   if (!src) {
-    return <div className="h-6 w-6 rounded-full bg-white/10" />;
+    return <div className="h-6 w-6 shrink-0 rounded-full bg-white/10" />;
   }
 
   return (
@@ -79,7 +79,7 @@ function ConfidenceBadge({ confidence }: { confidence: number }) {
 
   return (
     <span
-      className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${styles}`}
+      className={`inline-flex shrink-0 rounded-full border px-2 py-1 text-xs font-semibold ${styles}`}
     >
       {label}
     </span>
@@ -96,12 +96,12 @@ function ProbabilityBar({
   barClassName: string;
 }) {
   return (
-    <div>
-      <div className="mb-1 flex justify-between text-xs">
-        <span>{label}</span>
-        <span>{value}%</span>
+    <div className="min-w-0">
+      <div className="mb-1 flex min-w-0 justify-between gap-3 text-xs">
+        <span className="min-w-0 truncate">{label}</span>
+        <span className="shrink-0">{value}%</span>
       </div>
-      <div className="h-2 rounded-full bg-white/10">
+      <div className="h-2 overflow-hidden rounded-full bg-white/10">
         <div
           className={`h-2 rounded-full ${barClassName}`}
           style={{ width: `${value}%` }}
@@ -132,7 +132,7 @@ function ValueBadge({
 }) {
   if (valueLabel === "STRONG_VALUE") {
     return (
-      <span className="rounded-full bg-green-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-green-300">
+      <span className="shrink-0 rounded-full bg-green-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-green-300">
         Strong Value {edge !== null && edge !== undefined ? `+${edge}%` : ""}
       </span>
     );
@@ -140,7 +140,7 @@ function ValueBadge({
 
   if (valueLabel === "SMALL_VALUE") {
     return (
-      <span className="rounded-full bg-yellow-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-yellow-300">
+      <span className="shrink-0 rounded-full bg-yellow-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-yellow-300">
         Small Value {edge !== null && edge !== undefined ? `+${edge}%` : ""}
       </span>
     );
@@ -148,14 +148,14 @@ function ValueBadge({
 
   if (valueLabel === "NO_ODDS") {
     return (
-      <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300">
+      <span className="shrink-0 rounded-full bg-white/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300">
         No Odds
       </span>
     );
   }
 
   return (
-    <span className="rounded-full bg-slate-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300">
+    <span className="shrink-0 rounded-full bg-slate-500/15 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-300">
       No Value
     </span>
   );
@@ -187,14 +187,14 @@ export default function PredictionsPage() {
   }, [leagueId]);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#0b1220] p-6 text-white">
-      <div className="mx-auto max-w-7xl space-y-6">
-        <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] p-6 shadow-2xl">
-          <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-red-300">
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] px-3 py-5 text-white sm:px-4 sm:py-6 md:px-6">
+      <div className="mx-auto w-full max-w-7xl space-y-5 overflow-x-hidden sm:space-y-6">
+        <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] p-4 shadow-2xl sm:rounded-3xl sm:p-6">
+          <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-red-300 sm:text-xs">
             Premium insights
           </div>
 
-          <h1 className="text-4xl font-black tracking-tight">
+          <h1 className="break-words text-2xl font-black tracking-tight sm:text-3xl md:text-4xl">
             Pro Football Intel — Predictions
           </h1>
 
@@ -211,12 +211,12 @@ export default function PredictionsPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-white/10 bg-[#101826] p-4 shadow-xl">
+        <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:rounded-3xl">
           <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
             Select competition
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex max-w-full gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:pb-0">
             {TOP_EURO_LEAGUES.map((league) => {
               const active = league.id === leagueId;
 
@@ -225,7 +225,7 @@ export default function PredictionsPage() {
                   key={league.id}
                   onClick={() => setLeagueId(league.id)}
                   className={[
-                    "rounded-xl px-4 py-2 text-sm font-semibold transition",
+                    "shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition",
                     active
                       ? "bg-[#d90429] text-white shadow-lg"
                       : "border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10",
@@ -238,38 +238,42 @@ export default function PredictionsPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-white/10 bg-[#111827] p-4">
+        <section className="grid min-w-0 gap-4 md:grid-cols-3">
+          <div className="min-w-0 rounded-2xl border border-white/10 bg-[#111827] p-4">
             <div className="text-xs uppercase tracking-wide text-slate-400">
               Model status
             </div>
-            <div className="mt-2 text-lg font-bold">Value betting mode</div>
+            <div className="mt-2 text-base font-bold sm:text-lg">
+              Value betting mode
+            </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-[#111827] p-4">
+          <div className="min-w-0 rounded-2xl border border-white/10 bg-[#111827] p-4">
             <div className="text-xs uppercase tracking-wide text-slate-400">
               Prediction type
             </div>
-            <div className="mt-2 text-lg font-bold">
+            <div className="mt-2 text-base font-bold sm:text-lg">
               Outcome + score value
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-[#111827] p-4">
+          <div className="min-w-0 rounded-2xl border border-white/10 bg-[#111827] p-4">
             <div className="text-xs uppercase tracking-wide text-slate-400">
               Access
             </div>
-            <div className="mt-2 text-lg font-bold">All unlocked</div>
+            <div className="mt-2 text-base font-bold sm:text-lg">
+              All unlocked
+            </div>
           </div>
         </section>
 
         {loading ? (
-          <div className="rounded-3xl border border-white/10 bg-[#111827] p-6">
+          <div className="rounded-2xl border border-white/10 bg-[#111827] p-5 sm:rounded-3xl sm:p-6">
             <p className="text-slate-300">Loading predictions...</p>
           </div>
         ) : (
           <>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {matches.map((match) => (
                 <PredictionCard key={match.fixtureId} match={match} />
               ))}
@@ -324,24 +328,28 @@ function PredictionCard({
   const scoreMarkets = match.prediction.scoreMarkets || [];
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#111827] p-4 shadow-xl">
-      <div className="mb-2 flex items-center justify-between gap-3 text-sm text-slate-400">
-        <span>{match.league}</span>
-        <span>{new Date(match.date).toLocaleString()}</span>
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#111827] p-4 shadow-xl">
+      <div className="mb-2 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <span className="min-w-0 truncate">{match.league}</span>
+        <span className="shrink-0 text-xs sm:text-sm">
+          {new Date(match.date).toLocaleString()}
+        </span>
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
         <div className="flex min-w-0 items-center gap-2">
           <TeamLogo src={match.homeLogo} alt={match.home} />
-          <span className="truncate font-semibold">{match.home}</span>
+          <span className="min-w-0 truncate text-sm font-semibold sm:text-base">
+            {match.home}
+          </span>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold uppercase text-slate-300">
+        <div className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-2 text-xs font-semibold uppercase text-slate-300 sm:px-3">
           vs
         </div>
 
         <div className="flex min-w-0 items-center justify-end gap-2">
-          <span className="truncate text-right font-semibold">
+          <span className="min-w-0 truncate text-right text-sm font-semibold sm:text-base">
             {match.away}
           </span>
           <TeamLogo src={match.awayLogo} alt={match.away} />
@@ -349,12 +357,12 @@ function PredictionCard({
       </div>
 
       <div className="mt-4 space-y-3 rounded-xl border border-green-400/20 bg-green-500/10 p-3 text-sm">
-        <div className="flex items-center justify-between gap-3">
-          <div>
+        <div className="flex min-w-0 items-center justify-between gap-3">
+          <div className="min-w-0">
             <div className="text-[11px] uppercase tracking-wide text-slate-400">
               Prediction
             </div>
-            <div className={`text-xl font-black ${predictionAccent}`}>
+            <div className={`truncate text-lg font-black sm:text-xl ${predictionAccent}`}>
               {predictionLabel}
             </div>
           </div>
@@ -395,10 +403,10 @@ function PredictionCard({
             {scoreMarkets.map((item, index) => (
               <div
                 key={`${match.fixtureId}-${index}`}
-                className="rounded-lg bg-black/20 px-3 py-3"
+                className="min-w-0 rounded-lg bg-black/20 px-3 py-3"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-lg font-bold text-white">
+                <div className="flex min-w-0 items-center justify-between gap-3">
+                  <div className="min-w-0 truncate text-lg font-bold text-white">
                     {item.score}
                   </div>
                   <ValueBadge
@@ -407,14 +415,18 @@ function PredictionCard({
                   />
                 </div>
 
-                <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-slate-300">
-                  <div>
-                    <div className="text-slate-500">Model probability</div>
+                <div className="mt-2 grid min-w-0 grid-cols-2 gap-2 text-xs text-slate-300">
+                  <div className="min-w-0">
+                    <div className="truncate text-slate-500">
+                      Model probability
+                    </div>
                     <div>{item.modelProbability}%</div>
                   </div>
 
-                  <div>
-                    <div className="text-slate-500">Market probability</div>
+                  <div className="min-w-0">
+                    <div className="truncate text-slate-500">
+                      Market probability
+                    </div>
                     <div>
                       {item.marketProbability !== null &&
                       item.marketProbability !== undefined
@@ -423,8 +435,8 @@ function PredictionCard({
                     </div>
                   </div>
 
-                  <div>
-                    <div className="text-slate-500">Best odds</div>
+                  <div className="min-w-0">
+                    <div className="truncate text-slate-500">Best odds</div>
                     <div>
                       {item.odds !== null && item.odds !== undefined
                         ? item.odds
@@ -432,9 +444,9 @@ function PredictionCard({
                     </div>
                   </div>
 
-                  <div>
-                    <div className="text-slate-500">Bookmaker</div>
-                    <div>{item.bookmaker || "—"}</div>
+                  <div className="min-w-0">
+                    <div className="truncate text-slate-500">Bookmaker</div>
+                    <div className="truncate">{item.bookmaker || "—"}</div>
                   </div>
                 </div>
               </div>
@@ -449,7 +461,10 @@ function PredictionCard({
 
           <ul className="space-y-2 text-xs text-slate-200">
             {match.prediction.insights.map((insight, index) => (
-              <li key={index} className="rounded-lg bg-black/20 px-3 py-2">
+              <li
+                key={index}
+                className="break-words rounded-lg bg-black/20 px-3 py-2"
+              >
                 {insight}
               </li>
             ))}
