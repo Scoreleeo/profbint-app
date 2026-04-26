@@ -19,6 +19,14 @@ export async function fetchFixturesRaw(
   return apiFootballFetch<any>("/fixtures", params, 90);
 }
 
+export async function fetchTeamFixturesRaw(
+  team: number,
+  league: number,
+  season: number
+) {
+  return apiFootballFetch<any>("/fixtures", { team, league, season }, 90);
+}
+
 export async function fetchLiveRaw() {
   return apiFootballFetch<any>("/fixtures", { live: "all" }, 15);
 }

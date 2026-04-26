@@ -534,10 +534,11 @@ export default function HomePage() {
                 ) : (
                   <div className="space-y-3">
                     {data.standings.map((row) => (
-                      <div
-                        key={row.teamId}
-                        className="flex min-h-[60px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3"
-                      >
+                      <Link
+  key={row.teamId}
+  href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}`}
+  className="flex min-h-[60px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
+>
                         <div className="flex min-w-0 items-center gap-3">
                           <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
                             {row.rank}
@@ -555,7 +556,7 @@ export default function HomePage() {
                             • GD {row.goalDiff}
                           </span>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}

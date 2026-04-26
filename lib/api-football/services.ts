@@ -13,6 +13,7 @@ import {
   fetchFixturesRaw,
   fetchLiveRaw,
   fetchStandingsRaw,
+  fetchTeamFixturesRaw,
   fetchTeamInjuriesRaw,
   fetchTransfersRaw,
 } from "./queries";
@@ -55,6 +56,29 @@ export async function getDashboardData(leagueId: number, season: number) {
 export async function getLiveMatches() {
   const raw = await fetchLiveRaw();
   return mapFixturesResponse(raw);
+}
+
+export async function getTeamFixtures(
+  teamId: number,
+  leagueId: number,
+  season: number
+) {
+  const raw = await fetchTeamFixturesRaw(teamId, leagueId, season);
+  const matches = mapFixturesResponse(raw);
+
+  const results = matches.filter((match) =>
+    ["FT", "AET", "PEN"].includes(match.status)
+  );
+
+  const fixtures = matches.filter(
+    (match) => !["FT", "AET", "PEN"].includes(match.status)
+  );
+
+  return {
+    matches,
+    results,
+    fixtures,
+  };
 }
 
 export async function getFixtureDetail(fixtureId: number) {
