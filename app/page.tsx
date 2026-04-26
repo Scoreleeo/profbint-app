@@ -88,6 +88,37 @@ function TeamLogo({
   );
 }
 
+function FormPills({ form }: { form?: string }) {
+  if (!form) {
+    return null;
+  }
+
+  return (
+    <div className="mt-1 flex min-w-0 items-center gap-1">
+      {form
+        .slice(-5)
+        .split("")
+        .map((result, index) => {
+          const styles =
+            result === "W"
+              ? "bg-green-500/20 text-green-300"
+              : result === "D"
+                ? "bg-yellow-500/20 text-yellow-300"
+                : "bg-red-500/20 text-red-300";
+
+          return (
+            <span
+              key={`${result}-${index}`}
+              className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${styles}`}
+            >
+              {result}
+            </span>
+          );
+        })}
+    </div>
+  );
+}
+
 function SectionCard({
   title,
   children,
@@ -535,18 +566,21 @@ export default function HomePage() {
                   <div className="space-y-3">
                     {data.standings.map((row) => (
                       <Link
-  key={row.teamId}
-  href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}`}
-  className="flex min-h-[60px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
->
+                        key={row.teamId}
+                        href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
+                        className="flex min-h-[68px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
+                      >
                         <div className="flex min-w-0 items-center gap-3">
                           <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
                             {row.rank}
                           </span>
                           <TeamLogo src={row.logo} alt={row.team} />
-                          <span className="min-w-0 truncate text-sm font-semibold sm:text-base">
-                            {row.team}
-                          </span>
+                          <div className="min-w-0">
+                            <span className="block min-w-0 truncate text-sm font-semibold sm:text-base">
+                              {row.team}
+                            </span>
+                            <FormPills form={row.form} />
+                          </div>
                         </div>
 
                         <div className="shrink-0 text-right text-xs text-slate-300 sm:text-sm">

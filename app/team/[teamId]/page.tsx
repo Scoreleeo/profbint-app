@@ -11,6 +11,9 @@ type Props = {
   searchParams: Promise<{
     league?: string;
     season?: string;
+    name?: string;
+    logo?: string;
+    form?: string;
   }>;
 };
 
@@ -34,6 +37,43 @@ function TeamLogo({
         sizes="32px"
         className="object-contain p-1"
       />
+    </div>
+  );
+}
+
+function FormPills({ form }: { form?: string }) {
+  if (!form) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-2">
+      <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        Recent form
+      </span>
+
+      <div className="flex items-center gap-1">
+        {form
+          .slice(-5)
+          .split("")
+          .map((result, index) => {
+            const styles =
+              result === "W"
+                ? "bg-green-500/20 text-green-300"
+                : result === "D"
+                  ? "bg-yellow-500/20 text-yellow-300"
+                  : "bg-red-500/20 text-red-300";
+
+            return (
+              <span
+                key={`${result}-${index}`}
+                className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black ${styles}`}
+              >
+                {result}
+              </span>
+            );
+          })}
+      </div>
     </div>
   );
 }
@@ -66,26 +106,28 @@ export default async function TeamPage({ params, searchParams }: Props) {
 
   const firstMatch = data.matches[0];
 
-const teamMatch = data.matches.find((match) => {
-  return (
-    String(match.homeTeamId) === String(parsedTeamId) ||
-    String(match.awayTeamId) === String(parsedTeamId)
-  );
-});
+  const teamMatch = data.matches.find((match) => {
+    return (
+      String(match.homeTeamId) === String(parsedTeamId) ||
+      String(match.awayTeamId) === String(parsedTeamId)
+    );
+  });
 
-const teamName =
-  teamMatch && String(teamMatch.homeTeamId) === String(parsedTeamId)
-    ? teamMatch.homeTeam
-    : teamMatch && String(teamMatch.awayTeamId) === String(parsedTeamId)
-      ? teamMatch.awayTeam
-      : firstMatch?.homeTeam || firstMatch?.awayTeam || "Team fixtures";
+  const teamName =
+    query.name ||
+    (teamMatch && String(teamMatch.homeTeamId) === String(parsedTeamId)
+      ? teamMatch.homeTeam
+      : teamMatch && String(teamMatch.awayTeamId) === String(parsedTeamId)
+        ? teamMatch.awayTeam
+        : firstMatch?.homeTeam || firstMatch?.awayTeam || "Team fixtures");
 
-const teamLogo =
-  teamMatch && String(teamMatch.homeTeamId) === String(parsedTeamId)
-    ? teamMatch.homeLogo
-    : teamMatch && String(teamMatch.awayTeamId) === String(parsedTeamId)
-      ? teamMatch.awayLogo
-      : undefined;
+  const teamLogo =
+    query.logo ||
+    (teamMatch && String(teamMatch.homeTeamId) === String(parsedTeamId)
+      ? teamMatch.homeLogo
+      : teamMatch && String(teamMatch.awayTeamId) === String(parsedTeamId)
+        ? teamMatch.awayLogo
+        : undefined);
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
@@ -112,6 +154,8 @@ const teamLogo =
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
             League results and remaining fixtures for {selectedLeague.name}.
           </p>
+
+          <FormPills form={query.form} />
         </div>
       </div>
 
