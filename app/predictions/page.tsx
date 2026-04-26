@@ -5,6 +5,12 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
 
+type PredictionOption = {
+  label: string;
+  probability: number;
+  type: "home" | "draw" | "away";
+};
+
 type PredictionMatch = {
   fixtureId: number;
   home: string;
@@ -113,86 +119,152 @@ function getDrawPredictionLabel(match: PredictionMatch) {
   return "Score Draw";
 }
 
-function getPredictionLabel(match: PredictionMatch) {
-  if (match.prediction.outcome === "HOME_WIN") return "Home Win";
-  if (match.prediction.outcome === "AWAY_WIN") return "Away Win";
-  return getDrawPredictionLabel(match);
-}
-
-function getPredictionAccent(match: PredictionMatch) {
-  if (match.prediction.outcome === "HOME_WIN") return "text-green-300";
-  if (match.prediction.outcome === "AWAY_WIN") return "text-blue-300";
+function getPredictionAccentByType(type: PredictionOption["type"]) {
+  if (type === "home") return "text-green-300";
+  if (type === "away") return "text-blue-300";
   return "text-yellow-300";
 }
 
-function getPredictionBorder(match: PredictionMatch) {
-  if (match.prediction.outcome === "HOME_WIN") {
+function getPredictionBadgeByType(type: PredictionOption["type"]) {
+  if (type === "home") return "bg-green-500/15 text-green-300";
+  if (type === "away") return "bg-blue-500/15 text-blue-300";
+  return "bg-yellow-500/15 text-yellow-300";
+}
+
+function getPredictionBorderByType(type: PredictionOption["type"]) {
+  if (type === "home") {
     return "border-green-400/20 bg-green-500/10";
   }
 
-  if (match.prediction.outcome === "AWAY_WIN") {
+  if (type === "away") {
     return "border-blue-400/20 bg-blue-500/10";
   }
 
   return "border-yellow-400/20 bg-yellow-500/10";
 }
 
-function buildMatchInsights(match: PredictionMatch) {
+function getPredictionLabel(match: PredictionMatch) {
+  if (match.prediction.outcome === "HOME_WIN") return "Home Win";
+  if (match.prediction.outcome === "AWAY_WIN") return "Away Win";
+  return getDrawPredictionLabel(match);
+}
+
+function getPrimaryPredictionType(match: PredictionMatch): PredictionOption["type"] {
+  if (match.prediction.outcome === "HOME_WIN") return "home";
+  if (match.prediction.outcome === "AWAY_WIN") return "away";
+  return "draw";
+}
+
+function getPredictionAccent(match: PredictionMatch) {
+  return getPredictionAccentByType(getPrimaryPredictionType(match));
+}
+
+function getPredictionBorder(match: PredictionMatch) {
+  return getPredictionBorderByType(getPrimaryPredictionType(match));
+}
+
+function getBestOptions(match: PredictionMatch): PredictionOption[] {
+  const drawLabel = getDrawPredictionLabel(match);
+
+  const options: PredictionOption[] = [
+    {
+      label: "Home Win",
+      probability: match.prediction.probabilities.home,
+      type: "home",
+    },
+    {
+      label: drawLabel,
+      probability: match.prediction.probabilities.draw,
+      type: "draw",
+    },
+    {
+      label: "Away Win",
+      probability: match.prediction.probabilities.away,
+      type: "away",
+    },
+  ];
+
+  const sortedOptions = options.sort((a, b) => b.probability - a.probability);
+  const primary = sortedOptions[0];
+  const secondary = sortedOptions[1];
+
+  const shouldShowSecondOption =
+    secondary.probability >= 24 ||
+    primary.probability - secondary.probability <= 14 ||
+    secondary.type === "draw";
+
+  if (shouldShowSecondOption) {
+    return [primary, secondary];
+  }
+
+  return [primary];
+}
+
+function buildOptionsLabel(options: PredictionOption[]) {
+  return options.map((option) => option.label).join(" / ");
+}
+
+function buildMatchInsights(match: PredictionMatch, options: PredictionOption[]) {
   const homeProbability = match.prediction.probabilities.home;
   const drawProbability = match.prediction.probabilities.draw;
   const awayProbability = match.prediction.probabilities.away;
   const confidence = match.prediction.confidence;
-  const predictionLabel = getPredictionLabel(match);
+  const primaryOption = options[0];
+  const secondaryOption = options[1];
 
   const generatedInsights: string[] = [];
 
-  if (match.prediction.outcome === "HOME_WIN") {
+  if (primaryOption.type === "home") {
     generatedInsights.push(
-      `${match.home} are rated as the stronger side, with the model giving them a ${homeProbability}% home win chance.`
+      `${match.home} are the strongest model option, with a ${homeProbability}% home win chance.`
     );
   }
 
-  if (match.prediction.outcome === "AWAY_WIN") {
+  if (primaryOption.type === "away") {
     generatedInsights.push(
-      `${match.away} are rated as the stronger side, with the model giving them a ${awayProbability}% away win chance.`
+      `${match.away} are the strongest model option, with a ${awayProbability}% away win chance.`
     );
   }
 
-  if (match.prediction.outcome === "DRAW") {
+  if (primaryOption.type === "draw") {
     generatedInsights.push(
-      `The model sees this as a draw-leaning match, with the draw probability currently at ${drawProbability}%.`
+      `The draw is the strongest model option, with the draw probability currently at ${drawProbability}%.`
     );
-
-    if (predictionLabel === "No Score Draw") {
-      generatedInsights.push(
-        "The draw profile leans low-scoring, so the safest read is a no score draw rather than guessing an exact result."
-      );
-    } else {
-      generatedInsights.push(
-        "The draw profile suggests both teams may still have scoring opportunities, so this is marked as a score draw."
-      );
-    }
   }
 
-  const gap = Math.abs(homeProbability - awayProbability);
-
-  if (gap <= 8) {
+  if (secondaryOption) {
     generatedInsights.push(
-      "The home and away win probabilities are close, which makes this a higher-variance fixture."
-    );
-  } else if (gap >= 18) {
-    generatedInsights.push(
-      "There is a clear probability gap between the two teams, giving the prediction a stronger directional lean."
+      `${secondaryOption.label} is included as the backup angle because it still carries a meaningful ${secondaryOption.probability}% probability.`
     );
   } else {
     generatedInsights.push(
-      "The probability gap is moderate, so confidence depends more on match context than a heavy favourite."
+      "No second option is shown because the model sees a clearer gap from the strongest outcome."
+    );
+  }
+
+  const homeAwayGap = Math.abs(homeProbability - awayProbability);
+
+  if (homeAwayGap <= 8) {
+    generatedInsights.push(
+      "The home and away win probabilities are close, which makes this a higher-variance fixture."
+    );
+  } else if (homeAwayGap >= 18) {
+    generatedInsights.push(
+      "There is a clear gap between the home and away win probabilities, giving the prediction a stronger direction."
+    );
+  } else {
+    generatedInsights.push(
+      "The home and away gap is moderate, so the second-best option should still be respected."
     );
   }
 
   if (drawProbability >= 30) {
     generatedInsights.push(
-      "Draw risk is meaningful here, so the result should be treated with more caution than a one-sided fixture."
+      "Draw risk is meaningful here, which is why the draw angle is more relevant than guessing an exact score."
+    );
+  } else if (drawProbability >= 24) {
+    generatedInsights.push(
+      "Draw risk is present but not dominant, so it works better as a backup option than the main pick."
     );
   } else {
     generatedInsights.push(
@@ -202,11 +274,11 @@ function buildMatchInsights(match: PredictionMatch) {
 
   if (confidence >= 70) {
     generatedInsights.push(
-      "Confidence is high because the model sees a strong enough probability edge in the selected outcome."
+      "Confidence is high because the model sees enough separation in the strongest option."
     );
   } else if (confidence >= 60) {
     generatedInsights.push(
-      "Confidence is medium, meaning the prediction has a lean but not enough separation to call it a banker."
+      "Confidence is medium, meaning the prediction has a lean but the backup option remains useful."
     );
   } else {
     generatedInsights.push(
@@ -272,8 +344,9 @@ export default function PredictionsPage() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Match predictions focused on outcome direction, draw type, confidence
-            and deeper match insights instead of exact-score guessing.
+            Match predictions focused on the best one or two outcome angles,
+            confidence and deeper match insights instead of exact-score
+            guessing.
           </p>
 
           <div className="mt-2 text-sm text-slate-400">
@@ -326,7 +399,7 @@ export default function PredictionsPage() {
               Prediction type
             </div>
             <div className="mt-2 text-base font-bold sm:text-lg">
-              1X2 + draw type
+              Best 1–2 options
             </div>
           </div>
 
@@ -396,10 +469,12 @@ function PredictionCard({
 }: {
   match: PredictionMatch;
 }) {
-  const predictionLabel = getPredictionLabel(match);
-  const predictionAccent = getPredictionAccent(match);
-  const predictionBorder = getPredictionBorder(match);
-  const matchInsights = buildMatchInsights(match);
+  const bestOptions = getBestOptions(match);
+  const primaryOption = bestOptions[0];
+  const predictionLabel = buildOptionsLabel(bestOptions);
+  const predictionAccent = getPredictionAccentByType(primaryOption.type);
+  const predictionBorder = getPredictionBorderByType(primaryOption.type);
+  const matchInsights = buildMatchInsights(match, bestOptions);
 
   return (
     <div className="min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#111827] p-4 shadow-xl">
@@ -434,9 +509,9 @@ function PredictionCard({
         <div className="flex min-w-0 items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="text-[11px] uppercase tracking-wide text-slate-400">
-              Prediction
+              Best options
             </div>
-            <div className={`truncate text-lg font-black sm:text-xl ${predictionAccent}`}>
+            <div className={`break-words text-lg font-black sm:text-xl ${predictionAccent}`}>
               {predictionLabel}
             </div>
           </div>
@@ -444,26 +519,24 @@ function PredictionCard({
           <ConfidenceBadge confidence={match.prediction.confidence} />
         </div>
 
-        <div className="grid min-w-0 grid-cols-2 gap-2 pt-1">
-          <div className="rounded-lg bg-black/20 px-3 py-2">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-              Draw type
+        <div className="grid min-w-0 gap-2 pt-1 sm:grid-cols-2">
+          {bestOptions.map((option, index) => (
+            <div key={`${option.label}-${index}`} className="rounded-lg bg-black/20 px-3 py-2">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                {index === 0 ? "Primary" : "Backup"}
+              </div>
+              <div
+                className={`mt-1 truncate text-sm font-bold ${getPredictionAccentByType(
+                  option.type
+                )}`}
+              >
+                {option.label}
+              </div>
+              <div className="mt-1 text-xs text-slate-400">
+                {option.probability}% model probability
+              </div>
             </div>
-            <div className="mt-1 truncate text-sm font-bold text-white">
-              {match.prediction.outcome === "DRAW"
-                ? predictionLabel
-                : "Not draw-led"}
-            </div>
-          </div>
-
-          <div className="rounded-lg bg-black/20 px-3 py-2">
-            <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-              Confidence
-            </div>
-            <div className="mt-1 text-sm font-bold text-white">
-              {match.prediction.confidence}%
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="pt-2">
