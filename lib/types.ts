@@ -4,6 +4,8 @@ export type MatchRow = {
   status: string;
   elapsed?: number | null;
   leagueName: string;
+  homeTeamId?: number;
+  awayTeamId?: number;
   homeTeam: string;
   awayTeam: string;
   homeLogo?: string;
@@ -28,18 +30,10 @@ export type StandingRow = {
 export type TeamNewsItem = {
   id: string;
   title: string;
-  summary: string;
-  kind: "injury" | "transfer";
-};
-
-export type NewsItem = {
-  id: string;
-  title: string;
   summary?: string;
   source?: string;
   date?: string;
   link?: string;
-  image?: string;
   kind?: "breaking" | "injury" | "transfer" | "news" | string;
 };
 
@@ -48,8 +42,8 @@ export type DashboardPayload = {
   fixtures: MatchRow[];
   results: MatchRow[];
   live: MatchRow[];
-  teamNews: TeamNewsItem[];
-  news?: NewsItem[];
+  teamNews?: TeamNewsItem[];
+  news?: TeamNewsItem[];
 };
 
 export type FixtureEvent = {
