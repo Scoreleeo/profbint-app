@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
 import { formatUKDateTime } from "@/lib/utils/date";
 
@@ -35,6 +35,11 @@ type PredictionMatch = {
     }>;
     insights: string[];
   };
+};
+
+type DailyPick = {
+  match: PredictionMatch;
+  option: PredictionOption;
 };
 
 function TeamLogo({
@@ -227,6 +232,73 @@ function getBestOptions(match: PredictionMatch): PredictionOption[] {
   return [primary];
 }
 
+function getStrongestOption(match: PredictionMatch): PredictionOption {
+  const drawLabel = getDrawPredictionLabel(match);
+
+  const options: PredictionOption[] = [
+    {
+      label: "Home Win",
+      probability: match.prediction.probabilities.home,
+      type: "home",
+    },
+    {
+      label: drawLabel,
+      probability: match.prediction.probabilities.draw,
+      type: "draw",
+    },
+    {
+      label: "Away Win",
+      probability: match.prediction.probabilities.away,
+      type: "away",
+    },
+  ];
+
+  return options.sort((a, b) => b.probability - a.probability)[0];
+}
+
+function getDailyPickLabel(match: PredictionMatch, option: PredictionOption) {
+  if (option.type === "home") {
+    return `${match.home} home win`;
+  }
+
+  if (option.type === "away") {
+    return `${match.away} away win`;
+  }
+
+  return option.label;
+}
+
+function isTodayFixture(date: string) {
+  const fixtureDate = new Date(date);
+  const now = new Date();
+
+  return (
+    fixtureDate.toLocaleDateString("en-GB", {
+      timeZone: "Europe/London",
+    }) ===
+    now.toLocaleDateString("en-GB", {
+      timeZone: "Europe/London",
+    })
+  );
+}
+
+function findDailyPick(matches: PredictionMatch[]): DailyPick | null {
+  const todayMatches = matches.filter((match) => isTodayFixture(match.date));
+
+  if (todayMatches.length === 0) {
+    return null;
+  }
+
+  const rankedPicks = todayMatches
+    .map((match) => ({
+      match,
+      option: getStrongestOption(match),
+    }))
+    .sort((a, b) => b.option.probability - a.option.probability);
+
+  return rankedPicks[0] || null;
+}
+
 function PredictionOptionPills({
   options,
 }: {
@@ -357,12 +429,18 @@ function buildMatchInsights(match: PredictionMatch, options: PredictionOption[])
 
 export default function PredictionsPage() {
   const [matches, setMatches] = useState<PredictionMatch[]>([]);
+  const [allLeagueMatches, setAllLeagueMatches] = useState<PredictionMatch[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dailyPickLoading, setDailyPickLoading] = useState(true);
   const [leagueId, setLeagueId] = useState<number>(TOP_EURO_LEAGUES[0].id);
 
   const selectedLeague =
     TOP_EURO_LEAGUES.find((league) => league.id === leagueId) ||
     TOP_EURO_LEAGUES[0];
+
+  const dailyPick = useMemo(() => {
+    return findDailyPick(allLeagueMatches);
+  }, [allLeagueMatches]);
 
   useEffect(() => {
     setLoading(true);
@@ -379,6 +457,48 @@ export default function PredictionsPage() {
         setLoading(false);
       });
   }, [leagueId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadDailyPickData() {
+      setDailyPickLoading(true);
+
+      try {
+        const responses = await Promise.all(
+          TOP_EURO_LEAGUES.map((league) =>
+            fetch(`/api/predictions?league=${league.id}&season=2025`).then(
+              (res) => res.json()
+            )
+          )
+        );
+
+        if (cancelled) {
+          return;
+        }
+
+        const mergedMatches = responses.flatMap((response) => {
+          return response.matches || [];
+        });
+
+        setAllLeagueMatches(mergedMatches);
+      } catch {
+        if (!cancelled) {
+          setAllLeagueMatches([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setDailyPickLoading(false);
+        }
+      }
+    }
+
+    void loadDailyPickData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] px-3 py-5 text-white sm:px-4 sm:py-6 md:px-6">
@@ -405,6 +525,8 @@ export default function PredictionsPage() {
             </span>
           </div>
         </section>
+
+        <DailyPickSection dailyPick={dailyPick} loading={dailyPickLoading} />
 
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:rounded-3xl">
           <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
@@ -457,7 +579,7 @@ export default function PredictionsPage() {
               Access
             </div>
             <div className="mt-2 text-base font-bold sm:text-lg">
-              All unlocked
+              Free daily pick
             </div>
           </div>
         </section>
@@ -510,6 +632,138 @@ export default function PredictionsPage() {
         </footer>
       </div>
     </main>
+  );
+}
+
+function DailyPickSection({
+  dailyPick,
+  loading,
+}: {
+  dailyPick: DailyPick | null;
+  loading: boolean;
+}) {
+  if (loading) {
+    return (
+      <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
+        <div className="text-sm font-semibold text-slate-300">
+          Loading today’s strongest pick across all leagues...
+        </div>
+      </section>
+    );
+  }
+
+  if (!dailyPick) {
+    return (
+      <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
+        <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
+          Free daily prediction
+        </div>
+
+        <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
+          Today’s Best Pick
+        </h2>
+
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+          No eligible fixtures were found for today across the available leagues.
+          Check back when today’s fixtures are available.
+        </p>
+      </section>
+    );
+  }
+
+  const match = dailyPick.match;
+  const option = dailyPick.option;
+  const pickLabel = getDailyPickLabel(match, option);
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
+            Free daily prediction
+          </div>
+
+          <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
+            Today’s Best Pick
+          </h2>
+
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+            The strongest model probability across all available leagues today.
+          </p>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className="mb-3 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+              <span className="min-w-0 truncate">{match.league}</span>
+              <span className="shrink-0 text-xs sm:text-sm">
+                {formatUKDateTime(match.date)}
+              </span>
+            </div>
+
+            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <TeamLogo src={match.homeLogo} alt={match.home} />
+                <span className="min-w-0 truncate text-sm font-semibold sm:text-base">
+                  {match.home}
+                </span>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-2 text-xs font-semibold uppercase text-slate-300 sm:px-3">
+                vs
+              </div>
+
+              <div className="flex min-w-0 items-center justify-end gap-2">
+                <span className="min-w-0 truncate text-right text-sm font-semibold sm:text-base">
+                  {match.away}
+                </span>
+                <TeamLogo src={match.awayLogo} alt={match.away} />
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                  Strongest pick
+                </div>
+                <div
+                  className={`mt-1 text-lg font-black sm:text-xl ${getPredictionAccentByType(
+                    option.type
+                  )}`}
+                >
+                  {pickLabel}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left sm:text-right">
+                <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                  Probability
+                </div>
+                <div className="mt-1 text-2xl font-black text-white">
+                  {option.probability}%
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <ConfidenceBadge confidence={match.prediction.confidence} />
+              <span
+                className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${getPredictionBadgeByType(
+                  option.type
+                )}`}
+              >
+                {option.label}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href={`/match/${match.fixtureId}`}
+          className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
+        >
+          View Match →
+        </Link>
+      </div>
+    </section>
   );
 }
 
