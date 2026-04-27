@@ -5,9 +5,9 @@ import { getFixtureDetail } from "@/lib/api-football/services";
 import { formatUKDateTime } from "@/lib/utils/date";
 
 type Props = {
-  params: Promise<{
+  params: {
     fixtureId: string;
-  }>;
+  };
 };
 
 function TeamBadge({
@@ -65,13 +65,13 @@ function TeamBadge({
 }
 
 export default async function MatchPage({ params }: Props) {
-  const { fixtureId } = await params;
+  const fixtureId = Number(params.fixtureId);
 
   if (!fixtureId) {
     notFound();
   }
 
-  const detail = await getFixtureDetail(Number(fixtureId));
+  const detail = await getFixtureDetail(fixtureId);
 
   if (!detail) {
     notFound();
@@ -170,7 +170,7 @@ export default async function MatchPage({ params }: Props) {
             <div className="p-4 sm:p-5">
               {detail.statistics.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-slate-400">
-                  Statistics not available yet.
+                  Statistics will appear once the match is live.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -228,7 +228,8 @@ export default async function MatchPage({ params }: Props) {
             <div className="p-4 sm:p-5">
               {detail.lineups.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-slate-400">
-                  Lineups not available yet.
+                  Confirmed lineups usually appear around 60–75 minutes before
+                  kick-off, depending on the competition and data availability.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -310,7 +311,7 @@ export default async function MatchPage({ params }: Props) {
           <div className="p-4 sm:p-5">
             {detail.events.length === 0 ? (
               <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-slate-400">
-                No match events available yet.
+                Match events will appear once the game starts.
               </div>
             ) : (
               <div className="space-y-3">
