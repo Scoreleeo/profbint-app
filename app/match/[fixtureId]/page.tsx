@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFixtureDetail } from "@/lib/api-football/services";
+import { formatUKDateTime } from "@/lib/utils/date";
 
 type Props = {
   params: Promise<{
@@ -61,23 +62,6 @@ function TeamBadge({
       )}
     </div>
   );
-}
-
-function formatUKDateTime(value: string) {
-  try {
-    return new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Europe/London",
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
 }
 
 export default async function MatchPage({ params }: Props) {
