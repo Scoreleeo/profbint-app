@@ -61,12 +61,18 @@ function buildValueLabel(edge: number | null): ScoreMarket["valueLabel"] {
 }
 
 function getLondonDateString() {
-  return new Intl.DateTimeFormat("en-CA", {
+  const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/London",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(new Date());
+  }).formatToParts(new Date());
+
+  const year = parts.find((part) => part.type === "year")?.value || "";
+  const month = parts.find((part) => part.type === "month")?.value || "";
+  const day = parts.find((part) => part.type === "day")?.value || "";
+
+  return `${year}-${month}-${day}`;
 }
 
 function extractCorrectScoreMap(oddsRaw: any) {
@@ -196,6 +202,7 @@ function getStrongestDailyPick(matches: PredictionMatch[]) {
         },
       ];
     })
+    .filter((pick) => Number.isFinite(pick.probability))
     .sort((a, b) => b.probability - a.probability);
 
   return rankedPicks[0] || null;
