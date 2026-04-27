@@ -66,6 +66,75 @@ function TeamBadge({
   );
 }
 
+function MatchUnavailable({
+  fixtureId,
+}: {
+  fixtureId: number;
+}) {
+  return (
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
+      <div className="border-b border-white/10 bg-[#08101c]">
+        <div className="mx-auto w-full max-w-6xl px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm font-semibold text-slate-400 transition hover:text-white"
+          >
+            ← Back to Home
+          </Link>
+
+          <div className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
+            Match Preview
+          </div>
+
+          <h1 className="mt-2 break-words text-2xl font-black tracking-tight sm:text-3xl md:text-5xl">
+            Match data not available yet
+          </h1>
+
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
+            This fixture is listed in the schedule, but the full match preview
+            data is not available from the football data provider yet.
+          </p>
+        </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-6xl overflow-x-hidden px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
+        <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] p-5 shadow-2xl sm:rounded-[32px] sm:p-6 md:p-8">
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Fixture ID
+          </div>
+
+          <div className="mt-2 text-lg font-black text-white sm:text-2xl">
+            {fixtureId}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-slate-300">
+            The fixture link is working, but API-Football has not returned the
+            detailed match record for this game yet. This can happen with future
+            fixtures, postponed matches, or fixtures where preview data has not
+            been published.
+          </div>
+
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link
+              href="/"
+              className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
+            >
+              Back to Home
+            </Link>
+
+            <Link
+              href="/predictions"
+              className="inline-flex justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+            >
+              View Predictions
+            </Link>
+          </div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
 export default async function MatchPage({ params }: Props) {
   const fixtureId = Number(params.fixtureId);
 
@@ -76,7 +145,7 @@ export default async function MatchPage({ params }: Props) {
   const detail = await getFixtureDetail(fixtureId);
 
   if (!detail) {
-    notFound();
+    return <MatchUnavailable fixtureId={fixtureId} />;
   }
 
   return (
