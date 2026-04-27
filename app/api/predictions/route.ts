@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { TOP_EURO_LEAGUES } from "@/lib/constants";
 import { apiFootballFetch } from "@/lib/api-football/client";
 import { buildMatchFeatures } from "@/lib/predictions/features";
 import { buildPrediction } from "@/lib/predictions/model";
@@ -16,6 +17,17 @@ type ScoreMarket = {
   marketProbability?: number | null;
   edge?: number | null;
   valueLabel: "STRONG_VALUE" | "SMALL_VALUE" | "NO_VALUE" | "NO_ODDS";
+};
+
+type PredictionMatch = {
+  fixtureId: number;
+  home: string;
+  away: string;
+  homeLogo?: string;
+  awayLogo?: string;
+  league: string;
+  date: string;
+  prediction: any;
 };
 
 function formatScoreline(match: any) {
@@ -46,6 +58,15 @@ function buildValueLabel(edge: number | null): ScoreMarket["valueLabel"] {
   if (edge >= 5) return "STRONG_VALUE";
   if (edge >= 2) return "SMALL_VALUE";
   return "NO_VALUE";
+}
+
+function getLondonDateString() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/London",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 
 function extractCorrectScoreMap(oddsRaw: any) {
@@ -127,111 +148,232 @@ function enrichLikelyScoresWithOdds(
   });
 }
 
+function getStrongestDailyPick(matches: PredictionMatch[]) {
+  const rankedPicks = matches
+    .flatMap((match) => {
+      return [
+        {
+          fixtureId: match.fixtureId,
+          home: match.home,
+          away: match.away,
+          homeLogo: match.homeLogo,
+          awayLogo: match.awayLogo,
+          league: match.league,
+          date: match.date,
+          label: `${match.home} home win`,
+          shortLabel: "Home Win",
+          type: "home",
+          probability: match.prediction.probabilities.home,
+          confidence: match.prediction.confidence,
+        },
+        {
+          fixtureId: match.fixtureId,
+          home: match.home,
+          away: match.away,
+          homeLogo: match.homeLogo,
+          awayLogo: match.awayLogo,
+          league: match.league,
+          date: match.date,
+          label: "Draw",
+          shortLabel: "Draw",
+          type: "draw",
+          probability: match.prediction.probabilities.draw,
+          confidence: match.prediction.confidence,
+        },
+        {
+          fixtureId: match.fixtureId,
+          home: match.home,
+          away: match.away,
+          homeLogo: match.homeLogo,
+          awayLogo: match.awayLogo,
+          league: match.league,
+          date: match.date,
+          label: `${match.away} away win`,
+          shortLabel: "Away Win",
+          type: "away",
+          probability: match.prediction.probabilities.away,
+          confidence: match.prediction.confidence,
+        },
+      ];
+    })
+    .sort((a, b) => b.probability - a.probability);
+
+  return rankedPicks[0] || null;
+}
+
+async function buildPredictionsForLeague({
+  league,
+  season,
+  date,
+  limit,
+}: {
+  league: number;
+  season: number;
+  date?: string;
+  limit: number;
+}) {
+  const fixtureParams: Record<string, string | number> = {
+    league,
+    season,
+    status: "NS",
+  };
+
+  if (date) {
+    fixtureParams.date = date;
+    fixtureParams.timezone = "Europe/London";
+  }
+
+  const fixturesRaw = await apiFootballFetch<any>("/fixtures", fixtureParams);
+
+  const upcomingMatches = (fixturesRaw.response || []).slice(0, limit);
+
+  if (upcomingMatches.length === 0) {
+    return [];
+  }
+
+  const standingsRaw = await apiFootballFetch<any>("/standings", {
+    league,
+    season,
+  });
+
+  const matches = await Promise.all(
+    upcomingMatches.map(async (match: any) => {
+      const homeTeamId = match.teams.home.id;
+      const awayTeamId = match.teams.away.id;
+      const fixtureId = match.fixture.id;
+
+      const [
+        homeRecentFixturesRaw,
+        awayRecentFixturesRaw,
+        h2hRaw,
+        oddsRaw,
+      ] = await Promise.all([
+        apiFootballFetch<any>("/fixtures", {
+          team: homeTeamId,
+          league,
+          season,
+          last: 20,
+        }),
+        apiFootballFetch<any>("/fixtures", {
+          team: awayTeamId,
+          league,
+          season,
+          last: 20,
+        }),
+        apiFootballFetch<any>("/fixtures/headtohead", {
+          h2h: `${homeTeamId}-${awayTeamId}`,
+          league,
+          last: 10,
+        }),
+        apiFootballFetch<any>("/odds", {
+          fixture: fixtureId,
+        }).catch(() => ({ response: [] })),
+      ]);
+
+      const h2hMatches = (h2hRaw?.response || []).filter(
+        (item: any) => item.fixture?.status?.short === "FT"
+      );
+
+      const lastMeeting =
+        h2hMatches.length > 0 ? formatScoreline(h2hMatches[0]) : null;
+
+      const lastVenueMeetingMatch = h2hMatches.find(
+        (item: any) =>
+          item.teams?.home?.id === homeTeamId &&
+          item.teams?.away?.id === awayTeamId
+      );
+
+      const lastVenueMeeting = lastVenueMeetingMatch
+        ? formatScoreline(lastVenueMeetingMatch)
+        : null;
+
+      const features = buildMatchFeatures({
+        homeTeamId,
+        homeTeamName: match.teams.home.name,
+        awayTeamId,
+        awayTeamName: match.teams.away.name,
+        homeRecentFixturesRaw,
+        awayRecentFixturesRaw,
+        standingsRaw,
+      });
+
+      const prediction = buildPrediction(features, {
+        lastMeeting,
+        lastVenueMeeting,
+      });
+
+      const correctScoreMap = extractCorrectScoreMap(oddsRaw);
+      const scoreMarkets = enrichLikelyScoresWithOdds(
+        prediction.likelyScores,
+        correctScoreMap
+      );
+
+      return {
+        fixtureId,
+        home: match.teams.home.name,
+        away: match.teams.away.name,
+        homeLogo: match.teams.home.logo,
+        awayLogo: match.teams.away.logo,
+        league: match.league.name,
+        date: match.fixture.date,
+        prediction: {
+          ...prediction,
+          scoreMarkets,
+        },
+      };
+    })
+  );
+
+  return matches;
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const league = Number(request.nextUrl.searchParams.get("league") || 39);
+    const leagueParam = request.nextUrl.searchParams.get("league");
+    const dailyPickParam = request.nextUrl.searchParams.get("dailyPick");
+    const dateParam = request.nextUrl.searchParams.get("date");
     const season = Number(request.nextUrl.searchParams.get("season") || 2025);
 
-    const fixturesRaw = await apiFootballFetch<any>("/fixtures", {
+    const shouldBuildDailyPick =
+      dailyPickParam === "true" || leagueParam === "all";
+
+    if (shouldBuildDailyPick) {
+      const date = dateParam || getLondonDateString();
+
+      const leagueResults = await Promise.all(
+        TOP_EURO_LEAGUES.map((league) =>
+          buildPredictionsForLeague({
+            league: league.id,
+            season,
+            date,
+            limit: 12,
+          }).catch((error) => {
+            console.error(
+              `PREDICTIONS DAILY PICK LEAGUE ERROR ${league.id}:`,
+              error
+            );
+            return [];
+          })
+        )
+      );
+
+      const matches = leagueResults.flat();
+      const dailyPick = getStrongestDailyPick(matches);
+
+      return NextResponse.json({
+        date,
+        dailyPick,
+        matches,
+      });
+    }
+
+    const league = Number(leagueParam || 39);
+
+    const matches = await buildPredictionsForLeague({
       league,
       season,
-      status: "NS",
+      limit: 12,
     });
-
-    const upcomingMatches = (fixturesRaw.response || []).slice(0, 12);
-
-    const standingsRaw = await apiFootballFetch<any>("/standings", {
-      league,
-      season,
-    });
-
-    const matches = await Promise.all(
-      upcomingMatches.map(async (match: any) => {
-        const homeTeamId = match.teams.home.id;
-        const awayTeamId = match.teams.away.id;
-        const fixtureId = match.fixture.id;
-
-        const [
-          homeRecentFixturesRaw,
-          awayRecentFixturesRaw,
-          h2hRaw,
-          oddsRaw,
-        ] = await Promise.all([
-          apiFootballFetch<any>("/fixtures", {
-            team: homeTeamId,
-            league,
-            season,
-            last: 20,
-          }),
-          apiFootballFetch<any>("/fixtures", {
-            team: awayTeamId,
-            league,
-            season,
-            last: 20,
-          }),
-          apiFootballFetch<any>("/fixtures/headtohead", {
-            h2h: `${homeTeamId}-${awayTeamId}`,
-            league,
-            last: 10,
-          }),
-          apiFootballFetch<any>("/odds", {
-            fixture: fixtureId,
-          }).catch(() => ({ response: [] })),
-        ]);
-
-        const h2hMatches = (h2hRaw?.response || []).filter(
-          (item: any) => item.fixture?.status?.short === "FT"
-        );
-
-        const lastMeeting =
-          h2hMatches.length > 0 ? formatScoreline(h2hMatches[0]) : null;
-
-        const lastVenueMeetingMatch = h2hMatches.find(
-          (item: any) =>
-            item.teams?.home?.id === homeTeamId &&
-            item.teams?.away?.id === awayTeamId
-        );
-
-        const lastVenueMeeting = lastVenueMeetingMatch
-          ? formatScoreline(lastVenueMeetingMatch)
-          : null;
-
-        const features = buildMatchFeatures({
-          homeTeamId,
-          homeTeamName: match.teams.home.name,
-          awayTeamId,
-          awayTeamName: match.teams.away.name,
-          homeRecentFixturesRaw,
-          awayRecentFixturesRaw,
-          standingsRaw,
-        });
-
-        const prediction = buildPrediction(features, {
-          lastMeeting,
-          lastVenueMeeting,
-        });
-
-        const correctScoreMap = extractCorrectScoreMap(oddsRaw);
-        const scoreMarkets = enrichLikelyScoresWithOdds(
-          prediction.likelyScores,
-          correctScoreMap
-        );
-
-        return {
-          fixtureId,
-          home: match.teams.home.name,
-          away: match.teams.away.name,
-          homeLogo: match.teams.home.logo,
-          awayLogo: match.teams.away.logo,
-          league: match.league.name,
-          date: match.fixture.date,
-          prediction: {
-            ...prediction,
-            scoreMarkets,
-          },
-        };
-      })
-    );
 
     return NextResponse.json({ matches });
   } catch (error) {
