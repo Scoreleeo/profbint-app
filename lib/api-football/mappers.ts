@@ -11,6 +11,7 @@ import type {
 
 export function mapStandingsResponse(data: any): StandingRow[] {
   const table = data?.response?.[0]?.league?.standings?.[0] || [];
+
   return table.map((row: any) => ({
     rank: row.rank,
     teamId: row.team?.id,
@@ -25,6 +26,7 @@ export function mapStandingsResponse(data: any): StandingRow[] {
 
 export function mapFixturesResponse(data: any): MatchRow[] {
   const rows = data?.response || [];
+
   return rows.map((item: any) => ({
     fixtureId: item.fixture?.id,
     date: item.fixture?.date,
@@ -32,11 +34,11 @@ export function mapFixturesResponse(data: any): MatchRow[] {
     elapsed: item.fixture?.status?.elapsed ?? null,
     leagueName: item.league?.name,
     homeTeamId: item.teams?.home?.id,
-awayTeamId: item.teams?.away?.id,
-homeTeam: item.teams?.home?.name,
-awayTeam: item.teams?.away?.name,
-homeLogo: item.teams?.home?.logo,
-awayLogo: item.teams?.away?.logo,
+    awayTeamId: item.teams?.away?.id,
+    homeTeam: item.teams?.home?.name,
+    awayTeam: item.teams?.away?.name,
+    homeLogo: item.teams?.home?.logo,
+    awayLogo: item.teams?.away?.logo,
     goals: {
       home: item.goals?.home ?? null,
       away: item.goals?.away ?? null,
@@ -46,6 +48,7 @@ awayLogo: item.teams?.away?.logo,
 
 export function mapInjuriesToNews(data: any): TeamNewsItem[] {
   const rows = data?.response || [];
+
   return rows.map((item: any) => ({
     id: `injury-${item.player?.id || item.player?.name}-${item.fixture?.id || "none"}`,
     title: `${item.player?.name || "Player"} injury update`,
@@ -58,11 +61,16 @@ export function mapInjuriesToNews(data: any): TeamNewsItem[] {
 
 export function mapTransfersToNews(data: any): TeamNewsItem[] {
   const rows = data?.response || [];
+
   return rows.flatMap((entry: any, index: number) =>
     (entry.transfers || []).map((transfer: any, innerIndex: number) => ({
       id: `transfer-${entry.player?.id || index}-${innerIndex}`,
       title: `${entry.player?.name || "Player"} transfer update`,
-      summary: [transfer.type, transfer.teams?.out?.name, transfer.teams?.in?.name]
+      summary: [
+        transfer.type,
+        transfer.teams?.out?.name,
+        transfer.teams?.in?.name,
+      ]
         .filter(Boolean)
         .join(" • "),
       kind: "transfer" as const,
@@ -100,43 +108,72 @@ export function buildDashboardPayload(input: {
 
 export function mapFixtureEventsResponse(data: any): FixtureEvent[] {
   const rows = data?.response || [];
-  return rows.map((item: any) => ({
-    time: item.time?.elapsed ? `${item.time.elapsed}'` : "—",
-    type: item.type || "Event",
-    detail: item.detail || "",
-    teamName: item.team?.name || "Team",
-    playerName: item.player?.name || undefined,
-    assistName: item.assist?.name || undefined,
-  }));
+
+  return rows.map((item: any) => {
+    const elapsed = item.time?.elapsed;
+    const extra = item.time?.extra;
+
+    const time =
+      elapsed && extra
+        ? `${elapsed}+${extra}'`
+        : elapsed
+          ? `${elapsed}'`
+          : "—";
+
+    return {
+      time,
+      type: item.type || "Event",
+      detail: item.detail || item.comments || "",
+      teamName: item.team?.name || "Team",
+      playerName: item.player?.name || undefined,
+      assistName: item.assist?.name || undefined,
+    };
+  });
 }
 
 export function mapFixtureStatisticsResponse(data: any): FixtureStatistic[] {
   const rows = data?.response || [];
-  return rows.map((item: any) => ({
-    teamName: item.team?.name || "Team",
-    teamLogo: item.team?.logo || undefined,
-    stats: Object.fromEntries(
+
+  return rows.map((item: any) => {
+    const stats = Object.fromEntries(
       (item.statistics || []).map((stat: any) => [
-        stat.type,
+        stat.type || "Statistic",
         stat.value ?? "—",
       ])
-    ),
-  }));
+    );
+
+    return {
+      teamName: item.team?.name || "Team",
+      teamLogo: item.team?.logo || undefined,
+      stats,
+    };
+  });
 }
 
 export function mapFixtureLineupsResponse(data: any): FixtureLineup[] {
   const rows = data?.response || [];
+
   return rows.map((item: any) => ({
     teamName: item.team?.name || "Team",
     teamLogo: item.team?.logo || undefined,
     formation: item.formation || undefined,
     coach: item.coach?.name || undefined,
-    startXI: (item.startXI || []).map(
-      (player: any) => player.player?.name || "Player"
-    ),
-    substitutes: (item.substitutes || []).map(
-      (player: any) => player.player?.name || "Player"
-    ),
+    startXI: (item.startXI || []).map((entry: any) => {
+      const player = entry.player || {};
+      const number = player.number ? `${player.number}. ` : "";
+      const name = player.name || "Player";
+      const position = player.pos ? ` (${player.pos})` : "";
+
+      return `${number}${name}${position}`;
+    }),
+    substitutes: (item.substitutes || []).map((entry: any) => {
+      const player = entry.player || {};
+      const number = player.number ? `${player.number}. ` : "";
+      const name = player.name || "Player";
+      const position = player.pos ? ` (${player.pos})` : "";
+
+      return `${number}${name}${position}`;
+    }),
   }));
 }
 
