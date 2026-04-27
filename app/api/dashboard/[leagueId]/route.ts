@@ -14,9 +14,23 @@ type NewsItem = {
   kind: string;
 };
 
+type DailyPick = {
+  fixtureId: number;
+  home: string;
+  away: string;
+  homeLogo?: string;
+  awayLogo?: string;
+  league: string;
+  date: string;
+  label: string;
+  shortLabel: string;
+  type: "home" | "draw" | "away";
+  probability: number;
+  confidence: number;
+};
+
 const parser = new Parser();
 
-// 🔥 REAL football feeds
 const FEEDS = [
   {
     source: "BBC Sport",
@@ -39,18 +53,7 @@ function detectKind(title: string) {
   return "news";
 }
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ leagueId: string }> }
-) {
-  const { leagueId } = await context.params;
-
-  const season = Number(
-    request.nextUrl.searchParams.get("season") || config.defaultSeason
-  );
-
-  const payload = await getDashboardData(Number(leagueId), season);
-
+async function getFootballNews() {
   let news: NewsItem[] = [];
 
   try {
@@ -76,8 +79,51 @@ export async function GET(
     console.error("RSS ERROR:", err);
   }
 
+  return news;
+}
+
+async function getDailyPick(request: NextRequest, season: number) {
+  try {
+    const url = new URL("/api/predictions", request.nextUrl.origin);
+    url.searchParams.set("dailyPick", "true");
+    url.searchParams.set("season", String(season));
+
+    const res = await fetch(url.toString(), {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+
+    return (data.dailyPick || null) as DailyPick | null;
+  } catch (err) {
+    console.error("DAILY PICK ERROR:", err);
+    return null;
+  }
+}
+
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ leagueId: string }> }
+) {
+  const { leagueId } = await context.params;
+
+  const season = Number(
+    request.nextUrl.searchParams.get("season") || config.defaultSeason
+  );
+
+  const [payload, news, dailyPick] = await Promise.all([
+    getDashboardData(Number(leagueId), season),
+    getFootballNews(),
+    getDailyPick(request, season),
+  ]);
+
   return NextResponse.json({
     ...payload,
     news,
+    dailyPick,
   });
 }
