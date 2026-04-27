@@ -304,13 +304,15 @@ export default function HomePage() {
 
       const json: DashboardPayload = await res.json();
       setData(json);
-      setLastUpdated(new Date().toLocaleTimeString("en-GB", {
-        timeZone: "Europe/London",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-      }));
+      setLastUpdated(
+        new Date().toLocaleTimeString("en-GB", {
+          timeZone: "Europe/London",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        })
+      );
     } catch (err) {
       console.error(err);
       setError("Could not load football data.");
@@ -439,7 +441,7 @@ export default function HomePage() {
                 AI Match Predictions Now Live
               </div>
               <div className="text-sm leading-6 text-slate-300">
-                Unlock win probabilities, score predictions and confidence
+                Unlock best outcome options, win probabilities and confidence
                 ratings.
               </div>
             </div>
