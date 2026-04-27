@@ -60,13 +60,16 @@ function buildValueLabel(edge: number | null): ScoreMarket["valueLabel"] {
   return "NO_VALUE";
 }
 
-function getLondonDateString() {
+function getLondonDateString(offsetDays = 0) {
+  const now = new Date();
+  now.setDate(now.getDate() + offsetDays);
+
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/London",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).formatToParts(new Date());
+  }).formatToParts(now);
 
   const year = parts.find((part) => part.type === "year")?.value || "";
   const month = parts.find((part) => part.type === "month")?.value || "";
@@ -334,6 +337,54 @@ async function buildPredictionsForLeague({
   return matches;
 }
 
+async function buildDailyPickAcrossAvailableLeagues({
+  season,
+  requestedDate,
+}: {
+  season: number;
+  requestedDate?: string | null;
+}) {
+  const datesToCheck = requestedDate
+    ? [requestedDate]
+    : Array.from({ length: 8 }, (_, index) => getLondonDateString(index));
+
+  for (const date of datesToCheck) {
+    const leagueResults = await Promise.all(
+      TOP_EURO_LEAGUES.map((league) =>
+        buildPredictionsForLeague({
+          league: league.id,
+          season,
+          date,
+          limit: 12,
+        }).catch((error) => {
+          console.error(
+            `PREDICTIONS DAILY PICK LEAGUE ERROR ${league.id}:`,
+            error
+          );
+          return [];
+        })
+      )
+    );
+
+    const matches = leagueResults.flat();
+    const dailyPick = getStrongestDailyPick(matches);
+
+    if (dailyPick) {
+      return {
+        date,
+        dailyPick,
+        matches,
+      };
+    }
+  }
+
+  return {
+    date: requestedDate || getLondonDateString(),
+    dailyPick: null,
+    matches: [],
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const leagueParam = request.nextUrl.searchParams.get("league");
@@ -345,33 +396,12 @@ export async function GET(request: NextRequest) {
       dailyPickParam === "true" || leagueParam === "all";
 
     if (shouldBuildDailyPick) {
-      const date = dateParam || getLondonDateString();
-
-      const leagueResults = await Promise.all(
-        TOP_EURO_LEAGUES.map((league) =>
-          buildPredictionsForLeague({
-            league: league.id,
-            season,
-            date,
-            limit: 12,
-          }).catch((error) => {
-            console.error(
-              `PREDICTIONS DAILY PICK LEAGUE ERROR ${league.id}:`,
-              error
-            );
-            return [];
-          })
-        )
-      );
-
-      const matches = leagueResults.flat();
-      const dailyPick = getStrongestDailyPick(matches);
-
-      return NextResponse.json({
-        date,
-        dailyPick,
-        matches,
+      const dailyPickPayload = await buildDailyPickAcrossAvailableLeagues({
+        season,
+        requestedDate: dateParam,
       });
+
+      return NextResponse.json(dailyPickPayload);
     }
 
     const league = Number(leagueParam || 39);
