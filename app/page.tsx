@@ -43,12 +43,28 @@ type NewsItem = {
   kind?: "breaking" | "injury" | "transfer" | "news" | string;
 };
 
+type DailyPick = {
+  fixtureId: number;
+  home: string;
+  away: string;
+  homeLogo?: string;
+  awayLogo?: string;
+  league: string;
+  date: string;
+  label: string;
+  shortLabel: string;
+  type: "home" | "draw" | "away";
+  probability: number;
+  confidence: number;
+};
+
 type DashboardPayload = {
   standings: StandingRow[];
   fixtures: MatchRow[];
   results: MatchRow[];
   live: MatchRow[];
   news?: NewsItem[];
+  dailyPick?: DailyPick | null;
 };
 
 const SEASON = 2025;
@@ -137,7 +153,31 @@ function SectionCard({
   );
 }
 
-function DailyPickCard() {
+function getConfidenceLabel(confidence: number) {
+  if (confidence >= 70) return "High";
+  if (confidence >= 60) return "Medium";
+  return "Low";
+}
+
+function getDailyPickAccent(type: DailyPick["type"]) {
+  if (type === "home") return "text-green-300";
+  if (type === "away") return "text-blue-300";
+  return "text-yellow-300";
+}
+
+function getDailyPickBadge(type: DailyPick["type"]) {
+  if (type === "home") {
+    return "border-green-400/20 bg-green-500/15 text-green-300";
+  }
+
+  if (type === "away") {
+    return "border-blue-400/20 bg-blue-500/15 text-blue-300";
+  }
+
+  return "border-yellow-400/20 bg-yellow-500/15 text-yellow-300";
+}
+
+function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
   return (
     <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -150,29 +190,109 @@ function DailyPickCard() {
             Today’s Best Pick
           </h2>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            One strongest model pick across all leagues will appear here.
-          </p>
+          {dailyPick ? (
+            <>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+                The strongest model probability across all available leagues.
+                This automatically moves to the next available matchday once the
+                current games are over.
+              </p>
 
-          <div className="mt-4 grid gap-3 sm:flex sm:flex-wrap">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
-                Access
-              </div>
-              <div className="mt-1 text-sm font-bold text-white">
-                Free pick daily
-              </div>
-            </div>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+                <div className="mb-3 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                  <span className="min-w-0 truncate">{dailyPick.league}</span>
+                  <span className="shrink-0 text-xs sm:text-sm">
+                    {formatUKDateTime(dailyPick.date)}
+                  </span>
+                </div>
 
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
-                Premium
+                <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <TeamLogo src={dailyPick.homeLogo} alt={dailyPick.home} />
+                    <span className="min-w-0 truncate text-sm font-semibold sm:text-base">
+                      {dailyPick.home}
+                    </span>
+                  </div>
+
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-2 text-xs font-semibold uppercase text-slate-300 sm:px-3">
+                    vs
+                  </div>
+
+                  <div className="flex min-w-0 items-center justify-end gap-2">
+                    <span className="min-w-0 truncate text-right text-sm font-semibold sm:text-base">
+                      {dailyPick.away}
+                    </span>
+                    <TeamLogo src={dailyPick.awayLogo} alt={dailyPick.away} />
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                      Strongest pick
+                    </div>
+                    <div
+                      className={`mt-1 break-words text-lg font-black sm:text-xl ${getDailyPickAccent(
+                        dailyPick.type
+                      )}`}
+                    >
+                      {dailyPick.label}
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left sm:text-right">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                      Probability
+                    </div>
+                    <div className="mt-1 text-2xl font-black text-white">
+                      {dailyPick.probability}%
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span
+                    className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${getDailyPickBadge(
+                      dailyPick.type
+                    )}`}
+                  >
+                    {dailyPick.shortLabel}
+                  </span>
+
+                  <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs font-semibold text-slate-200">
+                    {getConfidenceLabel(dailyPick.confidence)} confidence
+                  </span>
+                </div>
               </div>
-              <div className="mt-1 text-sm font-bold text-white">
-                Full match insights coming soon
+            </>
+          ) : (
+            <>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+                Today’s strongest model pick will appear here when eligible
+                fixtures are available across your selected leagues.
+              </p>
+
+              <div className="mt-4 grid gap-3 sm:flex sm:flex-wrap">
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                    Access
+                  </div>
+                  <div className="mt-1 text-sm font-bold text-white">
+                    Free pick daily
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                    Status
+                  </div>
+                  <div className="mt-1 text-sm font-bold text-white">
+                    Waiting for eligible fixtures
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
 
         <Link
@@ -480,7 +600,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <DailyPickCard />
+        <DailyPickCard dailyPick={data?.dailyPick} />
 
         <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-4 sm:mt-6 sm:p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
