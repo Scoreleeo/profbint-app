@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
+import { formatUKDateTime } from "@/lib/utils/date";
 
 type MatchRow = {
   fixtureId: number;
@@ -303,7 +304,13 @@ export default function HomePage() {
 
       const json: DashboardPayload = await res.json();
       setData(json);
-      setLastUpdated(new Date().toLocaleTimeString());
+      setLastUpdated(new Date().toLocaleTimeString("en-GB", {
+        timeZone: "Europe/London",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }));
     } catch (err) {
       console.error(err);
       setError("Could not load football data.");
@@ -324,21 +331,9 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [leagueId]);
 
-  function formatDate(value: string) {
-    try {
-      return new Date(value).toLocaleString();
-    } catch {
-      return value;
-    }
-  }
-
   function formatNewsDate(value?: string) {
     if (!value) return "";
-    try {
-      return new Date(value).toLocaleString();
-    } catch {
-      return value;
-    }
+    return formatUKDateTime(value);
   }
 
   const news = data?.news?.slice(0, 6) ?? [];
@@ -640,7 +635,7 @@ export default function HomePage() {
                         </div>
 
                         <div className="mt-2 truncate text-sm text-slate-300">
-                          {formatDate(match.date)}
+                          {formatUKDateTime(match.date)}
                         </div>
                       </Link>
                     ))}
@@ -691,6 +686,10 @@ export default function HomePage() {
                               alt={match.awayTeam}
                             />
                           </div>
+                        </div>
+
+                        <div className="mt-2 truncate text-sm text-slate-300">
+                          {formatUKDateTime(match.date)}
                         </div>
                       </Link>
                     ))}
