@@ -772,9 +772,10 @@ export default function HomePage() {
                 ) : (
                   <div className="space-y-3">
                     {data.fixtures.map((match) => (
-                      <div
+                      <Link
                         key={match.fixtureId}
-                        className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3"
+                        href={`/match/${match.fixtureId}`}
+                        className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
                       >
                         <div className="truncate text-sm text-slate-400">
                           {match.leagueName}
@@ -809,7 +810,7 @@ export default function HomePage() {
                         <div className="mt-2 truncate text-sm text-slate-300">
                           {formatUKDateTime(match.date)}
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}
