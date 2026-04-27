@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
+import { formatUKDateTime } from "@/lib/utils/date";
 
 type PredictionOption = {
   label: string;
@@ -166,8 +167,14 @@ function getPredictionAccentByType(type: PredictionOption["type"]) {
 }
 
 function getPredictionBadgeByType(type: PredictionOption["type"]) {
-  if (type === "home") return "border-green-400/20 bg-green-500/15 text-green-300";
-  if (type === "away") return "border-blue-400/20 bg-blue-500/15 text-blue-300";
+  if (type === "home") {
+    return "border-green-400/20 bg-green-500/15 text-green-300";
+  }
+
+  if (type === "away") {
+    return "border-blue-400/20 bg-blue-500/15 text-blue-300";
+  }
+
   return "border-yellow-400/20 bg-yellow-500/15 text-yellow-300";
 }
 
@@ -181,26 +188,6 @@ function getPredictionBorderByType(type: PredictionOption["type"]) {
   }
 
   return "border-yellow-400/20 bg-yellow-500/10";
-}
-
-function getPredictionLabel(match: PredictionMatch) {
-  if (match.prediction.outcome === "HOME_WIN") return "Home Win";
-  if (match.prediction.outcome === "AWAY_WIN") return "Away Win";
-  return getDrawPredictionLabel(match);
-}
-
-function getPrimaryPredictionType(match: PredictionMatch): PredictionOption["type"] {
-  if (match.prediction.outcome === "HOME_WIN") return "home";
-  if (match.prediction.outcome === "AWAY_WIN") return "away";
-  return "draw";
-}
-
-function getPredictionAccent(match: PredictionMatch) {
-  return getPredictionAccentByType(getPrimaryPredictionType(match));
-}
-
-function getPredictionBorder(match: PredictionMatch) {
-  return getPredictionBorderByType(getPrimaryPredictionType(match));
 }
 
 function getBestOptions(match: PredictionMatch): PredictionOption[] {
@@ -240,10 +227,6 @@ function getBestOptions(match: PredictionMatch): PredictionOption[] {
   return [primary];
 }
 
-function buildOptionsLabel(options: PredictionOption[]) {
-  return options.map((option) => option.label).join(" / ");
-}
-
 function PredictionOptionPills({
   options,
 }: {
@@ -265,7 +248,9 @@ function PredictionOptionPills({
           </span>
 
           {index < options.length - 1 ? (
-            <span className="shrink-0 text-xs font-black text-slate-500">/</span>
+            <span className="shrink-0 text-xs font-black text-slate-500">
+              /
+            </span>
           ) : null}
         </div>
       ))}
@@ -368,23 +353,6 @@ function buildMatchInsights(match: PredictionMatch, options: PredictionOption[])
   }
 
   return [...generatedInsights, ...match.prediction.insights].slice(0, 7);
-}
-
-function formatUKDateTime(value: string) {
-  try {
-    return new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Europe/London",
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
 }
 
 export default function PredictionsPage() {
