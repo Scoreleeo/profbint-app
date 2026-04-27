@@ -66,11 +66,7 @@ function TeamBadge({
   );
 }
 
-function MatchUnavailable({
-  fixtureId,
-}: {
-  fixtureId: number;
-}) {
+function MatchUnavailable({ fixtureId }: { fixtureId: number }) {
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
       <div className="border-b border-white/10 bg-[#08101c]">
@@ -142,7 +138,14 @@ export default async function MatchPage({ params }: Props) {
     notFound();
   }
 
-  const detail = await getFixtureDetail(fixtureId);
+  let detail = null;
+
+  try {
+    detail = await getFixtureDetail(fixtureId);
+  } catch (error) {
+    console.error("Could not load fixture detail:", error);
+    return <MatchUnavailable fixtureId={fixtureId} />;
+  }
 
   if (!detail) {
     return <MatchUnavailable fixtureId={fixtureId} />;
