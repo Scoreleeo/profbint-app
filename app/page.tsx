@@ -137,6 +137,55 @@ function SectionCard({
   );
 }
 
+function DailyPickCard() {
+  return (
+    <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0">
+          <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
+            Free daily prediction
+          </div>
+
+          <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
+            Today’s Best Pick
+          </h2>
+
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+            One strongest model pick across all leagues will appear here.
+          </p>
+
+          <div className="mt-4 grid gap-3 sm:flex sm:flex-wrap">
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                Access
+              </div>
+              <div className="mt-1 text-sm font-bold text-white">
+                Free pick daily
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
+                Premium
+              </div>
+              <div className="mt-1 text-sm font-bold text-white">
+                Full match insights coming soon
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href="/predictions"
+          className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
+        >
+          View Predictions →
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 function LiveTicker({
   matches,
 }: {
@@ -430,6 +479,8 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        <DailyPickCard />
 
         <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-4 sm:mt-6 sm:p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
