@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTeamFixtures } from "@/lib/api-football/services";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
+import { formatUKDateTime } from "@/lib/utils/date";
 
 type Props = {
   params: Promise<{
@@ -76,14 +77,6 @@ function FormPills({ form }: { form?: string }) {
       </div>
     </div>
   );
-}
-
-function formatDate(value: string) {
-  try {
-    return new Date(value).toLocaleString();
-  } catch {
-    return value;
-  }
 }
 
 export default async function TeamPage({ params, searchParams }: Props) {
@@ -233,7 +226,7 @@ export default async function TeamPage({ params, searchParams }: Props) {
                       </div>
 
                       <div className="mt-2 truncate text-sm text-slate-300">
-                        {formatDate(match.date)}
+                        {formatUKDateTime(match.date)}
                       </div>
                     </Link>
                   ))}
@@ -287,7 +280,7 @@ export default async function TeamPage({ params, searchParams }: Props) {
                       </div>
 
                       <div className="mt-2 truncate text-sm text-slate-300">
-                        {formatDate(match.date)}
+                        {formatUKDateTime(match.date)}
                       </div>
                     </Link>
                   ))}
