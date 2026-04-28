@@ -85,12 +85,11 @@ function MatchUnavailable({ fixtureId }: { fixtureId: number }) {
           </div>
 
           <h1 className="mt-2 break-words text-2xl font-black tracking-tight sm:text-3xl md:text-5xl">
-            Match data not available yet
+            Match preview coming soon
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
-            This fixture is listed in the schedule, but the full match preview
-            data is not available from the football data provider yet.
+            This match is scheduled but full preview data will appear closer to kick-off once released by the data provider.
           </p>
         </div>
       </div>
@@ -137,7 +136,7 @@ export default async function MatchPage({ params }: Props) {
   const fixtureId = parseInt(params.fixtureId, 10);
 
 if (isNaN(fixtureId)) {
-  return <MatchUnavailable fixtureId={Number(params.fixtureId) || 0} />;
+  return <MatchUnavailable fixtureId={Number(params.fixtureId)} />;
 }
 
   let detail = null;
@@ -150,7 +149,7 @@ if (isNaN(fixtureId)) {
   }
 
   if (!detail) {
-    return <MatchUnavailable fixtureId={fixtureId} />;
+    return <MatchUnavailable fixtureId={fixtureId || "—"} />;
   }
 
   return (
