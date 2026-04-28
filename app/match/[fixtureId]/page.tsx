@@ -97,7 +97,7 @@ function MatchUnavailable({ fixtureId }: { fixtureId: number }) {
       <div className="mx-auto w-full max-w-6xl overflow-x-hidden px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] p-5 shadow-2xl sm:rounded-[32px] sm:p-6 md:p-8">
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Fixture ID
+            Match Status
           </div>
 
           <div className="mt-2 text-lg font-black text-white sm:text-2xl">
