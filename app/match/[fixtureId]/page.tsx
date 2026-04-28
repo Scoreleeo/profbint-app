@@ -136,7 +136,7 @@ export default async function MatchPage({ params }: Props) {
   const fixtureId = parseInt(params.fixtureId, 10);
 
 if (isNaN(fixtureId)) {
-  return <MatchUnavailable fixtureId={Number(params.fixtureId)} />;
+  return <MatchUnavailable fixtureId={fixtureId} />;
 }
 
   let detail = null;
@@ -149,7 +149,7 @@ if (isNaN(fixtureId)) {
   }
 
   if (!detail) {
-    return <MatchUnavailable fixtureId={fixtureId || 0} />;
+    return <MatchUnavailable fixtureId={fixtureId} />;
   }
 
   return (
