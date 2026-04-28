@@ -101,7 +101,7 @@ function MatchUnavailable({ fixtureId }: { fixtureId: number }) {
           </div>
 
           <div className="mt-2 text-lg font-black text-white sm:text-2xl">
-            {fixtureId}
+            {"Match scheduled"}
           </div>
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-slate-300">
