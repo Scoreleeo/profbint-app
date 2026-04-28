@@ -1,4 +1,6 @@
 export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+export const revalidate = 0;
 
 import Image from "next/image";
 import Link from "next/link";
@@ -132,11 +134,11 @@ function MatchUnavailable({ fixtureId }: { fixtureId: number }) {
 }
 
 export default async function MatchPage({ params }: Props) {
-  const fixtureId = Number(params.fixtureId);
+  const fixtureId = parseInt(params.fixtureId, 10);
 
-  if (!fixtureId) {
-    notFound();
-  }
+if (isNaN(fixtureId)) {
+  return <MatchUnavailable fixtureId={0} />;
+}
 
   let detail = null;
 
