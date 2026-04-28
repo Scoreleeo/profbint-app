@@ -149,7 +149,7 @@ if (isNaN(fixtureId)) {
   }
 
   if (!detail) {
-    return <MatchUnavailable fixtureId={fixtureId || "—"} />;
+    return <MatchUnavailable fixtureId={fixtureId || 0} />;
   }
 
   return (
