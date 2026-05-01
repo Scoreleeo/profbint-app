@@ -79,13 +79,24 @@ function TeamLogo({
   size?: number;
 }) {
   const boxSize = size + 6;
+  const [imgError, setImgError] = useState(false);
 
-  if (!src) {
+  // Create initials fallback (e.g. "Man Utd" -> "MU")
+  const initials = alt
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  if (!src || imgError) {
     return (
       <div
-        className="shrink-0 rounded-full bg-white/10"
+        className="flex items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white"
         style={{ width: boxSize, height: boxSize }}
-      />
+      >
+        {initials}
+      </div>
     );
   }
 
@@ -100,6 +111,7 @@ function TeamLogo({
         fill
         sizes={`${boxSize}px`}
         className="object-contain p-1"
+        onError={() => setImgError(true)}
       />
     </div>
   );
