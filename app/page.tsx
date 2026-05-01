@@ -145,10 +145,12 @@ function SectionCard({
 }) {
   return (
     <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#111827] shadow-xl sm:rounded-3xl">
-      <div className="border-b border-white/10 px-4 py-4 sm:px-5">
-        <h2 className="text-lg font-bold text-white sm:text-xl">{title}</h2>
+      <div className="border-b border-white/10 px-3 py-3 sm:px-5 sm:py-4">
+        <h2 className="truncate text-base font-bold text-white sm:text-xl">
+          {title}
+        </h2>
       </div>
-      <div className="p-4 sm:p-5">{children}</div>
+      <div className="p-3 sm:p-5">{children}</div>
     </section>
   );
 }
@@ -179,14 +181,14 @@ function getDailyPickBadge(type: DailyPick["type"]) {
 
 function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
   return (
-    <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    <section className="mt-4 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
+          <div className="mb-2 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:mb-3 sm:text-xs">
             Free daily prediction
           </div>
 
-          <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
+          <h2 className="truncate text-lg font-black tracking-tight text-white sm:text-2xl">
             Today’s Best Pick
           </h2>
 
@@ -198,7 +200,7 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                 current games are over.
               </p>
 
-              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:mt-4 sm:p-4">
                 <div className="mb-3 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
                   <span className="min-w-0 truncate">{dailyPick.league}</span>
                   <span className="shrink-0 text-xs sm:text-sm">
@@ -214,7 +216,7 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                     </span>
                   </div>
 
-                  <div className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-2 text-xs font-semibold uppercase text-slate-300 sm:px-3">
+                  <div className="rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-[11px] font-semibold uppercase text-slate-300 sm:px-3 sm:text-xs">
                     vs
                   </div>
 
@@ -232,7 +234,7 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                       Strongest pick
                     </div>
                     <div
-                      className={`mt-1 break-words text-lg font-black sm:text-xl ${getDailyPickAccent(
+                      className={`mt-1 break-words text-base font-black sm:text-xl ${getDailyPickAccent(
                         dailyPick.type
                       )}`}
                     >
@@ -240,11 +242,11 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left sm:text-right">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left sm:px-4 sm:text-right">
                     <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
                       Probability
                     </div>
-                    <div className="mt-1 text-2xl font-black text-white">
+                    <div className="mt-1 text-xl font-black text-white sm:text-2xl">
                       {dailyPick.probability}%
                     </div>
                   </div>
@@ -517,57 +519,57 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
+    <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden overscroll-none bg-[#0b1220] text-white">
       <LiveTicker matches={data?.live || []} />
 
       <div className="border-b border-white/10 bg-[#08101c]">
-        <div className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
-          <div className="text-xs font-semibold uppercase tracking-[0.14em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
+        <div className="mx-auto max-w-7xl px-3 py-3 sm:px-4 sm:py-5 md:px-6 lg:px-8">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
             Live Football Centre
           </div>
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-3 py-5 sm:px-4 sm:py-6 md:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-3 py-4 sm:px-4 sm:py-6 md:px-6 lg:px-8">
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] shadow-2xl sm:rounded-[32px]">
-          <div className="grid gap-5 px-4 py-6 sm:gap-6 sm:px-6 sm:py-8 md:px-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
+          <div className="grid gap-4 px-4 py-5 sm:gap-6 sm:px-6 sm:py-8 md:px-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
             <div className="min-w-0">
-              <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-red-300 sm:text-xs">
+              <div className="mb-2 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-red-300 sm:mb-3 sm:text-xs">
                 Matchday coverage
               </div>
 
-              <h1 className="break-words text-2xl font-black tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
+              <h1 className="truncate text-[26px] font-black leading-tight tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
                 Pro Football Intel
               </h1>
 
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:mt-3 md:text-base">
                 Data-driven football insights, live scores, and AI-powered match
                 predictions across Europe’s top leagues.
               </p>
 
-              <div className="mt-5 grid gap-3 sm:mt-6 sm:flex sm:flex-wrap">
+              <div className="mt-4 grid gap-2 sm:mt-6 sm:flex sm:flex-wrap sm:gap-3">
                 <Link
                   href="/predictions"
-                  className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
+                  className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-red-400 sm:py-3"
                 >
                   View AI Predictions
                 </Link>
 
                 <Link
                   href="/predictions"
-                  className="inline-flex justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                  className="inline-flex justify-center rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10 sm:py-3"
                 >
                   Premium Insights →
                 </Link>
               </div>
             </div>
 
-            <div className="grid min-w-0 grid-cols-2 gap-3">
+            <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-3">
               <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   League
                 </div>
-                <div className="mt-2 truncate text-sm font-bold sm:text-lg">
+                <div className="mt-1 truncate text-sm font-bold sm:mt-2 sm:text-lg">
                   {selectedLeague.name}
                 </div>
               </div>
@@ -576,14 +578,16 @@ export default function HomePage() {
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Season
                 </div>
-                <div className="mt-2 text-sm font-bold sm:text-lg">{SEASON}</div>
+                <div className="mt-1 text-sm font-bold sm:mt-2 sm:text-lg">
+                  {SEASON}
+                </div>
               </div>
 
               <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Live Games
                 </div>
-                <div className="mt-2 text-sm font-bold sm:text-lg">
+                <div className="mt-1 text-sm font-bold sm:mt-2 sm:text-lg">
                   {data?.live?.length ?? 0}
                 </div>
               </div>
@@ -592,7 +596,7 @@ export default function HomePage() {
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Updated
                 </div>
-                <div className="mt-2 truncate text-sm font-bold sm:text-lg">
+                <div className="mt-1 truncate text-sm font-bold sm:mt-2 sm:text-lg">
                   {lastUpdated || "--:--:--"}
                 </div>
               </div>
@@ -602,13 +606,13 @@ export default function HomePage() {
 
         <DailyPickCard dailyPick={data?.dailyPick} />
 
-        <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-4 sm:mt-6 sm:p-5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <section className="mt-4 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-3 sm:mt-6 sm:p-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0">
-              <div className="text-xs uppercase tracking-wide text-red-300">
+              <div className="text-[10px] uppercase tracking-wide text-red-300 sm:text-xs">
                 New
               </div>
-              <div className="text-base font-bold sm:text-lg">
+              <div className="truncate text-base font-bold sm:text-lg">
                 AI Match Predictions Now Live
               </div>
               <div className="text-sm leading-6 text-slate-300">
@@ -626,8 +630,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:mt-6 sm:rounded-3xl">
-          <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
+        <section className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-4">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400 sm:text-sm">
             Select competition
           </div>
 
@@ -640,7 +644,7 @@ export default function HomePage() {
                   key={league.id}
                   onClick={() => setLeagueId(league.id)}
                   className={[
-                    "shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition",
+                    "shrink-0 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4",
                     active
                       ? "bg-[#d90429] text-white shadow-lg"
                       : "border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10",
@@ -654,24 +658,24 @@ export default function HomePage() {
         </section>
 
         {loading ? (
-          <section className="mt-5 rounded-2xl border border-white/10 bg-[#111827] p-5 sm:mt-6 sm:rounded-3xl sm:p-6">
-            <div className="text-slate-300">
+          <section className="mt-4 rounded-2xl border border-white/10 bg-[#111827] p-4 sm:mt-6 sm:rounded-3xl sm:p-6">
+            <div className="text-sm text-slate-300 sm:text-base">
               Loading {selectedLeague.name} data...
             </div>
           </section>
         ) : null}
 
         {error ? (
-          <section className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 p-5 sm:mt-6 sm:rounded-3xl sm:p-6">
+          <section className="mt-4 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 sm:mt-6 sm:rounded-3xl sm:p-6">
             <div className="font-semibold text-red-200">{error}</div>
           </section>
         ) : null}
 
         {!loading && data ? (
           <>
-            <section className="mt-5 sm:mt-6">
+            <section className="mt-4 sm:mt-6">
               <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
-                <h2 className="min-w-0 truncate text-lg font-bold sm:text-xl">
+                <h2 className="min-w-0 truncate text-base font-bold sm:text-xl">
                   Live Matches
                 </h2>
                 <span className="shrink-0 text-sm font-semibold text-red-400">
@@ -680,15 +684,15 @@ export default function HomePage() {
               </div>
 
               {data.live.length === 0 ? (
-                <div className="rounded-2xl border border-white/10 bg-[#111827] p-5 text-slate-300 sm:rounded-3xl">
+                <div className="rounded-2xl border border-white/10 bg-[#111827] p-4 text-sm text-slate-300 sm:rounded-3xl sm:p-5 sm:text-base">
                   No live matches right now.
                 </div>
               ) : (
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3">
                   {data.live.map((match) => (
                     <div
                       key={match.fixtureId}
-                      className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-4 shadow-lg transition hover:border-red-400/40"
+                      className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-3 shadow-lg transition hover:border-red-400/40 sm:p-4"
                     >
                       <div className="mb-2 flex min-w-0 items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide">
                         <span className="min-w-0 truncate text-slate-400">
@@ -724,19 +728,19 @@ export default function HomePage() {
               )}
             </section>
 
-            <div className="mt-5 grid min-w-0 gap-5 sm:mt-6 lg:grid-cols-2">
+            <div className="mt-4 grid min-w-0 gap-4 sm:mt-6 sm:gap-5 lg:grid-cols-2">
               <SectionCard title="Standings">
                 {data.standings.length === 0 ? (
-                  <p className="text-slate-300">
+                  <p className="text-sm text-slate-300 sm:text-base">
                     No standings returned for this league.
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {data.standings.map((row) => (
                       <Link
                         key={row.teamId}
                         href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
-                        className="flex min-h-[68px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
+                        className="flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10 sm:min-h-[68px]"
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
@@ -766,11 +770,11 @@ export default function HomePage() {
 
               <SectionCard title="Upcoming Fixtures">
                 {data.fixtures.length === 0 ? (
-                  <p className="text-slate-300">
+                  <p className="text-sm text-slate-300 sm:text-base">
                     No fixtures returned for this league.
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {data.fixtures.map((match) => (
                       <Link
                         key={match.fixtureId}
@@ -817,14 +821,14 @@ export default function HomePage() {
               </SectionCard>
             </div>
 
-            <div className="mt-5 sm:mt-6">
+            <div className="mt-4 sm:mt-6">
               <SectionCard title="Latest Results">
                 {data.results.length === 0 ? (
-                  <p className="text-slate-300">
+                  <p className="text-sm text-slate-300 sm:text-base">
                     No results returned for this league.
                   </p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {data.results.map((match) => (
                       <Link
                         key={match.fixtureId}
@@ -871,14 +875,14 @@ export default function HomePage() {
               </SectionCard>
             </div>
 
-            <div className="mt-5 sm:mt-6">
+            <div className="mt-4 sm:mt-6">
               <SectionCard title="Football News">
                 {news.length === 0 ? (
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-slate-300">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300 sm:p-5 sm:text-base">
                     Football news feed unavailable right now.
                   </div>
                 ) : (
-                  <div className="space-y-5">
+                  <div className="space-y-4 sm:space-y-5">
                     <div className="mb-1 flex items-center gap-2">
                       <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500"></div>
                       <span className="text-xs font-semibold uppercase tracking-[0.18em] text-red-400 sm:tracking-[0.2em]">
@@ -891,15 +895,15 @@ export default function HomePage() {
                       const kind = article.kind?.toLowerCase() || "news";
 
                       const cardClasses = isFeatured
-                        ? "block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] p-5 shadow-lg transition hover:border-red-400/30 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-7 md:p-8"
+                        ? "block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] p-4 shadow-lg transition hover:border-red-400/30 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-7 md:p-8"
                         : "block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-white/20 hover:bg-white/10 sm:p-5";
 
                       const titleClasses = isFeatured
-                        ? "mt-4 max-w-4xl break-words text-xl font-black leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl"
-                        : "mt-2 break-words text-lg font-bold leading-tight text-white md:text-xl";
+                        ? "mt-3 max-w-4xl break-words text-lg font-black leading-tight text-white sm:mt-4 sm:text-3xl md:text-4xl lg:text-5xl"
+                        : "mt-2 break-words text-base font-bold leading-tight text-white sm:text-lg md:text-xl";
 
                       const summaryClasses = isFeatured
-                        ? "mt-4 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base md:text-lg md:leading-7"
+                        ? "mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:mt-4 sm:text-base md:text-lg md:leading-7"
                         : "mt-3 text-sm leading-6 text-slate-300";
 
                       const content = (
@@ -961,7 +965,7 @@ export default function HomePage() {
           </>
         ) : null}
 
-        <footer className="mt-10 border-t border-white/10 pt-6 pb-2">
+        <footer className="mt-8 border-t border-white/10 pt-5 pb-5 sm:mt-10 sm:pt-6 sm:pb-2">
           <div className="flex flex-wrap items-center justify-center gap-4 text-center">
             <Link
               href="/"
