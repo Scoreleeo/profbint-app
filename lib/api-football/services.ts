@@ -20,31 +20,38 @@ import {
 import { getUpcomingFixtures as getSportmonksUpcomingFixtures } from "@/lib/sportmonks/services";
 
 const SPORTMONKS_LEAGUE_MAP: Record<number, number> = {
+  // API-Football Premier League -> Sportmonks Premier League
   39: 8,
 };
 
-export async function getDashboardData(leagueId: number, season: number) {
+async function getSportmonksFixturesForLeague(leagueId: number) {
   const sportmonksLeagueId = SPORTMONKS_LEAGUE_MAP[leagueId];
 
+  if (!sportmonksLeagueId) {
+    return null;
+  }
+
+  try {
+    return await getSportmonksUpcomingFixtures(sportmonksLeagueId);
+  } catch (error) {
+    console.error("Sportmonks fixtures unavailable, using API-Football:", error);
+    return null;
+  }
+}
+
+export async function getDashboardData(leagueId: number, season: number) {
   const [
     standingsRaw,
     fixturesRaw,
     resultsRaw,
     liveRaw,
-    sportmonksFixturesResult,
+    sportmonksFixturesRaw,
   ] = await Promise.all([
     fetchStandingsRaw(leagueId, season),
     fetchFixturesRaw(leagueId, season, "NS"),
     fetchFixturesRaw(leagueId, season, "FT"),
     fetchLiveRaw(),
-    sportmonksLeagueId
-      ? getSportmonksUpcomingFixtures(sportmonksLeagueId)
-          .then((data) => ({ ok: true as const, data }))
-          .catch((error) => {
-            console.error("Sportmonks fixtures fallback:", error);
-            return { ok: false as const, data: null };
-          })
-      : Promise.resolve({ ok: false as const, data: null }),
+    getSportmonksFixturesForLeague(leagueId),
   ]);
 
   const standings = mapStandingsResponse(standingsRaw);
@@ -65,9 +72,7 @@ export async function getDashboardData(leagueId: number, season: number) {
     fixturesRaw,
     resultsRaw,
     liveRaw,
-    sportmonksFixturesRaw: sportmonksFixturesResult.ok
-      ? sportmonksFixturesResult.data
-      : null,
+    sportmonksFixturesRaw,
     injuryBlocks: injuryBlocks.flatMap((item) =>
       item.status === "fulfilled" ? [item.value] : []
     ),

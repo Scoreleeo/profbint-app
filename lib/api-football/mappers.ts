@@ -32,13 +32,13 @@ export function mapFixturesResponse(data: any): MatchRow[] {
     date: item.fixture?.date,
     status: item.fixture?.status?.short || item.fixture?.status?.long || "",
     elapsed: item.fixture?.status?.elapsed ?? null,
-    leagueName: item.league?.name,
+    leagueName: item.league?.name || "",
     homeTeamId: item.teams?.home?.id,
     awayTeamId: item.teams?.away?.id,
-    homeTeam: item.teams?.home?.name,
-    awayTeam: item.teams?.away?.name,
-    homeLogo: item.teams?.home?.logo,
-    awayLogo: item.teams?.away?.logo,
+    homeTeam: item.teams?.home?.name || "Home",
+    awayTeam: item.teams?.away?.name || "Away",
+    homeLogo: item.teams?.home?.logo || undefined,
+    awayLogo: item.teams?.away?.logo || undefined,
     goals: {
       home: item.goals?.home ?? null,
       away: item.goals?.away ?? null,
@@ -53,12 +53,14 @@ export function mapSportmonksFixturesResponse(data: any): MatchRow[] {
     const participants = item.participants || [];
 
     const homeTeam =
-      participants.find((participant: any) => participant.meta?.location === "home") ||
-      participants[0];
+      participants.find(
+        (participant: any) => participant.meta?.location === "home"
+      ) || participants[0];
 
     const awayTeam =
-      participants.find((participant: any) => participant.meta?.location === "away") ||
-      participants[1];
+      participants.find(
+        (participant: any) => participant.meta?.location === "away"
+      ) || participants[1];
 
     return {
       fixtureId: item.id,

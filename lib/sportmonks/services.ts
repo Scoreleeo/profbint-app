@@ -20,33 +20,60 @@ async function fetchSportmonks(
 
   const url = new URL(`${BASE_URL}${endpoint}`);
 
-  // required auth
+  // Auth
   url.searchParams.set("api_token", apiKey);
 
-  // optional params (clean + expandable)
+  // Optional query params
   if (params) {
-    Object.entries(params).forEach(([key, value]) => {
-      if (value) {
-        url.searchParams.set(key, value);
+    Object.entries(params).forEach(([paramKey, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        url.searchParams.set(paramKey, value);
       }
     });
   }
 
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch(url.toString(), {
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    throw new Error(`Sportmonks error: ${res.status}`);
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Sportmonks error: ${res.status} - ${text}`);
+    }
+
+    const json = await res.json();
+
+    return json;
+  } catch (error) {
+    console.error("Sportmonks fetch failed:", {
+      endpoint,
+      params,
+      error,
+    });
+
+    throw error;
   }
-
-  return res.json();
 }
 
-// ✅ Upcoming fixtures (first integration target)
+// ✅ Upcoming fixtures (primary integration endpoint)
 export async function getUpcomingFixtures(leagueId: number) {
-  return fetchSportmonks(`/fixtures`, {
+  return fetchSportmonks("/fixtures", {
     filters: `fixtureLeagues:${leagueId}`,
+    include: "participants;league;state;venue",
+  });
+}
+
+// (Future-ready placeholders — DO NOT use yet, but ready when we expand)
+
+export async function getLiveFixtures() {
+  return fetchSportmonks("/livescores", {
+    include: "participants;league;state;venue",
+  });
+}
+
+export async function getFixturesByDate(date: string) {
+  return fetchSportmonks("/fixtures/date/" + date, {
     include: "participants;league;state;venue",
   });
 }
