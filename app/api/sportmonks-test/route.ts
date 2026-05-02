@@ -10,13 +10,13 @@ export async function GET() {
       count: Array.isArray(data?.data) ? data.data.length : 0,
       sample: Array.isArray(data?.data) ? data.data.slice(0, 3) : [],
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Sportmonks test failed:", error);
 
     return NextResponse.json(
       {
         ok: false,
-        error: "Sportmonks test failed",
+        error: error.message || "Unknown error",
       },
       { status: 500 }
     );
