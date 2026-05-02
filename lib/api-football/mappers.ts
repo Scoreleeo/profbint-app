@@ -39,6 +39,7 @@ export function mapFixturesResponse(data: any): MatchRow[] {
     awayTeam: item.teams?.away?.name || "Away",
     homeLogo: item.teams?.home?.logo || undefined,
     awayLogo: item.teams?.away?.logo || undefined,
+    provider: "api-football",
     goals: {
       home: item.goals?.home ?? null,
       away: item.goals?.away ?? null,
@@ -74,6 +75,7 @@ export function mapSportmonksFixturesResponse(data: any): MatchRow[] {
       awayTeam: awayTeam?.name || "Away",
       homeLogo: homeTeam?.image_path || undefined,
       awayLogo: awayTeam?.image_path || undefined,
+      provider: "sportmonks",
       goals: {
         home: null,
         away: null,
@@ -246,6 +248,7 @@ export function mapFixtureDetailResponse(input: {
     awayTeam: item.teams?.away?.name || "Away",
     homeLogo: item.teams?.home?.logo || undefined,
     awayLogo: item.teams?.away?.logo || undefined,
+    provider: "api-football",
     goals: {
       home: item.goals?.home ?? null,
       away: item.goals?.away ?? null,
