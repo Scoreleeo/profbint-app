@@ -16,6 +16,7 @@ type MatchRow = {
   awayTeam: string;
   homeLogo?: string;
   awayLogo?: string;
+  provider?: "api-football" | "sportmonks";
   goals: {
     home: number | null;
     away: number | null;
@@ -81,7 +82,6 @@ function TeamLogo({
   const boxSize = size + 6;
   const [imgError, setImgError] = useState(false);
 
-  // Create initials fallback (e.g. "Man Utd" -> "MU")
   const initials = alt
     .split(" ")
     .map((word) => word[0])
@@ -92,7 +92,7 @@ function TeamLogo({
   if (!src || imgError) {
     return (
       <div
-        className="flex items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white"
+        className="flex shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white"
         style={{ width: boxSize, height: boxSize }}
       >
         {initials}
@@ -531,7 +531,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden overscroll-none bg-[#0b1220] text-white">
+    <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
       <LiveTicker matches={data?.live || []} />
 
       <div className="border-b border-white/10 bg-[#08101c]">
@@ -793,8 +793,16 @@ export default function HomePage() {
                         href={`/match/${match.fixtureId}`}
                         className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
                       >
-                        <div className="truncate text-sm text-slate-400">
-                          {match.leagueName}
+                        <div className="flex min-w-0 items-center justify-between gap-2">
+                          <div className="min-w-0 truncate text-sm text-slate-400">
+                            {match.leagueName}
+                          </div>
+
+                          {match.provider === "sportmonks" ? (
+                            <span className="shrink-0 rounded-full border border-blue-400/20 bg-blue-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-300">
+                              Sportmonks
+                            </span>
+                          ) : null}
                         </div>
 
                         <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
