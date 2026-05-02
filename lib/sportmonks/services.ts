@@ -1,11 +1,38 @@
+import "server-only";
+
 const BASE_URL = "https://api.sportmonks.com/v3/football";
 
-const API_KEY = process.env.SPORTMONKS_API_KEY;
+function getApiKey() {
+  const key = process.env.SPORTMONKS_API_KEY;
 
-async function fetchSportmonks(endpoint: string) {
-  const url = `${BASE_URL}${endpoint}?api_token=${API_KEY}`;
+  if (!key) {
+    throw new Error("SPORTMONKS_API_KEY is missing");
+  }
 
-  const res = await fetch(url, {
+  return key;
+}
+
+async function fetchSportmonks(
+  endpoint: string,
+  params?: Record<string, string>
+) {
+  const apiKey = getApiKey();
+
+  const url = new URL(`${BASE_URL}${endpoint}`);
+
+  // required auth
+  url.searchParams.set("api_token", apiKey);
+
+  // optional params (clean + expandable)
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value) {
+        url.searchParams.set(key, value);
+      }
+    });
+  }
+
+  const res = await fetch(url.toString(), {
     cache: "no-store",
   });
 
@@ -16,9 +43,9 @@ async function fetchSportmonks(endpoint: string) {
   return res.json();
 }
 
-// ✅ Upcoming fixtures (we'll use this first)
+// ✅ Upcoming fixtures (first integration target)
 export async function getUpcomingFixtures(leagueId: number) {
-  return fetchSportmonks(
-    `/fixtures/upcoming/leagues/${leagueId}`
-  );
+  return fetchSportmonks(`/fixtures/upcoming/leagues/${leagueId}`, {
+    include: "participants;league;state;venue",
+  });
 }
