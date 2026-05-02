@@ -46,6 +46,40 @@ export function mapFixturesResponse(data: any): MatchRow[] {
   }));
 }
 
+export function mapSportmonksFixturesResponse(data: any): MatchRow[] {
+  const rows = data?.data || [];
+
+  return rows.map((item: any) => {
+    const participants = item.participants || [];
+
+    const homeTeam =
+      participants.find((participant: any) => participant.meta?.location === "home") ||
+      participants[0];
+
+    const awayTeam =
+      participants.find((participant: any) => participant.meta?.location === "away") ||
+      participants[1];
+
+    return {
+      fixtureId: item.id,
+      date: item.starting_at,
+      status: item.state?.short_name || item.state?.name || "NS",
+      elapsed: null,
+      leagueName: item.league?.name || "",
+      homeTeamId: homeTeam?.id,
+      awayTeamId: awayTeam?.id,
+      homeTeam: homeTeam?.name || "Home",
+      awayTeam: awayTeam?.name || "Away",
+      homeLogo: homeTeam?.image_path || undefined,
+      awayLogo: awayTeam?.image_path || undefined,
+      goals: {
+        home: null,
+        away: null,
+      },
+    };
+  });
+}
+
 export function mapInjuriesToNews(data: any): TeamNewsItem[] {
   const rows = data?.response || [];
 
@@ -85,6 +119,7 @@ export function buildDashboardPayload(input: {
   liveRaw: any;
   injuryBlocks: any[];
   transferBlocks: any[];
+  sportmonksFixturesRaw?: any;
 }): DashboardPayload {
   const allNews = [
     ...input.injuryBlocks.flatMap((block) => mapInjuriesToNews(block)),
@@ -93,9 +128,17 @@ export function buildDashboardPayload(input: {
 
   const shuffledNews = [...allNews].sort(() => Math.random() - 0.5);
 
+  const apiFootballFixtures = mapFixturesResponse(input.fixturesRaw);
+  const sportmonksFixtures = input.sportmonksFixturesRaw
+    ? mapSportmonksFixturesResponse(input.sportmonksFixturesRaw)
+    : [];
+
+  const fixtures =
+    sportmonksFixtures.length > 0 ? sportmonksFixtures : apiFootballFixtures;
+
   return {
     standings: mapStandingsResponse(input.standingsRaw),
-    fixtures: mapFixturesResponse(input.fixturesRaw)
+    fixtures: fixtures
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, 12),
     results: mapFixturesResponse(input.resultsRaw)
