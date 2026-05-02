@@ -46,8 +46,7 @@ async function fetchSportmonks(
 // ✅ Upcoming fixtures (first integration target)
 export async function getUpcomingFixtures(leagueId: number) {
   return fetchSportmonks(`/fixtures`, {
-    "filter[league_id]": String(leagueId),
-    "filter[status]": "NS",
+    filters: `fixtureLeagues:${leagueId}`,
     include: "participants;league;state;venue",
   });
 }
