@@ -1,3 +1,5 @@
+export type DataProvider = "api-football" | "sportmonks";
+
 export type MatchRow = {
   fixtureId: number;
   date: string;
@@ -10,6 +12,7 @@ export type MatchRow = {
   awayTeam: string;
   homeLogo?: string;
   awayLogo?: string;
+  provider?: DataProvider;
   goals: {
     home: number | null;
     away: number | null;
@@ -82,6 +85,7 @@ export type FixtureDetail = {
   awayTeam: string;
   homeLogo?: string;
   awayLogo?: string;
+  provider?: DataProvider;
   goals: {
     home: number | null;
     away: number | null;
