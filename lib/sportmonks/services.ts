@@ -73,11 +73,9 @@ async function fetchSportmonks(
 }
 
 export async function getUpcomingFixtures(leagueId: number) {
-  const { start, end } = getUpcomingDateRange();
-
-  return fetchSportmonks(`/fixtures/between/${start}/${end}`, {
+  return fetchSportmonks("/fixtures", {
     filters: `fixtureLeagues:${leagueId}`,
-    include: "participants;league;state;venue",
+    include: "participants;participants.team;league;state;venue",
   });
 }
 
