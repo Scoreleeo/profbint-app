@@ -435,7 +435,7 @@ function DailyPickSection({
     return (
       <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
         <div className="text-sm font-semibold text-slate-300">
-          Loading today’s featured match...
+          Loading best pick right now...
         </div>
       </section>
     );
@@ -449,12 +449,12 @@ function DailyPickSection({
         </div>
 
         <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
-          Today’s Best Pick
+          Best Pick Right Now
         </h2>
 
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-          No eligible fixtures were found for today across the available leagues.
-          Check back when today’s fixtures are available.
+          No eligible fixtures are available right now. Check back when the next
+          suitable fixtures are available.
         </p>
       </section>
     );
@@ -471,12 +471,12 @@ function DailyPickSection({
           </div>
 
           <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
-            Today’s Best Pick
+            Best Pick Right Now
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            This is today’s strongest match selection. Unlock to view the model
-            prediction, probability and confidence rating.
+            This is the strongest match selection available right now. It can
+            update automatically as fixtures change, kick off or close.
           </p>
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -522,7 +522,7 @@ function DailyPickSection({
           href={buildPredictionHref(match)}
           className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
         >
-          Unlock today’s best pick →
+          Unlock best pick right now →
         </Link>
       </div>
     </section>
