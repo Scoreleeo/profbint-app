@@ -17,15 +17,33 @@ type PageProps = {
   }>;
 };
 
-function TeamLogo({ src, alt }: { src?: string; alt: string }) {
-  const initials = alt
+function getInitials(name: string) {
+  return name
     .split(" ")
+    .filter(Boolean)
     .map((word) => word[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
+}
 
-  if (!src) {
+function cleanLogoUrl(value?: string) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function TeamLogo({ src, alt }: { src?: string; alt: string }) {
+  const logoSrc = cleanLogoUrl(src);
+  const initials = getInitials(alt);
+
+  if (!logoSrc) {
     return (
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-black text-white sm:h-14 sm:w-14">
         {initials || "?"}
@@ -36,9 +54,10 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   return (
     <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/5 sm:h-14 sm:w-14">
       <Image
-        src={src}
+        src={logoSrc}
         alt={alt}
         fill
+        unoptimized
         sizes="56px"
         className="object-contain p-1"
       />
@@ -71,8 +90,8 @@ export default async function LockedPredictionPage({
   const away = resolvedSearchParams.away || "Away Team";
   const league = resolvedSearchParams.league || "Football";
   const date = resolvedSearchParams.date || "";
-  const homeLogo = resolvedSearchParams.homeLogo || "";
-  const awayLogo = resolvedSearchParams.awayLogo || "";
+  const homeLogo = cleanLogoUrl(resolvedSearchParams.homeLogo);
+  const awayLogo = cleanLogoUrl(resolvedSearchParams.awayLogo);
   const provider = resolvedSearchParams.provider || "football-data";
 
   const matchStarted = hasMatchStarted(date);
