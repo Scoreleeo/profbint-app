@@ -2,11 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatUKDateTime } from "@/lib/utils/date";
 
-type Props = {
-  params: {
+type PageProps = {
+  params: Promise<{
     fixtureId: string;
-  };
-  searchParams?: {
+  }>;
+  searchParams: Promise<{
     home?: string;
     away?: string;
     league?: string;
@@ -14,20 +14,8 @@ type Props = {
     homeLogo?: string;
     awayLogo?: string;
     provider?: string;
-  };
+  }>;
 };
-
-function safeDecode(value?: string) {
-  if (!value) {
-    return "";
-  }
-
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
-}
 
 function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   const initials = alt
@@ -58,14 +46,20 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
-export default function LockedPredictionPage({ params, searchParams }: Props) {
-  const home = safeDecode(searchParams?.home) || "Home Team";
-  const away = safeDecode(searchParams?.away) || "Away Team";
-  const league = safeDecode(searchParams?.league) || "Football";
-  const date = safeDecode(searchParams?.date);
-  const homeLogo = safeDecode(searchParams?.homeLogo);
-  const awayLogo = safeDecode(searchParams?.awayLogo);
-  const provider = safeDecode(searchParams?.provider) || "football-data";
+export default async function LockedPredictionPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
+  const home = resolvedSearchParams.home || "Home Team";
+  const away = resolvedSearchParams.away || "Away Team";
+  const league = resolvedSearchParams.league || "Football";
+  const date = resolvedSearchParams.date || "";
+  const homeLogo = resolvedSearchParams.homeLogo || "";
+  const awayLogo = resolvedSearchParams.awayLogo || "";
+  const provider = resolvedSearchParams.provider || "football-data";
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
@@ -215,8 +209,8 @@ export default function LockedPredictionPage({ params, searchParams }: Props) {
 
             <p className="mt-5 text-xs leading-5 text-slate-500">
               Payments are not active yet. This page prepares the premium unlock
-              flow before Stripe is connected. Fixture ID: {params.fixtureId}.
-              Provider: {provider}.
+              flow before Stripe is connected. Fixture ID:{" "}
+              {resolvedParams.fixtureId}. Provider: {provider}.
             </p>
           </div>
         </section>
