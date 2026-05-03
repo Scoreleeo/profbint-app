@@ -71,6 +71,36 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
+function QuickNav() {
+  const links = [
+    { href: "/", label: "Home" },
+    { href: "#best-pick", label: "Best Pick" },
+    { href: "#competitions", label: "Competitions" },
+    { href: "#predictions-list", label: "Predictions" },
+    { href: "#disclaimer", label: "Disclaimer" },
+  ];
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:rounded-3xl">
+      <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
+        Jump to
+      </div>
+
+      <div className="flex max-w-full gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:pb-0">
+        {links.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-red-400/40 hover:bg-white/10"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function getDrawPredictionLabel(match: PredictionMatch) {
   const drawProbability = match.prediction.probabilities.draw;
   const homeProbability = match.prediction.probabilities.home;
@@ -291,9 +321,16 @@ export default function PredictionsPage() {
   }, []);
 
   return (
-    <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] px-3 py-5 text-white sm:px-4 sm:py-6 md:px-6">
+    <main className="min-h-screen w-full max-w-full overflow-x-hidden scroll-smooth bg-[#0b1220] px-3 py-5 text-white sm:px-4 sm:py-6 md:px-6">
       <div className="mx-auto w-full max-w-7xl space-y-5 overflow-x-hidden sm:space-y-6">
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] p-4 shadow-2xl sm:rounded-3xl sm:p-6">
+          <Link
+            href="/"
+            className="mb-4 inline-flex rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+          >
+            ← Back to Home
+          </Link>
+
           <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-red-300 sm:text-xs">
             Premium insights
           </div>
@@ -315,9 +352,14 @@ export default function PredictionsPage() {
           </div>
         </section>
 
+        <QuickNav />
+
         <DailyPickSection dailyPick={dailyPick} loading={dailyPickLoading} />
 
-        <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:rounded-3xl">
+        <section
+          id="competitions"
+          className="scroll-mt-20 overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-4 shadow-xl sm:rounded-3xl"
+        >
           <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
             Select competition
           </div>
@@ -379,13 +421,27 @@ export default function PredictionsPage() {
           </div>
         ) : (
           <>
-            <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {matches.map((match) => (
-                <LockedPredictionCard key={match.fixtureId} match={match} />
-              ))}
-            </div>
+            <section id="predictions-list" className="scroll-mt-20">
+              <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
+                <h2 className="min-w-0 truncate text-base font-bold sm:text-xl">
+                  Locked Predictions
+                </h2>
+                <span className="shrink-0 text-sm font-semibold text-red-400">
+                  {matches.length} matches
+                </span>
+              </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#111827] p-4 text-center shadow-xl">
+              <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {matches.map((match) => (
+                  <LockedPredictionCard key={match.fixtureId} match={match} />
+                ))}
+              </div>
+            </section>
+
+            <div
+              id="disclaimer"
+              className="scroll-mt-20 rounded-2xl border border-white/10 bg-[#111827] p-4 text-center shadow-xl"
+            >
               <p className="text-xs leading-6 text-slate-400">
                 Predictions are for informational purposes only and do not
                 guarantee outcomes.{" "}
@@ -433,7 +489,10 @@ function DailyPickSection({
 }) {
   if (loading) {
     return (
-      <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
+      <section
+        id="best-pick"
+        className="scroll-mt-20 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5"
+      >
         <div className="text-sm font-semibold text-slate-300">
           Loading best pick right now...
         </div>
@@ -443,7 +502,10 @@ function DailyPickSection({
 
   if (!dailyPick) {
     return (
-      <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
+      <section
+        id="best-pick"
+        className="scroll-mt-20 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5"
+      >
         <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
           Featured match
         </div>
@@ -463,7 +525,10 @@ function DailyPickSection({
   const match = dailyPick.match;
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
+    <section
+      id="best-pick"
+      className="scroll-mt-20 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5"
+    >
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
