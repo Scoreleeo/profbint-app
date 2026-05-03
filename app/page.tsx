@@ -70,6 +70,29 @@ type DashboardPayload = {
 
 const SEASON = 2025;
 
+function buildPredictionHref(match: MatchRow) {
+  const params = new URLSearchParams();
+
+  params.set("home", match.homeTeam);
+  params.set("away", match.awayTeam);
+  params.set("league", match.leagueName);
+  params.set("date", match.date);
+
+  if (match.homeLogo) {
+    params.set("homeLogo", match.homeLogo);
+  }
+
+  if (match.awayLogo) {
+    params.set("awayLogo", match.awayLogo);
+  }
+
+  if (match.provider) {
+    params.set("provider", match.provider);
+  }
+
+  return `/predictions/${match.fixtureId}?${params.toString()}`;
+}
+
 function TeamLogo({
   src,
   alt,
@@ -790,7 +813,7 @@ export default function HomePage() {
                     {data.fixtures.map((match) => (
                       <Link
                         key={match.fixtureId}
-                        href={`/match/${match.fixtureId}`}
+                        href={buildPredictionHref(match)}
                         className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
                       >
                         <div className="flex min-w-0 items-center justify-between gap-2">
@@ -798,11 +821,9 @@ export default function HomePage() {
                             {match.leagueName}
                           </div>
 
-                          {match.provider === "sportmonks" ? (
-                            <span className="shrink-0 rounded-full border border-blue-400/20 bg-blue-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-300">
-                              Sportmonks
-                            </span>
-                          ) : null}
+                          <span className="shrink-0 rounded-full border border-red-400/20 bg-red-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-red-300">
+                            Locked Prediction
+                          </span>
                         </div>
 
                         <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
@@ -831,8 +852,13 @@ export default function HomePage() {
                           </div>
                         </div>
 
-                        <div className="mt-2 truncate text-sm text-slate-300">
-                          {formatUKDateTime(match.date)}
+                        <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="truncate text-sm text-slate-300">
+                            {formatUKDateTime(match.date)}
+                          </div>
+                          <div className="text-xs font-semibold text-red-300">
+                            Tap to unlock match prediction →
+                          </div>
                         </div>
                       </Link>
                     ))}
