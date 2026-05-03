@@ -17,13 +17,19 @@ type Props = {
   };
 };
 
-function TeamLogo({
-  src,
-  alt,
-}: {
-  src?: string;
-  alt: string;
-}) {
+function safeDecode(value?: string) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   const initials = alt
     .split(" ")
     .map((word) => word[0])
@@ -34,7 +40,7 @@ function TeamLogo({
   if (!src) {
     return (
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-black text-white sm:h-14 sm:w-14">
-        {initials}
+        {initials || "?"}
       </div>
     );
   }
@@ -53,13 +59,13 @@ function TeamLogo({
 }
 
 export default function LockedPredictionPage({ params, searchParams }: Props) {
-  const home = searchParams?.home || "Home Team";
-  const away = searchParams?.away || "Away Team";
-  const league = searchParams?.league || "Football";
-  const date = searchParams?.date || "";
-  const homeLogo = searchParams?.homeLogo;
-  const awayLogo = searchParams?.awayLogo;
-  const provider = searchParams?.provider || "football-data";
+  const home = safeDecode(searchParams?.home) || "Home Team";
+  const away = safeDecode(searchParams?.away) || "Away Team";
+  const league = safeDecode(searchParams?.league) || "Football";
+  const date = safeDecode(searchParams?.date);
+  const homeLogo = safeDecode(searchParams?.homeLogo);
+  const awayLogo = safeDecode(searchParams?.awayLogo);
+  const provider = safeDecode(searchParams?.provider) || "football-data";
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
