@@ -115,10 +115,10 @@ export default async function LockedPredictionPage({
             {home} vs {away}
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300 md:text-base">
             {matchStarted
               ? "This match has already kicked off, so the paid prediction window is now closed."
-              : "Unlock the model prediction, probability rating and confidence score for this fixture before kick-off."}
+              : "Unlock the model prediction, probability rating and confidence score before kick-off."}
           </p>
         </div>
       </div>
