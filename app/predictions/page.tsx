@@ -71,27 +71,6 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
-function ConfidenceBadge({ confidence }: { confidence: number }) {
-  let label = "Low";
-  let styles = "bg-red-500/15 text-red-300 border-red-400/20";
-
-  if (confidence >= 70) {
-    label = "High";
-    styles = "bg-green-500/15 text-green-300 border-green-400/20";
-  } else if (confidence >= 60) {
-    label = "Medium";
-    styles = "bg-yellow-500/15 text-yellow-300 border-yellow-400/20";
-  }
-
-  return (
-    <span
-      className={`inline-flex shrink-0 rounded-full border px-2 py-1 text-xs font-semibold ${styles}`}
-    >
-      {label}
-    </span>
-  );
-}
-
 function getDrawPredictionLabel(match: PredictionMatch) {
   const drawProbability = match.prediction.probabilities.draw;
   const homeProbability = match.prediction.probabilities.home;
@@ -145,24 +124,6 @@ function getDrawPredictionLabel(match: PredictionMatch) {
   return "Score Draw";
 }
 
-function getPredictionAccentByType(type: PredictionOption["type"]) {
-  if (type === "home") return "text-green-300";
-  if (type === "away") return "text-blue-300";
-  return "text-yellow-300";
-}
-
-function getPredictionBadgeByType(type: PredictionOption["type"]) {
-  if (type === "home") {
-    return "border-green-400/20 bg-green-500/15 text-green-300";
-  }
-
-  if (type === "away") {
-    return "border-blue-400/20 bg-blue-500/15 text-blue-300";
-  }
-
-  return "border-yellow-400/20 bg-yellow-500/15 text-yellow-300";
-}
-
 function getStrongestOption(match: PredictionMatch): PredictionOption {
   const drawLabel = getDrawPredictionLabel(match);
 
@@ -185,18 +146,6 @@ function getStrongestOption(match: PredictionMatch): PredictionOption {
   ];
 
   return options.sort((a, b) => b.probability - a.probability)[0];
-}
-
-function getDailyPickLabel(match: PredictionMatch, option: PredictionOption) {
-  if (option.type === "home") {
-    return `${match.home} home win`;
-  }
-
-  if (option.type === "away") {
-    return `${match.away} away win`;
-  }
-
-  return option.label;
 }
 
 function isTodayFixture(date: string) {
@@ -354,9 +303,8 @@ export default function PredictionsPage() {
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Every prediction is locked before kick-off, except the free daily
-            pick. Unlock one match, one division, or all predictions for the
-            day.
+            Predictions are locked before kick-off. Choose one match, one
+            division, or all predictions for the day.
           </p>
 
           <div className="mt-2 text-sm text-slate-400">
@@ -420,7 +368,7 @@ export default function PredictionsPage() {
               Access
             </div>
             <div className="mt-2 text-base font-bold sm:text-lg">
-              Free daily pick
+              Paid unlock
             </div>
           </div>
         </section>
@@ -433,11 +381,7 @@ export default function PredictionsPage() {
           <>
             <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {matches.map((match) => (
-                <LockedPredictionCard
-                  key={match.fixtureId}
-                  match={match}
-                  dailyPickFixtureId={dailyPick?.match.fixtureId}
-                />
+                <LockedPredictionCard key={match.fixtureId} match={match} />
               ))}
             </div>
 
@@ -491,7 +435,7 @@ function DailyPickSection({
     return (
       <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
         <div className="text-sm font-semibold text-slate-300">
-          Loading today’s strongest pick across all leagues...
+          Loading today’s featured match...
         </div>
       </section>
     );
@@ -501,7 +445,7 @@ function DailyPickSection({
     return (
       <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
         <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
-          Free daily prediction
+          Featured match
         </div>
 
         <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
@@ -517,15 +461,13 @@ function DailyPickSection({
   }
 
   const match = dailyPick.match;
-  const option = dailyPick.option;
-  const pickLabel = getDailyPickLabel(match, option);
 
   return (
     <section className="overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="mb-3 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:text-xs">
-            Free daily prediction
+            Featured match
           </div>
 
           <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
@@ -533,7 +475,8 @@ function DailyPickSection({
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            The strongest model probability across all available leagues today.
+            This is today’s strongest match selection. Unlock to view the model
+            prediction, probability and confidence rating.
           </p>
 
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -564,39 +507,13 @@ function DailyPickSection({
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
-                  Strongest pick
-                </div>
-                <div
-                  className={`mt-1 text-lg font-black sm:text-xl ${getPredictionAccentByType(
-                    option.type
-                  )}`}
-                >
-                  {pickLabel}
-                </div>
+            <div className="mt-4 rounded-xl border border-red-400/20 bg-red-500/10 p-3">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-red-300">
+                Prediction locked
               </div>
-
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left sm:text-right">
-                <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
-                  Probability
-                </div>
-                <div className="mt-1 text-2xl font-black text-white">
-                  {option.probability}%
-                </div>
+              <div className="mt-2 text-sm leading-6 text-slate-300">
+                Outcome, probability and confidence are hidden until unlocked.
               </div>
-            </div>
-
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <ConfidenceBadge confidence={match.prediction.confidence} />
-              <span
-                className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${getPredictionBadgeByType(
-                  option.type
-                )}`}
-              >
-                {option.label}
-              </span>
             </div>
           </div>
         </div>
@@ -605,74 +522,15 @@ function DailyPickSection({
           href={buildPredictionHref(match)}
           className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
         >
-          View Free Pick →
+          Unlock today’s best pick →
         </Link>
       </div>
     </section>
   );
 }
 
-function LockedPredictionCard({
-  match,
-  dailyPickFixtureId,
-}: {
-  match: PredictionMatch;
-  dailyPickFixtureId?: number;
-}) {
-  const isDailyPick = dailyPickFixtureId === match.fixtureId;
+function LockedPredictionCard({ match }: { match: PredictionMatch }) {
   const matchStarted = hasMatchStarted(match.date);
-
-  if (isDailyPick) {
-    const option = getStrongestOption(match);
-    const pickLabel = getDailyPickLabel(match, option);
-
-    return (
-      <div className="min-w-0 overflow-hidden rounded-2xl border border-red-400/20 bg-[#111827] p-4 shadow-xl">
-        <div className="mb-2 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-          <span className="min-w-0 truncate">{match.league}</span>
-          <span className="shrink-0 text-xs sm:text-sm">
-            {formatUKDateTime(match.date)}
-          </span>
-        </div>
-
-        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
-          <div className="flex min-w-0 items-center gap-2">
-            <TeamLogo src={match.homeLogo} alt={match.home} />
-            <span className="min-w-0 truncate text-sm font-semibold sm:text-base">
-              {match.home}
-            </span>
-          </div>
-
-          <div className="rounded-xl border border-white/10 bg-white/5 px-2.5 py-2 text-xs font-semibold uppercase text-slate-300 sm:px-3">
-            vs
-          </div>
-
-          <div className="flex min-w-0 items-center justify-end gap-2">
-            <span className="min-w-0 truncate text-right text-sm font-semibold sm:text-base">
-              {match.away}
-            </span>
-            <TeamLogo src={match.awayLogo} alt={match.away} />
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-red-400/20 bg-red-500/10 p-3">
-          <div className="text-[11px] font-bold uppercase tracking-wide text-red-300">
-            Free daily pick
-          </div>
-          <div
-            className={`mt-2 text-lg font-black ${getPredictionAccentByType(
-              option.type
-            )}`}
-          >
-            {pickLabel}
-          </div>
-          <div className="mt-1 text-sm text-slate-300">
-            {option.probability}% model probability
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <Link
@@ -739,7 +597,7 @@ function LockedPredictionCard({
           )}
 
           <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs font-semibold text-slate-300">
-            {matchStarted ? "Match started" : "Tap to unlock"}
+            {matchStarted ? "Match started" : "Unlock from £1.99"}
           </span>
         </div>
       </div>
