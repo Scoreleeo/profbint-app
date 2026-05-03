@@ -12,6 +12,26 @@ function getApiKey() {
   return key;
 }
 
+function formatSportmonksDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function getUpcomingDateRange() {
+  const startDate = new Date();
+  const endDate = new Date();
+
+  endDate.setDate(startDate.getDate() + 60);
+
+  return {
+    start: formatSportmonksDate(startDate),
+    end: formatSportmonksDate(endDate),
+  };
+}
+
 async function fetchSportmonks(
   endpoint: string,
   params?: Record<string, string>
@@ -20,10 +40,8 @@ async function fetchSportmonks(
 
   const url = new URL(`${BASE_URL}${endpoint}`);
 
-  // Auth
   url.searchParams.set("api_token", apiKey);
 
-  // Optional query params
   if (params) {
     Object.entries(params).forEach(([paramKey, value]) => {
       if (value !== undefined && value !== null && value !== "") {
@@ -42,9 +60,7 @@ async function fetchSportmonks(
       throw new Error(`Sportmonks error: ${res.status} - ${text}`);
     }
 
-    const json = await res.json();
-
-    return json;
+    return res.json();
   } catch (error) {
     console.error("Sportmonks fetch failed:", {
       endpoint,
@@ -56,15 +72,14 @@ async function fetchSportmonks(
   }
 }
 
-// ✅ Upcoming fixtures (primary integration endpoint)
 export async function getUpcomingFixtures(leagueId: number) {
-  return fetchSportmonks("/fixtures", {
+  const { start, end } = getUpcomingDateRange();
+
+  return fetchSportmonks(`/fixtures/between/${start}/${end}`, {
     filters: `fixtureLeagues:${leagueId}`,
     include: "participants;league;state;venue",
   });
 }
-
-// (Future-ready placeholders — DO NOT use yet, but ready when we expand)
 
 export async function getLiveFixtures() {
   return fetchSportmonks("/livescores", {
@@ -73,7 +88,7 @@ export async function getLiveFixtures() {
 }
 
 export async function getFixturesByDate(date: string) {
-  return fetchSportmonks("/fixtures/date/" + date, {
+  return fetchSportmonks(`/fixtures/date/${date}`, {
     include: "participants;league;state;venue",
   });
 }
