@@ -93,6 +93,27 @@ function buildPredictionHref(match: MatchRow) {
   return `/predictions/${match.fixtureId}?${params.toString()}`;
 }
 
+function buildDailyPickHref(dailyPick: DailyPick) {
+  const params = new URLSearchParams();
+
+  params.set("home", dailyPick.home);
+  params.set("away", dailyPick.away);
+  params.set("league", dailyPick.league);
+  params.set("date", dailyPick.date);
+
+  if (dailyPick.homeLogo) {
+    params.set("homeLogo", dailyPick.homeLogo);
+  }
+
+  if (dailyPick.awayLogo) {
+    params.set("awayLogo", dailyPick.awayLogo);
+  }
+
+  params.set("provider", "api-football");
+
+  return `/predictions/${dailyPick.fixtureId}?${params.toString()}`;
+}
+
 function TeamLogo({
   src,
   alt,
@@ -118,7 +139,7 @@ function TeamLogo({
         className="flex shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white"
         style={{ width: boxSize, height: boxSize }}
       >
-        {initials}
+        {initials || "?"}
       </div>
     );
   }
@@ -190,49 +211,59 @@ function SectionCard({
   );
 }
 
-function getConfidenceLabel(confidence: number) {
-  if (confidence >= 70) return "High";
-  if (confidence >= 60) return "Medium";
-  return "Low";
-}
+function QuickNav() {
+  const links = [
+    { href: "#best-pick", label: "Best Pick" },
+    { href: "#live", label: "Live" },
+    { href: "#standings", label: "Standings" },
+    { href: "#fixtures", label: "Fixtures" },
+    { href: "#results", label: "Results" },
+    { href: "#news", label: "News" },
+  ];
 
-function getDailyPickAccent(type: DailyPick["type"]) {
-  if (type === "home") return "text-green-300";
-  if (type === "away") return "text-blue-300";
-  return "text-yellow-300";
-}
+  return (
+    <section className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-[#101826] p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-4">
+      <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400 sm:text-sm">
+        Jump to
+      </div>
 
-function getDailyPickBadge(type: DailyPick["type"]) {
-  if (type === "home") {
-    return "border-green-400/20 bg-green-500/15 text-green-300";
-  }
-
-  if (type === "away") {
-    return "border-blue-400/20 bg-blue-500/15 text-blue-300";
-  }
-
-  return "border-yellow-400/20 bg-yellow-500/15 text-yellow-300";
+      <div className="flex max-w-full gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:pb-0">
+        {links.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-red-400/40 hover:bg-white/10 sm:px-4"
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5">
+    <section
+      id="best-pick"
+      className="scroll-mt-20 mt-4 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5"
+    >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <div className="mb-2 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:mb-3 sm:text-xs">
-            Free daily prediction
+            Featured match
           </div>
 
           <h2 className="truncate text-lg font-black tracking-tight text-white sm:text-2xl">
-            Today’s Best Pick
+            Best Pick Right Now
           </h2>
 
           {dailyPick ? (
             <>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-                The strongest model probability across all available leagues.
-                This automatically moves to the next available matchday once the
-                current games are over.
+                This is the strongest match selection available right now.
+                Unlock to view the model prediction, probability and confidence
+                rating.
               </p>
 
               <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:mt-4 sm:p-4">
@@ -263,50 +294,22 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                   </div>
                 </div>
 
-                <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                  <div className="min-w-0">
-                    <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
-                      Strongest pick
-                    </div>
-                    <div
-                      className={`mt-1 break-words text-base font-black sm:text-xl ${getDailyPickAccent(
-                        dailyPick.type
-                      )}`}
-                    >
-                      {dailyPick.label}
-                    </div>
+                <div className="mt-4 rounded-xl border border-red-400/20 bg-red-500/10 p-3">
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-red-300">
+                    Prediction locked
                   </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left sm:px-4 sm:text-right">
-                    <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:text-xs">
-                      Probability
-                    </div>
-                    <div className="mt-1 text-xl font-black text-white sm:text-2xl">
-                      {dailyPick.probability}%
-                    </div>
+                  <div className="mt-2 text-sm leading-6 text-slate-300">
+                    Outcome, probability and confidence are hidden until
+                    unlocked.
                   </div>
-                </div>
-
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span
-                    className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${getDailyPickBadge(
-                      dailyPick.type
-                    )}`}
-                  >
-                    {dailyPick.shortLabel}
-                  </span>
-
-                  <span className="inline-flex rounded-full border border-white/10 bg-white/5 px-2 py-1 text-xs font-semibold text-slate-200">
-                    {getConfidenceLabel(dailyPick.confidence)} confidence
-                  </span>
                 </div>
               </div>
             </>
           ) : (
             <>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-                Today’s strongest model pick will appear here when eligible
-                fixtures are available across your selected leagues.
+                No eligible fixtures are available right now. Check back when
+                the next suitable fixtures are available.
               </p>
 
               <div className="mt-4 grid gap-3 sm:flex sm:flex-wrap">
@@ -315,7 +318,7 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                     Access
                   </div>
                   <div className="mt-1 text-sm font-bold text-white">
-                    Free pick daily
+                    Paid unlock
                   </div>
                 </div>
 
@@ -332,12 +335,21 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
           )}
         </div>
 
-        <Link
-          href="/predictions"
-          className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
-        >
-          View Predictions →
-        </Link>
+        {dailyPick ? (
+          <Link
+            href={buildDailyPickHref(dailyPick)}
+            className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
+          >
+            Unlock best pick right now →
+          </Link>
+        ) : (
+          <Link
+            href="/predictions"
+            className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
+          >
+            View Predictions →
+          </Link>
+        )}
       </div>
     </section>
   );
@@ -554,7 +566,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
+    <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden scroll-smooth bg-[#0b1220] text-white">
       <LiveTicker matches={data?.live || []} />
 
       <div className="border-b border-white/10 bg-[#08101c]">
@@ -639,6 +651,8 @@ export default function HomePage() {
           </div>
         </section>
 
+        <QuickNav />
+
         <DailyPickCard dailyPick={data?.dailyPick} />
 
         <section className="mt-4 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-3 sm:mt-6 sm:p-5">
@@ -708,7 +722,7 @@ export default function HomePage() {
 
         {!loading && data ? (
           <>
-            <section className="mt-4 sm:mt-6">
+            <section id="live" className="scroll-mt-20 mt-4 sm:mt-6">
               <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
                 <h2 className="min-w-0 truncate text-base font-bold sm:text-xl">
                   Live Matches
@@ -764,110 +778,114 @@ export default function HomePage() {
             </section>
 
             <div className="mt-4 grid min-w-0 gap-4 sm:mt-6 sm:gap-5 lg:grid-cols-2">
-              <SectionCard title="Standings">
-                {data.standings.length === 0 ? (
-                  <p className="text-sm text-slate-300 sm:text-base">
-                    No standings returned for this league.
-                  </p>
-                ) : (
-                  <div className="space-y-2 sm:space-y-3">
-                    {data.standings.map((row) => (
-                      <Link
-                        key={row.teamId}
-                        href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
-                        className="flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10 sm:min-h-[68px]"
-                      >
-                        <div className="flex min-w-0 items-center gap-3">
-                          <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
-                            {row.rank}
-                          </span>
-                          <TeamLogo src={row.logo} alt={row.team} />
-                          <div className="min-w-0">
-                            <span className="block min-w-0 truncate text-sm font-semibold sm:text-base">
-                              {row.team}
+              <div id="standings" className="scroll-mt-20">
+                <SectionCard title="Standings">
+                  {data.standings.length === 0 ? (
+                    <p className="text-sm text-slate-300 sm:text-base">
+                      No standings returned for this league.
+                    </p>
+                  ) : (
+                    <div className="space-y-2 sm:space-y-3">
+                      {data.standings.map((row) => (
+                        <Link
+                          key={row.teamId}
+                          href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
+                          className="flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10 sm:min-h-[68px]"
+                        >
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
+                              {row.rank}
                             </span>
-                            <FormPills form={row.form} />
-                          </div>
-                        </div>
-
-                        <div className="shrink-0 text-right text-xs text-slate-300 sm:text-sm">
-                          {row.points} pts
-                          <span className="hidden sm:inline">
-                            {" "}
-                            • GD {row.goalDiff}
-                          </span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </SectionCard>
-
-              <SectionCard title="Upcoming Fixtures">
-                {data.fixtures.length === 0 ? (
-                  <p className="text-sm text-slate-300 sm:text-base">
-                    No fixtures returned for this league.
-                  </p>
-                ) : (
-                  <div className="space-y-2 sm:space-y-3">
-                    {data.fixtures.map((match) => (
-                      <Link
-                        key={match.fixtureId}
-                        href={buildPredictionHref(match)}
-                        className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
-                      >
-                        <div className="flex min-w-0 items-center justify-between gap-2">
-                          <div className="min-w-0 truncate text-sm text-slate-400">
-                            {match.leagueName}
+                            <TeamLogo src={row.logo} alt={row.team} />
+                            <div className="min-w-0">
+                              <span className="block min-w-0 truncate text-sm font-semibold sm:text-base">
+                                {row.team}
+                              </span>
+                              <FormPills form={row.form} />
+                            </div>
                           </div>
 
-                          <span className="shrink-0 rounded-full border border-red-400/20 bg-red-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-red-300">
-                            Locked Prediction
-                          </span>
-                        </div>
+                          <div className="shrink-0 text-right text-xs text-slate-300 sm:text-sm">
+                            {row.points} pts
+                            <span className="hidden sm:inline">
+                              {" "}
+                              • GD {row.goalDiff}
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </SectionCard>
+              </div>
 
-                        <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
-                          <div className="flex min-w-0 items-center gap-2">
-                            <TeamLogo
-                              src={match.homeLogo}
-                              alt={match.homeTeam}
-                            />
-                            <span className="min-w-0 truncate text-sm font-medium sm:text-base">
-                              {match.homeTeam}
+              <div id="fixtures" className="scroll-mt-20">
+                <SectionCard title="Upcoming Fixtures">
+                  {data.fixtures.length === 0 ? (
+                    <p className="text-sm text-slate-300 sm:text-base">
+                      No fixtures returned for this league.
+                    </p>
+                  ) : (
+                    <div className="space-y-2 sm:space-y-3">
+                      {data.fixtures.map((match) => (
+                        <Link
+                          key={match.fixtureId}
+                          href={buildPredictionHref(match)}
+                          className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
+                        >
+                          <div className="flex min-w-0 items-center justify-between gap-2">
+                            <div className="min-w-0 truncate text-sm text-slate-400">
+                              {match.leagueName}
+                            </div>
+
+                            <span className="shrink-0 rounded-full border border-red-400/20 bg-red-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-red-300">
+                              Locked Prediction
                             </span>
                           </div>
 
-                          <span className="text-xs font-semibold uppercase text-slate-400 sm:text-sm">
-                            vs
-                          </span>
+                          <div className="mt-2 grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <TeamLogo
+                                src={match.homeLogo}
+                                alt={match.homeTeam}
+                              />
+                              <span className="min-w-0 truncate text-sm font-medium sm:text-base">
+                                {match.homeTeam}
+                              </span>
+                            </div>
 
-                          <div className="flex min-w-0 items-center justify-end gap-2">
-                            <span className="min-w-0 truncate text-right text-sm font-medium sm:text-base">
-                              {match.awayTeam}
+                            <span className="text-xs font-semibold uppercase text-slate-400 sm:text-sm">
+                              vs
                             </span>
-                            <TeamLogo
-                              src={match.awayLogo}
-                              alt={match.awayTeam}
-                            />
-                          </div>
-                        </div>
 
-                        <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                          <div className="truncate text-sm text-slate-300">
-                            {formatUKDateTime(match.date)}
+                            <div className="flex min-w-0 items-center justify-end gap-2">
+                              <span className="min-w-0 truncate text-right text-sm font-medium sm:text-base">
+                                {match.awayTeam}
+                              </span>
+                              <TeamLogo
+                                src={match.awayLogo}
+                                alt={match.awayTeam}
+                              />
+                            </div>
                           </div>
-                          <div className="text-xs font-semibold text-red-300">
-                            Tap to unlock match prediction →
+
+                          <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="truncate text-sm text-slate-300">
+                              {formatUKDateTime(match.date)}
+                            </div>
+                            <div className="text-xs font-semibold text-red-300">
+                              Tap to unlock match prediction →
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </SectionCard>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </SectionCard>
+              </div>
             </div>
 
-            <div className="mt-4 sm:mt-6">
+            <div id="results" className="scroll-mt-20 mt-4 sm:mt-6">
               <SectionCard title="Latest Results">
                 {data.results.length === 0 ? (
                   <p className="text-sm text-slate-300 sm:text-base">
@@ -921,7 +939,7 @@ export default function HomePage() {
               </SectionCard>
             </div>
 
-            <div className="mt-4 sm:mt-6">
+            <div id="news" className="scroll-mt-20 mt-4 sm:mt-6">
               <SectionCard title="Football News">
                 {news.length === 0 ? (
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300 sm:p-5 sm:text-base">
