@@ -20,9 +20,93 @@ import {
 import { getUpcomingFixtures as getSportmonksUpcomingFixtures } from "@/lib/sportmonks/services";
 
 const SPORTMONKS_LEAGUE_MAP: Record<number, number> = {
-  // API-Football Premier League -> Sportmonks Premier League
   39: 8,
 };
+
+function emptyApiFootballResponse() {
+  return {
+    response: [],
+  };
+}
+
+function hasApiFootballRows(data: any) {
+  return Array.isArray(data?.response) && data.response.length > 0;
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetryIfEmpty(
+  label: string,
+  fetcher: () => Promise<any>,
+  retries = 2
+) {
+  let lastData: any = null;
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const data = await fetcher();
+      lastData = data;
+
+      if (hasApiFootballRows(data)) {
+        return data;
+      }
+
+      if (attempt < retries) {
+        await sleep(700 + attempt * 500);
+      }
+    } catch (error) {
+      lastError = error;
+
+      if (attempt < retries) {
+        await sleep(700 + attempt * 500);
+      }
+    }
+  }
+
+  if (lastData) {
+    console.warn(`${label} returned empty after retry.`);
+    return lastData;
+  }
+
+  console.error(`${label} failed after retry:`, lastError);
+  return emptyApiFootballResponse();
+}
+
+async function fetchSafe(label: string, fetcher: () => Promise<any>) {
+  try {
+    return await fetcher();
+  } catch (error) {
+    console.error(`${label} failed:`, error);
+    return emptyApiFootballResponse();
+  }
+}
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  fallback: T,
+  label: string
+): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<T>((resolve) => {
+    timeout = setTimeout(() => {
+      console.warn(`${label} timed out after ${ms}ms.`);
+      resolve(fallback);
+    }, ms);
+  });
+
+  const result = await Promise.race([promise, timeoutPromise]);
+
+  if (timeout) {
+    clearTimeout(timeout);
+  }
+
+  return result;
+}
 
 async function getSportmonksFixturesForLeague(leagueId: number) {
   const sportmonksLeagueId = SPORTMONKS_LEAGUE_MAP[leagueId];
@@ -31,28 +115,36 @@ async function getSportmonksFixturesForLeague(leagueId: number) {
     return null;
   }
 
-  try {
-    return await getSportmonksUpcomingFixtures(sportmonksLeagueId);
-  } catch (error) {
-    console.error("Sportmonks fixtures unavailable, using API-Football:", error);
-    return null;
-  }
+  return withTimeout(
+    getSportmonksUpcomingFixtures(sportmonksLeagueId).catch((error) => {
+      console.error(
+        "Sportmonks fixtures unavailable, using API-Football:",
+        error
+      );
+
+      return null;
+    }),
+    3500,
+    null,
+    "Sportmonks fixtures"
+  );
 }
 
 export async function getDashboardData(leagueId: number, season: number) {
-  const [
-    standingsRaw,
-    fixturesRaw,
-    resultsRaw,
-    liveRaw,
-    sportmonksFixturesRaw,
-  ] = await Promise.all([
-    fetchStandingsRaw(leagueId, season),
-    fetchFixturesRaw(leagueId, season, "NS"),
-    fetchFixturesRaw(leagueId, season, "FT"),
-    fetchLiveRaw(),
-    getSportmonksFixturesForLeague(leagueId),
+  const [standingsRaw, fixturesRaw, resultsRaw, liveRaw] = await Promise.all([
+    fetchWithRetryIfEmpty("Standings", () =>
+      fetchStandingsRaw(leagueId, season)
+    ),
+    fetchWithRetryIfEmpty("Upcoming fixtures", () =>
+      fetchFixturesRaw(leagueId, season, "NS")
+    ),
+    fetchWithRetryIfEmpty("Latest results", () =>
+      fetchFixturesRaw(leagueId, season, "FT")
+    ),
+    fetchSafe("Live matches", () => fetchLiveRaw()),
   ]);
+
+  const sportmonksFixturesRaw = await getSportmonksFixturesForLeague(leagueId);
 
   const standings = mapStandingsResponse(standingsRaw);
   const teamIds = standings
