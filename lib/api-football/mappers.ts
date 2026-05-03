@@ -63,6 +63,14 @@ export function mapSportmonksFixturesResponse(data: any): MatchRow[] {
         (participant: any) => participant.meta?.location === "away"
       ) || participants[1];
 
+    // ✅ FIX: robust logo handling
+    const getLogo = (team: any) =>
+      team?.image_path ||
+      team?.logo ||
+      team?.image ||
+      team?.meta?.image_path ||
+      undefined;
+
     return {
       fixtureId: item.id,
       date: item.starting_at,
@@ -73,8 +81,8 @@ export function mapSportmonksFixturesResponse(data: any): MatchRow[] {
       awayTeamId: awayTeam?.id,
       homeTeam: homeTeam?.name || "Home",
       awayTeam: awayTeam?.name || "Away",
-      homeLogo: homeTeam?.image_path || undefined,
-      awayLogo: awayTeam?.image_path || undefined,
+      homeLogo: getLogo(homeTeam),
+      awayLogo: getLogo(awayTeam),
       provider: "sportmonks",
       goals: {
         home: null,
@@ -164,8 +172,8 @@ export function mapFixtureEventsResponse(data: any): FixtureEvent[] {
       elapsed && extra
         ? `${elapsed}+${extra}'`
         : elapsed
-          ? `${elapsed}'`
-          : "—";
+        ? `${elapsed}'`
+        : "—";
 
     return {
       time,
