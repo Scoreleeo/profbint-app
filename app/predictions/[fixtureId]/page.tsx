@@ -46,6 +46,20 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
+function hasMatchStarted(date: string) {
+  if (!date) {
+    return false;
+  }
+
+  const kickoffTime = new Date(date).getTime();
+
+  if (Number.isNaN(kickoffTime)) {
+    return false;
+  }
+
+  return Date.now() >= kickoffTime;
+}
+
 export default async function LockedPredictionPage({
   params,
   searchParams,
@@ -61,6 +75,8 @@ export default async function LockedPredictionPage({
   const awayLogo = resolvedSearchParams.awayLogo || "";
   const provider = resolvedSearchParams.provider || "football-data";
 
+  const matchStarted = hasMatchStarted(date);
+
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
       <div className="border-b border-white/10 bg-[#08101c]">
@@ -73,7 +89,7 @@ export default async function LockedPredictionPage({
           </Link>
 
           <div className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
-            Locked Match Prediction
+            {matchStarted ? "Prediction Closed" : "Locked Match Prediction"}
           </div>
 
           <h1 className="mt-2 break-words text-2xl font-black tracking-tight sm:text-3xl md:text-5xl">
@@ -81,8 +97,9 @@ export default async function LockedPredictionPage({
           </h1>
 
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
-            Unlock the model prediction, probability rating and confidence score
-            for this fixture.
+            {matchStarted
+              ? "This match has already kicked off, so the paid prediction window is now closed."
+              : "Unlock the model prediction, probability rating and confidence score for this fixture before kick-off."}
           </p>
         </div>
       </div>
@@ -150,70 +167,128 @@ export default async function LockedPredictionPage({
           </div>
         </section>
 
-        <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-5 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mx-auto mb-4 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-red-300">
-              🔒 Prediction locked
-            </div>
-
-            <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
-              Unlock this match prediction
-            </h2>
-
-            <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
-              Get the best outcome option, model probability and confidence
-              rating for this fixture.
-            </p>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-wide text-slate-400">
-                  Single match
-                </div>
-                <div className="mt-2 text-2xl font-black text-white">£1.99</div>
+        {matchStarted ? (
+          <section className="mt-5 overflow-hidden rounded-2xl border border-yellow-400/20 bg-yellow-500/10 p-5 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="mx-auto mb-4 inline-flex rounded-full border border-yellow-400/20 bg-yellow-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-yellow-300">
+                Prediction closed
               </div>
 
-              <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4">
-                <div className="text-xs uppercase tracking-wide text-red-300">
-                  Best value
+              <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+                Match has started
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
+                Paid predictions close at kick-off. This protects the product
+                and keeps the service fair.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Link
+                  href="/"
+                  className="rounded-xl bg-red-500 px-6 py-3 text-sm font-black text-white shadow-lg transition hover:bg-red-400"
+                >
+                  Back to fixtures
+                </Link>
+
+                <Link
+                  href="/predictions"
+                  className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                >
+                  View available predictions
+                </Link>
+              </div>
+
+              <p className="mt-5 text-xs leading-5 text-slate-500">
+                Fixture ID: {resolvedParams.fixtureId}. Provider: {provider}.
+              </p>
+            </div>
+          </section>
+        ) : (
+          <section className="mt-5 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-5 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="mx-auto mb-4 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-red-300">
+                🔒 Prediction locked
+              </div>
+
+              <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+                Unlock this match prediction
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
+                Get the best outcome option, model probability and confidence
+                rating for this fixture.
+              </p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <div className="text-xs uppercase tracking-wide text-slate-400">
+                    Single match
+                  </div>
+                  <div className="mt-2 text-2xl font-black text-white">
+                    £1.99
+                  </div>
+                  <div className="mt-1 text-xs text-slate-400">
+                    Unlock this game
+                  </div>
                 </div>
-                <div className="mt-2 text-2xl font-black text-white">£9.99</div>
-                <div className="mt-1 text-xs text-slate-400">
-                  Unlock all today
+
+                <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4">
+                  <div className="text-xs uppercase tracking-wide text-red-300">
+                    Best value
+                  </div>
+                  <div className="mt-2 text-2xl font-black text-white">
+                    £9.99
+                  </div>
+                  <div className="mt-1 text-xs text-slate-400">
+                    Unlock all today
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <div className="text-xs uppercase tracking-wide text-slate-400">
+                    Division pass
+                  </div>
+                  <div className="mt-2 text-2xl font-black text-white">
+                    £5.99
+                  </div>
+                  <div className="mt-1 text-xs text-slate-400">
+                    Unlock this league
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <div className="text-xs uppercase tracking-wide text-slate-400">
-                  Division pass
-                </div>
-                <div className="mt-2 text-2xl font-black text-white">£5.99</div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <button
+                  type="button"
+                  className="rounded-xl bg-red-500 px-6 py-3 text-sm font-black text-white shadow-lg transition hover:bg-red-400"
+                >
+                  Unlock this prediction – £1.99
+                </button>
+
+                <button
+                  type="button"
+                  className="rounded-xl border border-red-400/30 bg-red-500/10 px-6 py-3 text-sm font-black text-red-200 transition hover:bg-red-500/20"
+                >
+                  Unlock all today – £9.99
+                </button>
+
+                <Link
+                  href="/predictions"
+                  className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                >
+                  View all predictions
+                </Link>
               </div>
+
+              <p className="mt-5 text-xs leading-5 text-slate-500">
+                Payments are not active yet. This page prepares the premium
+                unlock flow before Stripe is connected. Fixture ID:{" "}
+                {resolvedParams.fixtureId}. Provider: {provider}.
+              </p>
             </div>
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <button
-                type="button"
-                className="rounded-xl bg-red-500 px-6 py-3 text-sm font-black text-white shadow-lg transition hover:bg-red-400"
-              >
-                Unlock this prediction – £1.99
-              </button>
-
-              <Link
-                href="/predictions"
-                className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-              >
-                View all predictions
-              </Link>
-            </div>
-
-            <p className="mt-5 text-xs leading-5 text-slate-500">
-              Payments are not active yet. This page prepares the premium unlock
-              flow before Stripe is connected. Fixture ID:{" "}
-              {resolvedParams.fixtureId}. Provider: {provider}.
-            </p>
-          </div>
-        </section>
+          </section>
+        )}
 
         <section className="mt-5 rounded-2xl border border-white/10 bg-[#111827] p-4 text-xs leading-6 text-slate-400 sm:mt-6 sm:rounded-3xl sm:p-5">
           Predictions are for informational purposes only and do not guarantee
