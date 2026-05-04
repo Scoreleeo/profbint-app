@@ -201,7 +201,7 @@ function SectionCard({
 }) {
   return (
     <section className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] shadow-xl sm:rounded-3xl">
-      <div className="border-b border-white/15 px-3 py-3 sm:px-5 sm:py-4">
+      <div className="border-b border-white/10 px-3 py-3 sm:px-5 sm:py-4">
         <h2 className="truncate text-base font-bold text-white sm:text-xl">
           {title}
         </h2>
@@ -232,7 +232,7 @@ function QuickNav() {
           <a
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-xl border border-blue-500/30 bg-blue-600/20 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-blue-600/30 sm:px-4"
+            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-blue-700 hover:bg-blue-700 hover:text-white sm:px-4"
           >
             {item.label}
           </a>
@@ -246,11 +246,11 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
   return (
     <section
       id="best-pick"
-      className="scroll-mt-20 mt-4 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-blue-500/10 via-[#172033] to-blue-400/5 p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5"
+      className="scroll-mt-20 mt-4 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5"
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <div className="mb-2 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:mb-3 sm:text-xs">
+          <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 sm:mb-3 sm:text-xs">
             Featured match
           </div>
 
@@ -569,19 +569,19 @@ export default function HomePage() {
     <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden scroll-smooth bg-[#101827] text-white">
       <LiveTicker matches={data?.live || []} />
 
-      <div className="border-b border-white/15 bg-[#08101c]">
+      <div className="border-b border-white/10 bg-[#101827]">
         <div className="mx-auto max-w-7xl px-3 py-3 sm:px-4 sm:py-4 md:px-6 lg:px-8">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-sm sm:tracking-[0.2em]">
             Live Football Centre
           </div>
         </div>
       </div>
 
       <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-3 py-4 sm:px-4 sm:py-6 md:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-[#172033] via-[#182235] to-[#1e293b] shadow-2xl sm:rounded-[32px]">
+        <section className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] shadow-2xl sm:rounded-[32px]">
           <div className="grid gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 md:px-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
             <div className="min-w-0">
-              <div className="mb-2 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-blue-300 sm:text-xs">
+              <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
                 Matchday coverage
               </div>
 
@@ -639,10 +639,10 @@ export default function HomePage() {
 
         <DailyPickCard dailyPick={data?.dailyPick} />
 
-        <section className="mt-4 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-blue-500/10 to-blue-400/5 p-3 sm:mt-6 sm:p-5">
+        <section className="mt-4 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 sm:mt-6 sm:p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-wide text-blue-300 sm:text-xs">
+              <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                 New
               </div>
               <div className="truncate text-base font-bold sm:text-lg">
@@ -680,7 +680,7 @@ export default function HomePage() {
                     "shrink-0 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4",
                     active
                       ? "bg-blue-700 text-white shadow-lg"
-                      : "border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10",
+                      : "border border-white/15 bg-white/5 text-slate-200 hover:bg-blue-700 hover:text-white",
                   ].join(" ")}
                 >
                   {league.name}
@@ -725,7 +725,7 @@ export default function HomePage() {
                   {data.live.map((match) => (
                     <div
                       key={match.fixtureId}
-                      className="overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-[#172033] to-[#1e293b] p-3 shadow-lg transition hover:border-red-400/40 sm:p-4"
+                      className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 shadow-lg transition hover:border-white/25 sm:p-4"
                     >
                       <div className="mb-2 flex min-w-0 items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide">
                         <span className="min-w-0 truncate text-slate-400">
@@ -774,7 +774,7 @@ export default function HomePage() {
                         <Link
                           key={row.teamId}
                           href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
-                          className="flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/15 bg-white/5 p-3 transition hover:border-blue-400/40 hover:bg-white/10 sm:min-h-[68px]"
+                          className="flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/15 bg-[#172033] p-3 transition hover:border-blue-700 hover:bg-white/10 sm:min-h-[68px]"
                         >
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
@@ -815,7 +815,7 @@ export default function HomePage() {
                         <Link
                           key={match.fixtureId}
                           href={buildPredictionHref(match)}
-                          className="block overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-3 transition hover:border-blue-400/40 hover:bg-white/10"
+                          className="block overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 transition hover:border-blue-700 hover:bg-white/10"
                         >
                           <div className="flex min-w-0 items-center justify-between gap-2">
                             <div className="min-w-0 truncate text-sm text-slate-400">
@@ -857,7 +857,7 @@ export default function HomePage() {
                             <div className="truncate text-sm text-slate-300">
                               {formatUKDateTime(match.date)}
                             </div>
-                            <div className="text-xs font-semibold text-red-300">
+                            <div className="text-xs font-semibold text-slate-300">
                               Tap to unlock match prediction →
                             </div>
                           </div>
@@ -881,7 +881,7 @@ export default function HomePage() {
                       <Link
                         key={match.fixtureId}
                         href={`/report/${match.fixtureId}`}
-                        className="block overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-3 transition hover:border-blue-400/40 hover:bg-white/10"
+                        className="block overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 transition hover:border-blue-700 hover:bg-white/10"
                       >
                         <div className="truncate text-sm text-slate-400">
                           {match.leagueName}
@@ -926,7 +926,7 @@ export default function HomePage() {
             <div id="news" className="scroll-mt-20 mt-4 sm:mt-6">
               <SectionCard title="Football News">
                 {news.length === 0 ? (
-                  <div className="rounded-2xl border border-white/15 bg-white/5 p-4 text-sm text-slate-300 sm:p-5 sm:text-base">
+                  <div className="rounded-2xl border border-white/15 bg-[#172033] p-4 text-sm text-slate-300 sm:p-5 sm:text-base">
                     Football news feed unavailable right now.
                   </div>
                 ) : (
@@ -943,8 +943,8 @@ export default function HomePage() {
                       const kind = article.kind?.toLowerCase() || "news";
 
                       const cardClasses = isFeatured
-                        ? "block overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-[#1e293b] via-[#172033] to-[#101827] p-4 shadow-lg transition hover:border-blue-400/30 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-7 md:p-8"
-                        : "block overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-4 transition hover:border-white/20 hover:bg-white/10 sm:p-5";
+                        ? "block overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-lg transition hover:border-blue-700 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-7 md:p-8"
+                        : "block overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 transition hover:border-white/20 hover:bg-white/10 sm:p-5";
 
                       const titleClasses = isFeatured
                         ? "mt-3 max-w-4xl break-words text-lg font-black leading-tight text-white sm:mt-4 sm:text-3xl md:text-4xl lg:text-5xl"
@@ -1013,7 +1013,7 @@ export default function HomePage() {
           </>
         ) : null}
 
-        <footer className="mt-8 border-t border-white/15 pt-5 pb-5 sm:mt-10 sm:pt-6 sm:pb-2">
+        <footer className="mt-8 border-t border-white/10 pt-5 pb-5 sm:mt-10 sm:pt-6 sm:pb-2">
           <div className="flex flex-wrap items-center justify-center gap-4 text-center">
             <Link
               href="/"
