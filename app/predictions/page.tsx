@@ -91,7 +91,7 @@ function QuickNav() {
           <Link
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-red-400/40 hover:bg-white/10"
+            className="shrink-0 rounded-xl border border-blue-500/30 bg-blue-600/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-blue-600/30"
           >
             {item.label}
           </Link>
@@ -326,7 +326,7 @@ export default function PredictionsPage() {
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] p-4 shadow-2xl sm:rounded-3xl sm:p-6">
           <Link
             href="/"
-            className="mb-4 inline-flex rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+            className="mb-4 inline-flex rounded-xl border border-blue-500/30 bg-blue-600/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-blue-600/30"
           >
             ← Back to Home
           </Link>
@@ -585,7 +585,7 @@ function DailyPickSection({
 
         <Link
           href={buildPredictionHref(match)}
-          className="inline-flex justify-center rounded-xl bg-red-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-red-400"
+          className="inline-flex justify-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-blue-600"
         >
           Unlock best pick right now →
         </Link>
