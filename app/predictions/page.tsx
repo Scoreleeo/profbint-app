@@ -91,7 +91,7 @@ function QuickNav() {
           <Link
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-blue-700 hover:bg-blue-700 hover:text-white"
+            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
           >
             {item.label}
           </Link>
@@ -326,7 +326,7 @@ export default function PredictionsPage() {
         <section className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-2xl sm:rounded-3xl sm:p-5">
           <Link
             href="/"
-            className="mb-3 inline-flex rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-blue-700 hover:bg-blue-700 hover:text-white"
+            className="mb-3 inline-flex rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
           >
             ← Back to Home
           </Link>
@@ -375,8 +375,8 @@ export default function PredictionsPage() {
                   className={[
                     "shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition",
                     active
-                      ? "bg-blue-700 text-white shadow-lg"
-                      : "border border-white/15 bg-white/5 text-slate-200 hover:bg-blue-700 hover:text-white",
+                      ? "border border-[#f3d98b]/30 bg-[#d6a94f] text-[#08101c]"
+                      : "border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10",
                   ].join(" ")}
                 >
                   {league.name}
@@ -585,7 +585,7 @@ function DailyPickSection({
 
         <Link
           href={buildPredictionHref(match)}
-          className="inline-flex justify-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-blue-600"
+          className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-5 py-3 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
         >
           Unlock best pick right now →
         </Link>
@@ -600,7 +600,7 @@ function LockedPredictionCard({ match }: { match: PredictionMatch }) {
   return (
     <Link
       href={buildPredictionHref(match)}
-      className="block min-w-0 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl transition hover:border-blue-700 hover:bg-white/[0.04]"
+      className="block min-w-0 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl transition hover:bg-white/[0.04]"
     >
       <div className="mb-2 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <span className="min-w-0 truncate">{match.league}</span>
