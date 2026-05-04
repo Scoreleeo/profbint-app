@@ -232,7 +232,7 @@ function QuickNav() {
           <a
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:border-blue-400/40 hover:bg-white/10 sm:px-4"
+            className="shrink-0 rounded-xl border border-blue-500/30 bg-blue-600/20 px-3 py-2 text-sm font-semibold text-slate-200 transition hover:bg-blue-600/30 sm:px-4"
           >
             {item.label}
           </a>
@@ -246,11 +246,11 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
   return (
     <section
       id="best-pick"
-      className="scroll-mt-20 mt-4 overflow-hidden rounded-2xl border border-blue-400/20 bg-gradient-to-r from-blue-500/10 via-[#111827] to-blue-400/5 p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5"
+      className="scroll-mt-20 mt-4 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 via-[#111827] to-red-400/5 p-3 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-5"
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <div className="mb-2 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:mb-3 sm:text-xs">
+          <div className="mb-2 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-300 sm:mb-3 sm:text-xs">
             Featured match
           </div>
 
@@ -294,8 +294,8 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                   </div>
                 </div>
 
-                <div className="mt-4 rounded-xl border border-blue-400/20 bg-blue-500/10 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-blue-300">
+                <div className="mt-4 rounded-xl border border-red-400/20 bg-red-500/10 p-3">
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-red-300">
                     Prediction locked
                   </div>
                   <div className="mt-2 text-sm leading-6 text-slate-300">
@@ -338,14 +338,14 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
         {dailyPick ? (
           <Link
             href={buildDailyPickHref(dailyPick)}
-            className="inline-flex justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500"
+            className="inline-flex justify-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-blue-600"
           >
             Unlock best pick right now →
           </Link>
         ) : (
           <Link
             href="/predictions"
-            className="inline-flex justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500"
+            className="inline-flex justify-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-blue-600"
           >
             View Predictions →
           </Link>
@@ -578,75 +578,59 @@ export default function HomePage() {
       </div>
 
       <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-3 py-4 sm:px-4 sm:py-6 md:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#101826] shadow-xl sm:rounded-3xl">
-          <div className="flex flex-col gap-4 px-4 py-4 sm:px-5 sm:py-5 lg:flex-row lg:items-center lg:justify-between">
+        <section className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-[#0f172a] via-[#111827] to-[#1e293b] shadow-2xl sm:rounded-[32px]">
+          <div className="grid gap-4 px-4 py-5 sm:gap-6 sm:px-6 sm:py-8 md:px-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
             <div className="min-w-0">
-              <div className="mb-2 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-blue-300 sm:text-xs">
+              <div className="mb-2 inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-red-300 sm:mb-3 sm:text-xs">
                 Matchday coverage
               </div>
 
-              <h1 className="truncate text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl">
+              <h1 className="truncate text-[26px] font-black leading-tight tracking-tight sm:text-3xl md:text-4xl lg:text-5xl">
                 Pro Football Intel
               </h1>
 
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:mt-3 md:text-base">
                 Data-driven football insights, live scores, and AI-powered match
                 predictions across Europe’s top leagues.
               </p>
             </div>
 
-            <div className="grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-4 lg:w-auto lg:min-w-[520px]">
-              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3">
+            <div className="grid min-w-0 grid-cols-2 gap-2 sm:gap-3">
+              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   League
                 </div>
-                <div className="mt-1 truncate text-sm font-bold text-white">
+                <div className="mt-1 truncate text-sm font-bold sm:mt-2 sm:text-lg">
                   {selectedLeague.name}
                 </div>
               </div>
 
-              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Season
                 </div>
-                <div className="mt-1 text-sm font-bold text-white">
+                <div className="mt-1 text-sm font-bold sm:mt-2 sm:text-lg">
                   {SEASON}
                 </div>
               </div>
 
-              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Live Games
                 </div>
-                <div className="mt-1 text-sm font-bold text-white">
+                <div className="mt-1 text-sm font-bold sm:mt-2 sm:text-lg">
                   {data?.live?.length ?? 0}
                 </div>
               </div>
 
-              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3">
+              <div className="min-w-0 rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                 <div className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
                   Updated
                 </div>
-                <div className="mt-1 truncate text-sm font-bold text-white">
+                <div className="mt-1 truncate text-sm font-bold sm:mt-2 sm:text-lg">
                   {lastUpdated || "--:--:--"}
                 </div>
               </div>
-            </div>
-
-            <div className="grid gap-2 sm:flex sm:flex-wrap lg:justify-end">
-              <Link
-                href="/predictions"
-                className="inline-flex justify-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition hover:bg-blue-500"
-              >
-                View AI Predictions
-              </Link>
-
-              <Link
-                href="/predictions"
-                className="inline-flex justify-center rounded-xl border border-blue-400/30 bg-blue-500/10 px-5 py-2.5 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/20"
-              >
-                Premium Insights →
-              </Link>
             </div>
           </div>
         </section>
@@ -655,10 +639,10 @@ export default function HomePage() {
 
         <DailyPickCard dailyPick={data?.dailyPick} />
 
-        <section className="mt-4 overflow-hidden rounded-2xl border border-blue-400/20 bg-gradient-to-r from-blue-500/10 to-blue-400/5 p-3 sm:mt-6 sm:p-5">
+        <section className="mt-4 overflow-hidden rounded-2xl border border-red-400/20 bg-gradient-to-r from-red-500/10 to-red-400/5 p-3 sm:mt-6 sm:p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-wide text-blue-300 sm:text-xs">
+              <div className="text-[10px] uppercase tracking-wide text-red-300 sm:text-xs">
                 New
               </div>
               <div className="truncate text-base font-bold sm:text-lg">
@@ -672,7 +656,7 @@ export default function HomePage() {
 
             <Link
               href="/predictions"
-              className="inline-flex justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
+              className="inline-flex justify-center rounded-xl bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600"
             >
               View →
             </Link>
@@ -695,7 +679,7 @@ export default function HomePage() {
                   className={[
                     "shrink-0 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4",
                     active
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                      ? "bg-[#d90429] text-white shadow-lg"
                       : "border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10",
                   ].join(" ")}
                 >
@@ -790,7 +774,7 @@ export default function HomePage() {
                         <Link
                           key={row.teamId}
                           href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
-                          className="flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-blue-400/40 hover:bg-white/10 sm:min-h-[68px]"
+                          className="flex min-h-[62px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10 sm:min-h-[68px]"
                         >
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
@@ -831,14 +815,14 @@ export default function HomePage() {
                         <Link
                           key={match.fixtureId}
                           href={buildPredictionHref(match)}
-                          className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-blue-400/40 hover:bg-white/10"
+                          className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
                         >
                           <div className="flex min-w-0 items-center justify-between gap-2">
                             <div className="min-w-0 truncate text-sm text-slate-400">
                               {match.leagueName}
                             </div>
 
-                            <span className="shrink-0 rounded-full border border-blue-400/20 bg-blue-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-300">
+                            <span className="shrink-0 rounded-full border border-red-400/20 bg-red-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-red-300">
                               Locked Prediction
                             </span>
                           </div>
@@ -873,7 +857,7 @@ export default function HomePage() {
                             <div className="truncate text-sm text-slate-300">
                               {formatUKDateTime(match.date)}
                             </div>
-                            <div className="text-xs font-semibold text-blue-300">
+                            <div className="text-xs font-semibold text-red-300">
                               Tap to unlock match prediction →
                             </div>
                           </div>
@@ -897,7 +881,7 @@ export default function HomePage() {
                       <Link
                         key={match.fixtureId}
                         href={`/report/${match.fixtureId}`}
-                        className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-blue-400/40 hover:bg-white/10"
+                        className="block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:border-red-400/40 hover:bg-white/10"
                       >
                         <div className="truncate text-sm text-slate-400">
                           {match.leagueName}
@@ -959,7 +943,7 @@ export default function HomePage() {
                       const kind = article.kind?.toLowerCase() || "news";
 
                       const cardClasses = isFeatured
-                        ? "block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] p-4 shadow-lg transition hover:border-blue-400/30 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-7 md:p-8"
+                        ? "block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#1e293b] via-[#0f172a] to-[#020617] p-4 shadow-lg transition hover:border-red-400/30 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-7 md:p-8"
                         : "block overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-white/20 hover:bg-white/10 sm:p-5";
 
                       const titleClasses = isFeatured
