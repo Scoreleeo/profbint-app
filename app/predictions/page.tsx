@@ -91,7 +91,7 @@ function QuickNav() {
           <Link
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-xl border border-blue-500/30 bg-blue-600/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-blue-600/30"
+            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-blue-700 hover:bg-blue-700 hover:text-white"
           >
             {item.label}
           </Link>
@@ -323,15 +323,15 @@ export default function PredictionsPage() {
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden scroll-smooth bg-[#101827] px-3 py-5 text-white sm:px-4 sm:py-6 md:px-6">
       <div className="mx-auto w-full max-w-7xl space-y-5 overflow-x-hidden sm:space-y-6">
-        <section className="overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-[#172033] via-[#182235] to-[#1e293b] p-4 shadow-2xl sm:rounded-3xl sm:p-5">
+        <section className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-2xl sm:rounded-3xl sm:p-5">
           <Link
             href="/"
-            className="mb-3 inline-flex rounded-xl border border-blue-500/30 bg-blue-600/20 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-blue-600/30"
+            className="mb-3 inline-flex rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-blue-700 hover:bg-blue-700 hover:text-white"
           >
             ← Back to Home
           </Link>
 
-          <div className="mb-2 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-blue-300 sm:text-xs">
+          <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
             Premium insights
           </div>
 
@@ -376,7 +376,7 @@ export default function PredictionsPage() {
                     "shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition",
                     active
                       ? "bg-blue-700 text-white shadow-lg"
-                      : "border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10",
+                      : "border border-white/15 bg-white/5 text-slate-200 hover:bg-blue-700 hover:text-white",
                   ].join(" ")}
                 >
                   {league.name}
@@ -453,7 +453,7 @@ export default function PredictionsPage() {
           </>
         )}
 
-        <footer className="mt-10 border-t border-white/15 pt-6 pb-2">
+        <footer className="mt-10 border-t border-white/10 pt-6 pb-2">
           <div className="flex flex-wrap items-center justify-center gap-4 text-center">
             <Link
               href="/"
@@ -491,7 +491,7 @@ function DailyPickSection({
     return (
       <section
         id="best-pick"
-        className="scroll-mt-20 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-blue-500/10 via-[#172033] to-blue-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5"
+        className="scroll-mt-20 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl sm:rounded-3xl sm:p-5"
       >
         <div className="text-sm font-semibold text-slate-300">
           Loading best pick right now...
@@ -504,9 +504,9 @@ function DailyPickSection({
     return (
       <section
         id="best-pick"
-        className="scroll-mt-20 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-blue-500/10 via-[#172033] to-blue-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5"
+        className="scroll-mt-20 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl sm:rounded-3xl sm:p-5"
       >
-        <div className="mb-3 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:text-xs">
+        <div className="mb-3 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 sm:text-xs">
           Featured match
         </div>
 
@@ -527,11 +527,11 @@ function DailyPickSection({
   return (
     <section
       id="best-pick"
-      className="scroll-mt-20 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-blue-500/10 via-[#172033] to-blue-400/5 p-4 shadow-xl sm:rounded-3xl sm:p-5"
+      className="scroll-mt-20 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl sm:rounded-3xl sm:p-5"
     >
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
-          <div className="mb-3 inline-flex rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-300 sm:text-xs">
+          <div className="mb-3 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300 sm:text-xs">
             Featured match
           </div>
 
@@ -600,7 +600,7 @@ function LockedPredictionCard({ match }: { match: PredictionMatch }) {
   return (
     <Link
       href={buildPredictionHref(match)}
-      className="block min-w-0 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl transition hover:border-blue-400/40 hover:bg-white/[0.04]"
+      className="block min-w-0 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl transition hover:border-blue-700 hover:bg-white/[0.04]"
     >
       <div className="mb-2 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <span className="min-w-0 truncate">{match.league}</span>
