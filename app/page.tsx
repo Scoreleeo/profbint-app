@@ -232,7 +232,7 @@ function QuickNav() {
           <a
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-blue-500/40 hover:bg-blue-700 hover:text-white sm:text-sm"
+            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-blue-400/20 hover:bg-[#1e3a8a] hover:text-white sm:text-sm"
           >
             {item.label}
           </a>
@@ -338,14 +338,14 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
         {dailyPick ? (
           <Link
             href={buildDailyPickHref(dailyPick)}
-            className="inline-flex justify-center rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-600"
+            className="inline-flex justify-center rounded-xl border border-blue-400/20 bg-[#1d4ed8] px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-black/30 transition hover:bg-[#1e40af]"
           >
             Unlock best pick right now →
           </Link>
         ) : (
           <Link
             href="/predictions"
-            className="inline-flex justify-center rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-600"
+            className="inline-flex justify-center rounded-xl border border-blue-400/20 bg-[#1d4ed8] px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-black/30 transition hover:bg-[#1e40af]"
           >
             View Predictions →
           </Link>
@@ -656,7 +656,7 @@ export default function HomePage() {
 
             <Link
               href="/predictions"
-              className="inline-flex justify-center rounded-xl bg-blue-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600"
+              className="inline-flex justify-center rounded-xl border border-blue-400/20 bg-[#1d4ed8] px-4 py-2 text-sm font-semibold text-white shadow-md shadow-black/30 transition hover:bg-[#1e40af]"
             >
               View →
             </Link>
@@ -679,8 +679,8 @@ export default function HomePage() {
                   className={[
                     "shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold transition sm:text-sm",
                     active
-                      ? "bg-blue-700 text-white"
-                      : "border border-white/15 bg-white/5 text-slate-200 hover:border-blue-500/40 hover:bg-blue-700 hover:text-white",
+                      ? "border border-blue-400/20 bg-[#1e3a8a] text-white shadow-md shadow-black/30"
+                      : "border border-white/15 bg-white/5 text-slate-200 hover:border-blue-400/20 hover:bg-[#1e3a8a] hover:text-white",
                   ].join(" ")}
                 >
                   {league.name}
@@ -774,7 +774,7 @@ export default function HomePage() {
                         <Link
                           key={row.teamId}
                           href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
-                          className="flex min-h-[58px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:border-blue-500/40 hover:bg-white/10 sm:min-h-[64px]"
+                          className="flex min-h-[58px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:border-blue-400/20 hover:bg-white/10 sm:min-h-[64px]"
                         >
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
@@ -815,7 +815,7 @@ export default function HomePage() {
                         <Link
                           key={match.fixtureId}
                           href={buildPredictionHref(match)}
-                          className="block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:border-blue-500/40 hover:bg-white/10"
+                          className="block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:border-blue-400/20 hover:bg-white/10"
                         >
                           <div className="flex min-w-0 items-center justify-between gap-2">
                             <div className="min-w-0 truncate text-sm text-slate-400">
@@ -881,7 +881,7 @@ export default function HomePage() {
                       <Link
                         key={match.fixtureId}
                         href={`/report/${match.fixtureId}`}
-                        className="block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:border-blue-500/40 hover:bg-white/10"
+                        className="block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:border-blue-400/20 hover:bg-white/10"
                       >
                         <div className="truncate text-sm text-slate-400">
                           {match.leagueName}
@@ -943,7 +943,7 @@ export default function HomePage() {
                       const kind = article.kind?.toLowerCase() || "news";
 
                       const cardClasses = isFeatured
-                        ? "block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-4 shadow-lg transition hover:border-blue-500/40 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-6 md:p-7"
+                        ? "block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-4 shadow-lg transition hover:border-blue-400/20 hover:bg-white/[0.04] sm:rounded-[28px] sm:p-6 md:p-7"
                         : "block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-4 transition hover:border-white/20 hover:bg-white/10 sm:p-5";
 
                       const titleClasses = isFeatured
