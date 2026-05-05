@@ -239,40 +239,19 @@ export default async function LockedPredictionPage({
                 rating for this fixture.
               </p>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="mt-6">
+                <div className="mx-auto max-w-sm rounded-2xl border border-white/10 bg-black/20 p-5">
                   <div className="text-xs uppercase tracking-wide text-slate-400">
-                    Single match
+                    Match unlock
                   </div>
-                  <div className="mt-2 text-2xl font-black text-white">
-                    £1.99
+                  <div className="mt-2 text-3xl font-black text-white">
+                    £3.99
                   </div>
-                  <div className="mt-1 text-xs text-slate-400">
-                    Unlock this game
+                  <div className="mt-2 text-sm text-slate-300">
+                    Unlock this match prediction
                   </div>
-                </div>
-
-                <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4">
-                  <div className="text-xs uppercase tracking-wide text-red-300">
-                    Best value
-                  </div>
-                  <div className="mt-2 text-2xl font-black text-white">
-                    £9.99
-                  </div>
-                  <div className="mt-1 text-xs text-slate-400">
-                    Unlock all today
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="text-xs uppercase tracking-wide text-slate-400">
-                    Division pass
-                  </div>
-                  <div className="mt-2 text-2xl font-black text-white">
-                    £5.99
-                  </div>
-                  <div className="mt-1 text-xs text-slate-400">
-                    Unlock this league
+                  <div className="mt-2 text-xs text-slate-500">
+                    Access stays open until this game ends.
                   </div>
                 </div>
               </div>
@@ -280,16 +259,9 @@ export default async function LockedPredictionPage({
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 <button
                   type="button"
-                  className="rounded-xl bg-red-500 px-6 py-3 text-sm font-black text-white shadow-lg transition hover:bg-red-400"
+                  className="rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-6 py-3 text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
                 >
-                  Unlock this prediction – £1.99
-                </button>
-
-                <button
-                  type="button"
-                  className="rounded-xl border border-red-400/30 bg-red-500/10 px-6 py-3 text-sm font-black text-red-200 transition hover:bg-red-500/20"
-                >
-                  Unlock all today – £9.99
+                  Unlock this match – £3.99
                 </button>
 
                 <Link
