@@ -263,6 +263,7 @@ export default function PredictionsPage() {
   const [loading, setLoading] = useState(true);
   const [dailyPickLoading, setDailyPickLoading] = useState(true);
   const [leagueId, setLeagueId] = useState<number>(TOP_EURO_LEAGUES[0].id);
+  const [error, setError] = useState<string | null>(null);
 
   const selectedLeague =
     TOP_EURO_LEAGUES.find((league) => league.id === leagueId) ||
@@ -272,20 +273,30 @@ export default function PredictionsPage() {
     return findDailyPick(allLeagueMatches);
   }, [allLeagueMatches]);
 
-  useEffect(() => {
+  async function loadPredictions(id: number) {
     setLoading(true);
+    setError(null);
 
-    fetch(`/api/predictions?league=${leagueId}&season=2025`)
-      .then((res) => res.json())
-      .then((data) => {
-        setMatches(data.matches || []);
-        setLoading(false);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      })
-      .catch(() => {
-        setMatches([]);
-        setLoading(false);
-      });
+    try {
+      const res = await fetch(`/api/predictions?league=${id}&season=2025`);
+
+      if (!res.ok) {
+        throw new Error(`Failed to load predictions: ${res.status}`);
+      }
+
+      const data = await res.json();
+      setMatches(data.matches || []);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      console.error(err);
+      setError("Could not load predictions for this league.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadPredictions(leagueId);
   }, [leagueId]);
 
   useEffect(() => {
@@ -426,9 +437,32 @@ export default function PredictionsPage() {
 
         {loading ? (
           <div className="rounded-2xl border border-white/15 bg-[#172033] p-5 sm:rounded-3xl sm:p-6">
-            <p className="text-slate-300">Loading predictions...</p>
+            <p className="text-slate-300">
+              Loading {selectedLeague.name} predictions...
+            </p>
           </div>
-        ) : (
+        ) : null}
+
+        {error ? (
+          <div className="rounded-2xl border border-red-400/20 bg-red-500/10 p-5 sm:rounded-3xl sm:p-6">
+            <p className="font-semibold text-red-200">{error}</p>
+            <button
+              type="button"
+              onClick={() => void loadPredictions(leagueId)}
+              className="mt-4 rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-5 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+            >
+              Try again
+            </button>
+          </div>
+        ) : null}
+
+        {!loading && !error && matches.length === 0 ? (
+          <div className="rounded-2xl border border-white/15 bg-[#172033] p-5 text-slate-300 sm:rounded-3xl sm:p-6">
+            No predictions available for this league right now.
+          </div>
+        ) : null}
+
+        {matches.length > 0 ? (
           <>
             <section id="predictions-list" className="scroll-mt-20">
               <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
@@ -460,7 +494,7 @@ export default function PredictionsPage() {
               </p>
             </div>
           </>
-        )}
+        ) : null}
 
         <footer className="mt-10 border-t border-white/10 pt-6 pb-2">
           <div className="flex flex-wrap items-center justify-center gap-4 text-center">
