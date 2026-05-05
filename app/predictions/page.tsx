@@ -340,8 +340,7 @@ export default function PredictionsPage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-            Predictions are locked before kick-off. Choose one match, one
-            division, or all predictions for the day.
+            Predictions are locked before kick-off. Unlock any match for £3.99 and keep access until that game ends.
           </p>
 
           <div className="mt-2 text-sm text-slate-400">
