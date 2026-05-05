@@ -661,7 +661,7 @@ function LockedPredictionCard({ match }: { match: PredictionMatch }) {
           )}
 
           <span className="inline-flex rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs font-semibold text-slate-300">
-            {matchStarted ? "Match started" : "Unlock from £1.99"}
+            {matchStarted ? "Match started" : "Unlock for £3.99"}
           </span>
         </div>
       </div>
