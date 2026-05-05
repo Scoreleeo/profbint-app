@@ -42,7 +42,21 @@ type DailyPick = {
   option: PredictionOption;
 };
 
+function cleanLogoUrl(value?: string) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function TeamLogo({ src, alt }: { src?: string; alt: string }) {
+  const logoSrc = cleanLogoUrl(src);
+
   const initials = alt
     .split(" ")
     .map((word) => word[0])
@@ -50,7 +64,7 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
     .slice(0, 2)
     .toUpperCase();
 
-  if (!src) {
+  if (!logoSrc) {
     return (
       <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] font-black text-white">
         {initials || "?"}
@@ -61,9 +75,10 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   return (
     <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-white/5">
       <Image
-        src={src}
+        src={logoSrc}
         alt={alt}
         fill
+        unoptimized
         sizes="24px"
         className="object-contain p-1"
       />
