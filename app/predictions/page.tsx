@@ -178,20 +178,6 @@ function getStrongestOption(match: PredictionMatch): PredictionOption {
   return options.sort((a, b) => b.probability - a.probability)[0];
 }
 
-function isTodayFixture(date: string) {
-  const fixtureDate = new Date(date);
-  const now = new Date();
-
-  return (
-    fixtureDate.toLocaleDateString("en-GB", {
-      timeZone: "Europe/London",
-    }) ===
-    now.toLocaleDateString("en-GB", {
-      timeZone: "Europe/London",
-    })
-  );
-}
-
 function hasMatchStarted(date: string) {
   if (!date) {
     return false;
@@ -206,14 +192,23 @@ function hasMatchStarted(date: string) {
   return Date.now() >= kickoffTime;
 }
 
-function findDailyPick(matches: PredictionMatch[]): DailyPick | null {
-  const todayMatches = matches.filter((match) => isTodayFixture(match.date));
-
-  if (todayMatches.length === 0) {
-    return null;
+function isFutureFixture(date: string) {
+  if (!date) {
+    return false;
   }
 
-  const rankedPicks = todayMatches
+  const kickoffTime = new Date(date).getTime();
+
+  if (Number.isNaN(kickoffTime)) {
+    return false;
+  }
+
+  return Date.now() < kickoffTime;
+}
+
+function findDailyPick(matches: PredictionMatch[]): DailyPick | null {
+  const rankedPicks = matches
+    .filter((match) => isFutureFixture(match.date))
     .filter((match) => !hasMatchStarted(match.date))
     .map((match) => ({
       match,

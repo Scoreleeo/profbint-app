@@ -70,6 +70,28 @@ type DashboardPayload = {
 
 const SEASON = 2025;
 
+function cleanLogoUrl(value?: string) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 function buildPredictionHref(match: MatchRow) {
   const params = new URLSearchParams();
 
@@ -125,15 +147,10 @@ function TeamLogo({
 }) {
   const boxSize = size + 6;
   const [imgError, setImgError] = useState(false);
+  const logoSrc = cleanLogoUrl(src);
+  const initials = getInitials(alt);
 
-  const initials = alt
-    .split(" ")
-    .map((word) => word[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  if (!src || imgError) {
+  if (!logoSrc || imgError) {
     return (
       <div
         className="flex shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white"
@@ -150,9 +167,10 @@ function TeamLogo({
       style={{ width: boxSize, height: boxSize }}
     >
       <Image
-        src={src}
+        src={logoSrc}
         alt={alt}
         fill
+        unoptimized
         sizes={`${boxSize}px`}
         className="object-contain p-1"
         onError={() => setImgError(true)}
