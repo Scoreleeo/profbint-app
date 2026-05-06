@@ -399,7 +399,12 @@ export default function PredictionsPage() {
                       : "border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10",
                   ].join(" ")}
                 >
-                  {league.name}
+                  <span className="inline-flex items-center gap-2">
+                    {league.name}
+                    {active && loading ? (
+                      <span className="h-3 w-3 animate-spin rounded-full border border-[#08101c]/40 border-t-[#08101c]" />
+                    ) : null}
+                  </span>
                 </button>
               );
             })}
@@ -437,9 +442,7 @@ export default function PredictionsPage() {
 
         {loading ? (
           <div className="rounded-2xl border border-white/15 bg-[#172033] p-5 sm:rounded-3xl sm:p-6">
-            <p className="text-slate-300">
-              Loading {selectedLeague.name} predictions...
-            </p>
+            <p className="text-slate-300">Loading predictions...</p>
           </div>
         ) : null}
 
