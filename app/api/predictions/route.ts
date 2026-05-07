@@ -217,7 +217,7 @@ function getStrongestDailyPick(matches: PredictionMatch[]) {
   return rankedPicks[0] || null;
 }
 
-async function buildPredictionsForLeague({
+async function fetchUpcomingFixturesWithFallback({
   league,
   season,
   date,
@@ -240,8 +240,79 @@ async function buildPredictionsForLeague({
   }
 
   const fixturesRaw = await apiFootballFetch<any>("/fixtures", fixtureParams);
+  const originalUpcomingMatches = (fixturesRaw.response || []).slice(0, limit);
 
-  const upcomingMatches = (fixturesRaw.response || []).slice(0, limit);
+  if (originalUpcomingMatches.length > 0 || date) {
+    return originalUpcomingMatches;
+  }
+
+  const matchesByFixtureId = new Map<number, any>();
+
+  const datesToCheck = Array.from({ length: 14 }, (_, index) =>
+    getLondonDateString(index)
+  );
+
+  for (const fallbackDate of datesToCheck) {
+    if (matchesByFixtureId.size >= limit) {
+      break;
+    }
+
+    const fallbackRaw = await apiFootballFetch<any>("/fixtures", {
+      league,
+      season,
+      status: "NS",
+      date: fallbackDate,
+      timezone: "Europe/London",
+    }).catch((error) => {
+      console.error(
+        `PREDICTIONS FALLBACK DATE ERROR ${league} ${fallbackDate}:`,
+        error
+      );
+      return { response: [] };
+    });
+
+    const fallbackMatches = fallbackRaw.response || [];
+
+    for (const match of fallbackMatches) {
+      const fixtureId = match?.fixture?.id;
+
+      if (fixtureId && !matchesByFixtureId.has(fixtureId)) {
+        matchesByFixtureId.set(fixtureId, match);
+      }
+
+      if (matchesByFixtureId.size >= limit) {
+        break;
+      }
+    }
+  }
+
+  return Array.from(matchesByFixtureId.values())
+    .sort((a, b) => {
+      return (
+        new Date(a?.fixture?.date || "").getTime() -
+        new Date(b?.fixture?.date || "").getTime()
+      );
+    })
+    .slice(0, limit);
+}
+
+async function buildPredictionsForLeague({
+  league,
+  season,
+  date,
+  limit,
+}: {
+  league: number;
+  season: number;
+  date?: string;
+  limit: number;
+}) {
+  const upcomingMatches = await fetchUpcomingFixturesWithFallback({
+    league,
+    season,
+    date,
+    limit,
+  });
 
   if (upcomingMatches.length === 0) {
     return [];
@@ -343,54 +414,6 @@ async function buildPredictionsForLeague({
   return matches;
 }
 
-async function buildUpcomingPredictionsForLeague({
-  league,
-  season,
-  limit,
-}: {
-  league: number;
-  season: number;
-  limit: number;
-}) {
-  const datesToCheck = Array.from({ length: 14 }, (_, index) =>
-    getLondonDateString(index)
-  );
-
-  const matchesByFixtureId = new Map<number, PredictionMatch>();
-
-  for (const date of datesToCheck) {
-    if (matchesByFixtureId.size >= limit) {
-      break;
-    }
-
-    const matches = await buildPredictionsForLeague({
-      league,
-      season,
-      date,
-      limit,
-    }).catch((error) => {
-      console.error(`PREDICTIONS UPCOMING DATE ERROR ${league} ${date}:`, error);
-      return [];
-    });
-
-    for (const match of matches) {
-      if (!matchesByFixtureId.has(match.fixtureId)) {
-        matchesByFixtureId.set(match.fixtureId, match);
-      }
-
-      if (matchesByFixtureId.size >= limit) {
-        break;
-      }
-    }
-  }
-
-  return Array.from(matchesByFixtureId.values())
-    .sort((a, b) => {
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    })
-    .slice(0, limit);
-}
-
 async function buildDailyPickAcrossAvailableLeagues({
   season,
   requestedDate,
@@ -462,7 +485,7 @@ export async function GET(request: NextRequest) {
 
     const league = Number(leagueParam || 39);
 
-    const matches = await buildUpcomingPredictionsForLeague({
+    const matches = await buildPredictionsForLeague({
       league,
       season,
       limit: 12,
