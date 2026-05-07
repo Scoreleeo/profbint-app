@@ -261,6 +261,7 @@ export default function PredictionsPage() {
     []
   );
   const [loading, setLoading] = useState(true);
+  const [fetchFinished, setFetchFinished] = useState(false);
   const [dailyPickLoading, setDailyPickLoading] = useState(true);
   const [leagueId, setLeagueId] = useState<number>(TOP_EURO_LEAGUES[0].id);
   const [error, setError] = useState<string | null>(null);
@@ -275,6 +276,7 @@ export default function PredictionsPage() {
 
   async function loadPredictions(id: number) {
     setLoading(true);
+    setFetchFinished(false);
     setError(null);
 
     try {
@@ -291,13 +293,14 @@ export default function PredictionsPage() {
       console.error(err);
       setError("Could not load predictions for this league.");
     } finally {
+      setFetchFinished(true);
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    void loadPredictions(leagueId);
-  }, [leagueId]);
+    void loadPredictions(selectedLeague.id);
+  }, [leagueId, selectedLeague]);
 
   useEffect(() => {
     let cancelled = false;
@@ -442,7 +445,10 @@ export default function PredictionsPage() {
 
         {loading ? (
           <div className="rounded-2xl border border-white/15 bg-[#172033] p-5 sm:rounded-3xl sm:p-6">
-            <p className="text-slate-300">Loading predictions...</p>
+            <div className="flex items-center gap-3 text-slate-300">
+              <span className="h-4 w-4 animate-spin rounded-full border border-white/30 border-t-white" />
+              <span>Loading predictions...</span>
+            </div>
           </div>
         ) : null}
 
@@ -451,7 +457,7 @@ export default function PredictionsPage() {
             <p className="font-semibold text-red-200">{error}</p>
             <button
               type="button"
-              onClick={() => void loadPredictions(leagueId)}
+              onClick={() => void loadPredictions(selectedLeague.id)}
               className="mt-4 rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-5 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
             >
               Try again
@@ -459,7 +465,7 @@ export default function PredictionsPage() {
           </div>
         ) : null}
 
-        {!loading && !error && matches.length === 0 ? (
+        {!loading && fetchFinished && !error && matches.length === 0 ? (
           <div className="rounded-2xl border border-white/15 bg-[#172033] p-5 text-slate-300 sm:rounded-3xl sm:p-6">
             No predictions available for this league right now.
           </div>
