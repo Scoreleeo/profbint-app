@@ -30,6 +30,12 @@ type PredictionMatch = {
   prediction: any;
 };
 
+const NO_STORE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 function formatScoreline(match: any) {
   const homeName = match.teams?.home?.name || "Home";
   const awayName = match.teams?.away?.name || "Away";
@@ -337,6 +343,54 @@ async function buildPredictionsForLeague({
   return matches;
 }
 
+async function buildUpcomingPredictionsForLeague({
+  league,
+  season,
+  limit,
+}: {
+  league: number;
+  season: number;
+  limit: number;
+}) {
+  const datesToCheck = Array.from({ length: 14 }, (_, index) =>
+    getLondonDateString(index)
+  );
+
+  const matchesByFixtureId = new Map<number, PredictionMatch>();
+
+  for (const date of datesToCheck) {
+    if (matchesByFixtureId.size >= limit) {
+      break;
+    }
+
+    const matches = await buildPredictionsForLeague({
+      league,
+      season,
+      date,
+      limit,
+    }).catch((error) => {
+      console.error(`PREDICTIONS UPCOMING DATE ERROR ${league} ${date}:`, error);
+      return [];
+    });
+
+    for (const match of matches) {
+      if (!matchesByFixtureId.has(match.fixtureId)) {
+        matchesByFixtureId.set(match.fixtureId, match);
+      }
+
+      if (matchesByFixtureId.size >= limit) {
+        break;
+      }
+    }
+  }
+
+  return Array.from(matchesByFixtureId.values())
+    .sort((a, b) => {
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    })
+    .slice(0, limit);
+}
+
 async function buildDailyPickAcrossAvailableLeagues({
   season,
   requestedDate,
@@ -401,24 +455,34 @@ export async function GET(request: NextRequest) {
         requestedDate: dateParam,
       });
 
-      return NextResponse.json(dailyPickPayload);
+      return NextResponse.json(dailyPickPayload, {
+        headers: NO_STORE_HEADERS,
+      });
     }
 
     const league = Number(leagueParam || 39);
 
-    const matches = await buildPredictionsForLeague({
+    const matches = await buildUpcomingPredictionsForLeague({
       league,
       season,
       limit: 12,
     });
 
-    return NextResponse.json({ matches });
+    return NextResponse.json(
+      { matches },
+      {
+        headers: NO_STORE_HEADERS,
+      }
+    );
   } catch (error) {
     console.error("PREDICTIONS ROUTE ERROR:", error);
 
     return NextResponse.json(
       { error: "Failed to fetch predictions" },
-      { status: 500 }
+      {
+        status: 500,
+        headers: NO_STORE_HEADERS,
+      }
     );
   }
 }
