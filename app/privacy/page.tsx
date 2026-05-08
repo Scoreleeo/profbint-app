@@ -102,7 +102,9 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-lg font-bold text-white">
                 Third-Party Services
               </h2>
-              <p className="mt-2">We may use trusted third-party providers including:</p>
+              <p className="mt-2">
+                We may use trusted third-party providers including:
+              </p>
               <ul className="mt-3 list-disc space-y-2 pl-5">
                 <li>Stripe</li>
                 <li>Vercel</li>
