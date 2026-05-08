@@ -1046,6 +1046,30 @@ export default function HomePage() {
               Predictions
             </Link>
             <Link
+              href="/privacy"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="/refunds"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Refund Policy
+            </Link>
+            <Link
+              href="/responsible-gambling"
+              className="text-sm text-slate-400 transition hover:text-white"
+            >
+              Responsible Gambling
+            </Link>
+            <Link
               href="/legal"
               className="text-sm text-slate-400 transition hover:text-white"
             >
