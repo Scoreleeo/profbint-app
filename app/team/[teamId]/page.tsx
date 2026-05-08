@@ -18,6 +18,28 @@ type Props = {
   }>;
 };
 
+function cleanLogoUrl(value?: string) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 function TeamLogo({
   src,
   alt,
@@ -25,16 +47,24 @@ function TeamLogo({
   src?: string;
   alt: string;
 }) {
-  if (!src) {
-    return <div className="h-8 w-8 shrink-0 rounded-full bg-white/10" />;
+  const logoSrc = cleanLogoUrl(src);
+  const initials = getInitials(alt);
+
+  if (!logoSrc) {
+    return (
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-black text-white">
+        {initials || "?"}
+      </div>
+    );
   }
 
   return (
     <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/5">
       <Image
-        src={src}
+        src={logoSrc}
         alt={alt}
         fill
+        unoptimized
         sizes="32px"
         className="object-contain p-1"
       />
