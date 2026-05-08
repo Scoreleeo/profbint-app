@@ -83,9 +83,13 @@ export default function LegalPage() {
           <p className="text-slate-300">
             For any questions regarding these terms:
           </p>
-          <p className="mt-2 font-semibold text-white">
+
+          <a
+            href="mailto:support@profbint.com"
+            className="mt-2 inline-block font-semibold text-[#d6a94f] hover:text-[#f3d98b]"
+          >
             support@profbint.com
-          </p>
+          </a>
         </section>
 
       </div>
