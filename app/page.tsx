@@ -321,7 +321,7 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
             href="/predictions"
             className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
           >
-            Add picks to basket →
+            Go to predictions →
           </Link>
 
           <Link
@@ -638,7 +638,7 @@ export default function HomePage() {
               href="/predictions"
               className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2 text-sm font-semibold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
             >
-              Add Picks →
+              Match predictions →
             </Link>
           </div>
         </section>
@@ -802,7 +802,7 @@ export default function HomePage() {
                             </div>
 
                             <span className="shrink-0 rounded-full border border-[#f3d98b]/20 bg-[#d6a94f]/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f3d98b]">
-                              Basket Unlock
+                              Prediction available
                             </span>
                           </div>
 
@@ -841,7 +841,7 @@ export default function HomePage() {
                               href="/predictions"
                               className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-3 py-2 text-xs font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
                             >
-                              Add from predictions →
+                              Go to predictions →
                             </Link>
                           </div>
                         </div>
