@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
 import { formatUKDateTime } from "@/lib/utils/date";
+import { addToBasket, getBasket } from "@/lib/basket";
 
 type PredictionOption = {
   label: string;
@@ -86,7 +87,7 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
-function QuickNav() {
+function QuickNav({ basketCount }: { basketCount: number }) {
   const links = [
     { href: "/", label: "Home" },
     { href: "#best-pick", label: "Best Pick" },
@@ -111,6 +112,13 @@ function QuickNav() {
             {item.label}
           </Link>
         ))}
+
+        <Link
+          href="/basket"
+          className="shrink-0 rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2 text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+        >
+          Basket ({basketCount})
+        </Link>
       </div>
     </section>
   );
@@ -255,6 +263,19 @@ function buildPredictionHref(match: PredictionMatch) {
   return `/predictions/${match.fixtureId}?${params.toString()}`;
 }
 
+function buildBasketItem(match: PredictionMatch) {
+  return {
+    fixtureId: match.fixtureId,
+    home: match.home,
+    away: match.away,
+    league: match.league,
+    date: match.date,
+    homeLogo: match.homeLogo,
+    awayLogo: match.awayLogo,
+    price: 3.99,
+  };
+}
+
 export default function PredictionsPage() {
   const [matches, setMatches] = useState<PredictionMatch[]>([]);
   const [allLeagueMatches, setAllLeagueMatches] = useState<PredictionMatch[]>(
@@ -265,6 +286,7 @@ export default function PredictionsPage() {
   const [dailyPickLoading, setDailyPickLoading] = useState(true);
   const [leagueId, setLeagueId] = useState<number>(TOP_EURO_LEAGUES[0].id);
   const [error, setError] = useState<string | null>(null);
+  const [basketIds, setBasketIds] = useState<number[]>([]);
 
   const selectedLeague =
     TOP_EURO_LEAGUES.find((league) => league.id === leagueId) ||
@@ -273,6 +295,16 @@ export default function PredictionsPage() {
   const dailyPick = useMemo(() => {
     return findDailyPick(allLeagueMatches);
   }, [allLeagueMatches]);
+
+  function refreshBasket() {
+    const basket = getBasket();
+    setBasketIds(basket.map((item) => item.fixtureId));
+  }
+
+  function handleAddToBasket(match: PredictionMatch) {
+    const updated = addToBasket(buildBasketItem(match));
+    setBasketIds(updated.map((item) => item.fixtureId));
+  }
 
   async function loadPredictions(id: number) {
     setLoading(true);
@@ -299,8 +331,12 @@ export default function PredictionsPage() {
   }
 
   useEffect(() => {
+    refreshBasket();
+  }, []);
+
+  useEffect(() => {
     void loadPredictions(selectedLeague.id);
-  }, [leagueId, selectedLeague]);
+  }, [leagueId, selectedLeague.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -348,12 +384,21 @@ export default function PredictionsPage() {
     <main className="min-h-screen w-full max-w-full overflow-x-hidden scroll-smooth bg-[#101827] px-3 py-5 text-white sm:px-4 sm:py-6 md:px-6">
       <div className="mx-auto w-full max-w-7xl space-y-5 overflow-x-hidden sm:space-y-6">
         <section className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-2xl sm:rounded-3xl sm:p-5">
-          <Link
-            href="/"
-            className="mb-3 inline-flex rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-          >
-            ← Back to Home
-          </Link>
+          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Link
+              href="/"
+              className="inline-flex rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+            >
+              ← Back to Home
+            </Link>
+
+            <Link
+              href="/basket"
+              className="inline-flex rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2 text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+            >
+              Basket ({basketIds.length})
+            </Link>
+          </div>
 
           <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
             Premium insights
@@ -364,7 +409,8 @@ export default function PredictionsPage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-            Predictions are locked before kick-off. Unlock any match for £3.99 and keep access until that game ends.
+            Predictions are locked before kick-off. Add matches to your basket
+            for £3.99 each and keep access until those games end.
           </p>
 
           <div className="mt-2 text-sm text-slate-400">
@@ -375,9 +421,14 @@ export default function PredictionsPage() {
           </div>
         </section>
 
-        <QuickNav />
+        <QuickNav basketCount={basketIds.length} />
 
-        <DailyPickSection dailyPick={dailyPick} loading={dailyPickLoading} />
+        <DailyPickSection
+          dailyPick={dailyPick}
+          loading={dailyPickLoading}
+          basketIds={basketIds}
+          onAddToBasket={handleAddToBasket}
+        />
 
         <section
           id="competitions"
@@ -394,6 +445,7 @@ export default function PredictionsPage() {
               return (
                 <button
                   key={league.id}
+                  type="button"
                   onClick={() => setLeagueId(league.id)}
                   className={[
                     "shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition",
@@ -435,10 +487,10 @@ export default function PredictionsPage() {
 
           <div className="min-w-0 rounded-2xl border border-white/15 bg-[#172033] p-4">
             <div className="text-xs uppercase tracking-wide text-slate-400">
-              Access
+              Basket price
             </div>
             <div className="mt-2 text-base font-bold sm:text-lg">
-              Paid unlock
+              £3.99 per match
             </div>
           </div>
         </section>
@@ -478,14 +530,19 @@ export default function PredictionsPage() {
                 <h2 className="min-w-0 truncate text-base font-bold sm:text-xl">
                   Locked Predictions
                 </h2>
-                <span className="shrink-0 text-sm font-semibold text-red-400">
+                <span className="shrink-0 text-sm font-semibold text-[#d6a94f]">
                   {matches.length} matches
                 </span>
               </div>
 
               <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {matches.map((match) => (
-                  <LockedPredictionCard key={match.fixtureId} match={match} />
+                  <LockedPredictionCard
+                    key={match.fixtureId}
+                    match={match}
+                    inBasket={basketIds.includes(match.fixtureId)}
+                    onAddToBasket={handleAddToBasket}
+                  />
                 ))}
               </div>
             </section>
@@ -559,9 +616,13 @@ export default function PredictionsPage() {
 function DailyPickSection({
   dailyPick,
   loading,
+  basketIds,
+  onAddToBasket,
 }: {
   dailyPick: DailyPick | null;
   loading: boolean;
+  basketIds: number[];
+  onAddToBasket: (match: PredictionMatch) => void;
 }) {
   if (loading) {
     return (
@@ -599,6 +660,8 @@ function DailyPickSection({
   }
 
   const match = dailyPick.match;
+  const inBasket = basketIds.includes(match.fixtureId);
+  const matchStarted = hasMatchStarted(match.date);
 
   return (
     <section
@@ -616,8 +679,8 @@ function DailyPickSection({
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            This is the strongest match selection available right now. It can
-            update automatically as fixtures change, kick off or close.
+            This is the strongest match selection available right now. Add it to
+            your basket to unlock after checkout.
           </p>
 
           <div className="mt-4 rounded-2xl border border-white/15 bg-black/20 p-4">
@@ -648,8 +711,8 @@ function DailyPickSection({
               </div>
             </div>
 
-            <div className="mt-4 rounded-xl border border-red-400/20 bg-red-500/10 p-3">
-              <div className="text-[11px] font-bold uppercase tracking-wide text-red-300">
+            <div className="mt-4 rounded-xl border border-[#f3d98b]/20 bg-[#d6a94f]/10 p-3">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-[#f3d98b]">
                 Prediction locked
               </div>
               <div className="mt-2 text-sm leading-6 text-slate-300">
@@ -659,25 +722,50 @@ function DailyPickSection({
           </div>
         </div>
 
-        <Link
-          href={buildPredictionHref(match)}
-          className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-5 py-3 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
-        >
-          Unlock best pick right now →
-        </Link>
+        <div className="grid gap-3 sm:min-w-[230px]">
+          <button
+            type="button"
+            disabled={matchStarted || inBasket}
+            onClick={() => onAddToBasket(match)}
+            className={[
+              "inline-flex justify-center rounded-xl border px-5 py-3 text-sm font-bold shadow-md shadow-black/30 transition disabled:cursor-not-allowed disabled:opacity-70",
+              inBasket
+                ? "border-green-400/20 bg-green-500/15 text-green-300"
+                : "border-[#f3d98b]/30 bg-[#d6a94f] text-[#08101c] hover:bg-[#c89635]",
+            ].join(" ")}
+          >
+            {matchStarted
+              ? "Prediction closed"
+              : inBasket
+                ? "Added to basket"
+                : "Add best pick — £3.99"}
+          </button>
+
+          <Link
+            href="/basket"
+            className="inline-flex justify-center rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+          >
+            View basket →
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
-function LockedPredictionCard({ match }: { match: PredictionMatch }) {
+function LockedPredictionCard({
+  match,
+  inBasket,
+  onAddToBasket,
+}: {
+  match: PredictionMatch;
+  inBasket: boolean;
+  onAddToBasket: (match: PredictionMatch) => void;
+}) {
   const matchStarted = hasMatchStarted(match.date);
 
   return (
-    <Link
-      href={buildPredictionHref(match)}
-      className="block min-w-0 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl transition hover:bg-white/[0.04]"
-    >
+    <article className="block min-w-0 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl transition hover:bg-white/[0.04]">
       <div className="mb-2 flex min-w-0 flex-col gap-1 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
         <span className="min-w-0 truncate">{match.league}</span>
         <span className="shrink-0 text-xs sm:text-sm">
@@ -732,16 +820,43 @@ function LockedPredictionCard({ match }: { match: PredictionMatch }) {
               Prediction closed
             </span>
           ) : (
-            <span className="inline-flex rounded-full border border-red-400/20 bg-red-500/10 px-2 py-1 text-xs font-bold text-red-300">
+            <span className="inline-flex rounded-full border border-[#f3d98b]/20 bg-[#d6a94f]/10 px-2 py-1 text-xs font-bold text-[#f3d98b]">
               Locked prediction
             </span>
           )}
 
           <span className="inline-flex rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs font-semibold text-slate-300">
-            {matchStarted ? "Match started" : "Unlock for £3.99"}
+            {matchStarted ? "Match started" : "£3.99 per match"}
           </span>
         </div>
+
+        <div className="mt-4 grid gap-2">
+          <button
+            type="button"
+            disabled={matchStarted || inBasket}
+            onClick={() => onAddToBasket(match)}
+            className={[
+              "inline-flex w-full justify-center rounded-xl border px-4 py-2.5 text-sm font-bold shadow-md shadow-black/30 transition disabled:cursor-not-allowed disabled:opacity-70",
+              inBasket
+                ? "border-green-400/20 bg-green-500/15 text-green-300"
+                : "border-[#f3d98b]/30 bg-[#d6a94f] text-[#08101c] hover:bg-[#c89635]",
+            ].join(" ")}
+          >
+            {matchStarted
+              ? "Prediction closed"
+              : inBasket
+                ? "Added to basket"
+                : "Add to basket — £3.99"}
+          </button>
+
+          <Link
+            href={buildPredictionHref(match)}
+            className="inline-flex w-full justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+          >
+            View match details
+          </Link>
+        </div>
       </div>
-    </Link>
+    </article>
   );
 }
