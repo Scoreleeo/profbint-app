@@ -92,50 +92,6 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function buildPredictionHref(match: MatchRow) {
-  const params = new URLSearchParams();
-
-  params.set("home", match.homeTeam);
-  params.set("away", match.awayTeam);
-  params.set("league", match.leagueName);
-  params.set("date", match.date);
-
-  if (match.homeLogo) {
-    params.set("homeLogo", match.homeLogo);
-  }
-
-  if (match.awayLogo) {
-    params.set("awayLogo", match.awayLogo);
-  }
-
-  if (match.provider) {
-    params.set("provider", match.provider);
-  }
-
-  return `/predictions/${match.fixtureId}?${params.toString()}`;
-}
-
-function buildDailyPickHref(dailyPick: DailyPick) {
-  const params = new URLSearchParams();
-
-  params.set("home", dailyPick.home);
-  params.set("away", dailyPick.away);
-  params.set("league", dailyPick.league);
-  params.set("date", dailyPick.date);
-
-  if (dailyPick.homeLogo) {
-    params.set("homeLogo", dailyPick.homeLogo);
-  }
-
-  if (dailyPick.awayLogo) {
-    params.set("awayLogo", dailyPick.awayLogo);
-  }
-
-  params.set("provider", "api-football");
-
-  return `/predictions/${dailyPick.fixtureId}?${params.toString()}`;
-}
-
 function TeamLogo({
   src,
   alt,
@@ -255,6 +211,13 @@ function QuickNav() {
             {item.label}
           </a>
         ))}
+
+        <Link
+          href="/basket"
+          className="shrink-0 rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-3 py-1.5 text-xs font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635] sm:text-sm"
+        >
+          Basket
+        </Link>
       </div>
     </section>
   );
@@ -279,9 +242,9 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
           {dailyPick ? (
             <>
               <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-300 sm:text-sm">
-                This is the strongest match selection available right now.
-                Unlock to view the model prediction, probability and confidence
-                rating.
+                This is the strongest match selection available right now. Add
+                matches from the predictions page to build your basket before
+                checkout.
               </p>
 
               <div className="mt-3 rounded-2xl border border-white/15 bg-black/20 p-3 sm:p-4">
@@ -312,8 +275,8 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                   </div>
                 </div>
 
-                <div className="mt-3 rounded-xl border border-red-400/20 bg-red-500/10 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-red-300">
+                <div className="mt-3 rounded-xl border border-[#f3d98b]/20 bg-[#d6a94f]/10 p-3">
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-[#f3d98b]">
                     Prediction locked
                   </div>
                   <div className="mt-1.5 text-sm leading-6 text-slate-300">
@@ -336,7 +299,7 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                     Access
                   </div>
                   <div className="mt-1 text-sm font-bold text-white">
-                    Paid unlock
+                    Basket checkout
                   </div>
                 </div>
 
@@ -353,21 +316,21 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
           )}
         </div>
 
-        {dailyPick ? (
-          <Link
-            href={buildDailyPickHref(dailyPick)}
-            className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
-          >
-            Unlock best pick right now →
-          </Link>
-        ) : (
+        <div className="grid gap-3 sm:min-w-[220px]">
           <Link
             href="/predictions"
             className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
           >
-            View Predictions →
+            Add picks to basket →
           </Link>
-        )}
+
+          <Link
+            href="/basket"
+            className="inline-flex justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+          >
+            View basket →
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -667,8 +630,7 @@ export default function HomePage() {
                 AI Match Predictions Now Live
               </div>
               <div className="text-xs leading-5 text-slate-300 sm:text-sm">
-                Unlock best outcome options, win probabilities and confidence
-                ratings.
+                Add match predictions to your basket and checkout when ready.
               </div>
             </div>
 
@@ -676,7 +638,7 @@ export default function HomePage() {
               href="/predictions"
               className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2 text-sm font-semibold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
             >
-              View →
+              Add Picks →
             </Link>
           </div>
         </section>
@@ -830,9 +792,8 @@ export default function HomePage() {
                   ) : (
                     <div className="space-y-2">
                       {data.fixtures.map((match) => (
-                        <Link
+                        <div
                           key={match.fixtureId}
-                          href={buildPredictionHref(match)}
                           className="block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:bg-white/10"
                         >
                           <div className="flex min-w-0 items-center justify-between gap-2">
@@ -840,8 +801,8 @@ export default function HomePage() {
                               {match.leagueName}
                             </div>
 
-                            <span className="shrink-0 rounded-full border border-red-400/20 bg-red-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-red-300">
-                              Locked Prediction
+                            <span className="shrink-0 rounded-full border border-[#f3d98b]/20 bg-[#d6a94f]/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f3d98b]">
+                              Basket Unlock
                             </span>
                           </div>
 
@@ -871,15 +832,19 @@ export default function HomePage() {
                             </div>
                           </div>
 
-                          <div className="mt-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div className="truncate text-sm text-slate-300">
                               {formatUKDateTime(match.date)}
                             </div>
-                            <div className="text-xs font-semibold text-slate-300">
-                              Tap to unlock match prediction →
-                            </div>
+
+                            <Link
+                              href="/predictions"
+                              className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-3 py-2 text-xs font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+                            >
+                              Add from predictions →
+                            </Link>
                           </div>
-                        </Link>
+                        </div>
                       ))}
                     </div>
                   )}
