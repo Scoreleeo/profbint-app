@@ -101,16 +101,20 @@ function TeamLogo({
   alt: string;
   size?: number;
 }) {
-  const boxSize = size + 6;
+  const boxSize = size + 10;
   const [imgError, setImgError] = useState(false);
   const logoSrc = cleanLogoUrl(src);
   const initials = getInitials(alt);
 
+  const shellClassName =
+    "relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white shadow-[0_6px_14px_rgba(0,0,0,0.28)]";
+
   if (!logoSrc || imgError) {
     return (
       <div
-        className="flex shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-white"
+        className={`${shellClassName} text-[10px] font-black text-slate-800`}
         style={{ width: boxSize, height: boxSize }}
+        title={alt}
       >
         {initials || "?"}
       </div>
@@ -119,7 +123,7 @@ function TeamLogo({
 
   return (
     <div
-      className="relative shrink-0 overflow-hidden rounded-full bg-white/5"
+      className={shellClassName}
       style={{ width: boxSize, height: boxSize }}
     >
       <Image
@@ -128,7 +132,7 @@ function TeamLogo({
         fill
         unoptimized
         sizes={`${boxSize}px`}
-        className="object-contain p-1"
+        className="object-contain p-1.5"
         onError={() => setImgError(true)}
       />
     </div>
