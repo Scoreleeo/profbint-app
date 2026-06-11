@@ -50,23 +50,29 @@ function TeamLogo({
   const logoSrc = cleanLogoUrl(src);
   const initials = getInitials(alt);
 
+  const shellClassName =
+    "relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white shadow-[0_6px_14px_rgba(0,0,0,0.28)]";
+
   if (!logoSrc) {
     return (
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-[10px] font-black text-white">
+      <div
+        className={`${shellClassName} text-[10px] font-black text-slate-800`}
+        title={alt}
+      >
         {initials || "?"}
       </div>
     );
   }
 
   return (
-    <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/5">
+    <div className={shellClassName}>
       <Image
         src={logoSrc}
         alt={alt}
         fill
         unoptimized
-        sizes="32px"
-        className="object-contain p-1"
+        sizes="36px"
+        className="object-contain p-1.5"
       />
     </div>
   );
