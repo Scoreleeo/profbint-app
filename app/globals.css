@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #06101d;
+  --foreground: #f8fafc;
 }
 
 @theme inline {
@@ -12,17 +12,96 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 197, 94, 0.22), transparent 32rem),
+    radial-gradient(circle at 86% 5%, rgba(239, 68, 68, 0.18), transparent 30rem),
+    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.12), transparent 34rem),
+    linear-gradient(135deg, #06101d 0%, #081827 42%, #0f172a 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+body::before {
+  pointer-events: none;
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 72%);
+}
+
+.bg-\[\#101827\],
+.bg-\[\#0b1220\] {
+  background:
+    radial-gradient(circle at 14% 0%, rgba(34, 197, 94, 0.18), transparent 30rem),
+    radial-gradient(circle at 88% 3%, rgba(239, 68, 68, 0.16), transparent 28rem),
+    linear-gradient(135deg, #06101d 0%, #081827 48%, #0f172a 100%) !important;
+}
+
+.bg-\[\#172033\] {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(34, 197, 94, 0.1), transparent 18rem),
+    linear-gradient(145deg, rgba(16, 26, 45, 0.98), rgba(8, 17, 31, 0.98)) !important;
+}
+
+.bg-\[\#111a2b\] {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.08), transparent 15rem),
+    linear-gradient(145deg, rgba(13, 23, 40, 0.98), rgba(8, 17, 31, 0.98)) !important;
+}
+
+.bg-\[\#d6a94f\] {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 48%, #06b6d4 100%) !important;
+  color: #06101d !important;
+  box-shadow:
+    0 12px 28px rgba(34, 197, 94, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+.hover\:bg-\[\#c89635\]:hover {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 48%, #38bdf8 100%) !important;
+  color: #06101d !important;
+}
+
+.border-\[\#f3d98b\]\/30 {
+  border-color: rgba(34, 197, 94, 0.45) !important;
+}
+
+.border-\[\#f3d98b\]\/20 {
+  border-color: rgba(34, 197, 94, 0.28) !important;
+}
+
+.bg-\[\#d6a94f\]\/10 {
+  background: rgba(34, 197, 94, 0.1) !important;
+}
+
+.text-\[\#f3d98b\] {
+  color: #86efac !important;
+}
+
+.border-white\/15 {
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+
+.shadow-xl {
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.32),
+    0 0 26px rgba(34, 197, 94, 0.04) !important;
+}
+
+.rounded-2xl,
+.rounded-3xl {
+  background-clip: padding-box;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes ticker-scroll {
