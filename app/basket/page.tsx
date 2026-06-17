@@ -11,6 +11,31 @@ import {
 } from "@/lib/basket";
 import { formatUKDateTime } from "@/lib/utils/date";
 
+const CHECKOUT_BASKET_START_URL = "https://checkout.profbint.com/basket/start";
+
+type CheckoutBasketItem = {
+  fixtureId: string;
+  matchName: string;
+  returnUrl: string;
+  price: number;
+};
+
+function buildCheckoutItems(items: BasketItem[]): CheckoutBasketItem[] {
+  return items.map((item) => ({
+    fixtureId: String(item.fixtureId),
+    matchName: `${item.home} vs ${item.away}`,
+    returnUrl: `https://profbint.com/predictions/${item.fixtureId}`,
+    price: item.price,
+  }));
+}
+
+function buildBasketCheckoutUrl(items: BasketItem[]) {
+  const checkoutItems = buildCheckoutItems(items);
+  const encodedItems = encodeURIComponent(JSON.stringify(checkoutItems));
+
+  return `${CHECKOUT_BASKET_START_URL}?items=${encodedItems}`;
+}
+
 export default function BasketPage() {
   const [items, setItems] = useState<BasketItem[]>([]);
 
@@ -20,6 +45,10 @@ export default function BasketPage() {
 
   const total = useMemo(() => {
     return getBasketTotal(items);
+  }, [items]);
+
+  const basketCheckoutUrl = useMemo(() => {
+    return items.length > 0 ? buildBasketCheckoutUrl(items) : "";
   }, [items]);
 
   function handleRemove(fixtureId: number) {
@@ -134,12 +163,16 @@ export default function BasketPage() {
                   </span>
                 </div>
 
-                <button
-                  type="button"
-                  className="mt-5 w-full rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-5 py-3 text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+                <a
+                  href={basketCheckoutUrl}
+                  className="mt-5 block w-full rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-5 py-3 text-center text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
                 >
-                  Checkout Coming Next →
-                </button>
+                  Checkout Basket →
+                </a>
+
+                <p className="mt-3 text-center text-xs text-slate-400">
+                  You will be redirected to secure Stripe checkout.
+                </p>
               </div>
             </>
           )}
