@@ -2,6 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatUKDateTime } from "@/lib/utils/date";
 
+export const dynamic = "force-dynamic";
+
+const CHECKOUT_START_URL = "https://checkout.profbint.com/start";
+const CHECKOUT_VALIDATE_URL =
+  "https://checkout.profbint.com/api/unlock/validate";
+
 type PageProps = {
   params: Promise<{
     fixtureId: string;
@@ -14,7 +20,15 @@ type PageProps = {
     homeLogo?: string;
     awayLogo?: string;
     provider?: string;
+    ref?: string;
+    unlockReference?: string;
   }>;
+};
+
+type UnlockValidationResult = {
+  valid: boolean;
+  status?: string | null;
+  error?: string;
 };
 
 function getInitials(name: string) {
@@ -36,6 +50,112 @@ function cleanLogoUrl(value?: string) {
     return decodeURIComponent(value);
   } catch {
     return value;
+  }
+}
+
+function cleanUnlockReference(value?: string) {
+  if (!value) {
+    return "";
+  }
+
+  return value.trim().toUpperCase();
+}
+
+function buildReturnUrl({
+  fixtureId,
+  home,
+  away,
+  league,
+  date,
+  homeLogo,
+  awayLogo,
+  provider,
+}: {
+  fixtureId: string;
+  home: string;
+  away: string;
+  league: string;
+  date: string;
+  homeLogo: string;
+  awayLogo: string;
+  provider: string;
+}) {
+  const params = new URLSearchParams();
+
+  params.set("home", home);
+  params.set("away", away);
+  params.set("league", league);
+
+  if (date) params.set("date", date);
+  if (homeLogo) params.set("homeLogo", homeLogo);
+  if (awayLogo) params.set("awayLogo", awayLogo);
+  if (provider) params.set("provider", provider);
+
+  return `https://profbint.com/predictions/${fixtureId}?${params.toString()}`;
+}
+
+function buildCheckoutUrl({
+  fixtureId,
+  home,
+  away,
+  returnUrl,
+}: {
+  fixtureId: string;
+  home: string;
+  away: string;
+  returnUrl: string;
+}) {
+  const params = new URLSearchParams();
+
+  params.set("fixtureId", fixtureId);
+  params.set("matchName", `${home} vs ${away}`);
+  params.set("returnUrl", returnUrl);
+
+  return `${CHECKOUT_START_URL}?${params.toString()}`;
+}
+
+async function validateUnlockReference({
+  unlockReference,
+  fixtureId,
+}: {
+  unlockReference: string;
+  fixtureId: string;
+}): Promise<UnlockValidationResult> {
+  if (!unlockReference) {
+    return {
+      valid: false,
+    };
+  }
+
+  try {
+    const params = new URLSearchParams();
+
+    params.set("ref", unlockReference);
+    params.set("fixtureId", fixtureId);
+
+    const response = await fetch(`${CHECKOUT_VALIDATE_URL}?${params.toString()}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return {
+        valid: false,
+        error: "Unable to validate unlock reference.",
+      };
+    }
+
+    const data = (await response.json()) as UnlockValidationResult;
+
+    return {
+      valid: Boolean(data.valid),
+      status: data.status ?? null,
+      error: data.error,
+    };
+  } catch {
+    return {
+      valid: false,
+      error: "Unable to validate unlock reference.",
+    };
   }
 }
 
@@ -86,6 +206,7 @@ export default async function LockedPredictionPage({
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
 
+  const fixtureId = resolvedParams.fixtureId;
   const home = resolvedSearchParams.home || "Home Team";
   const away = resolvedSearchParams.away || "Away Team";
   const league = resolvedSearchParams.league || "Football";
@@ -93,8 +214,36 @@ export default async function LockedPredictionPage({
   const homeLogo = cleanLogoUrl(resolvedSearchParams.homeLogo);
   const awayLogo = cleanLogoUrl(resolvedSearchParams.awayLogo);
   const provider = resolvedSearchParams.provider || "football-data";
+  const unlockReference = cleanUnlockReference(
+    resolvedSearchParams.ref || resolvedSearchParams.unlockReference,
+  );
 
   const matchStarted = hasMatchStarted(date);
+
+  const returnUrl = buildReturnUrl({
+    fixtureId,
+    home,
+    away,
+    league,
+    date,
+    homeLogo,
+    awayLogo,
+    provider,
+  });
+
+  const checkoutUrl = buildCheckoutUrl({
+    fixtureId,
+    home,
+    away,
+    returnUrl,
+  });
+
+  const unlockValidation = await validateUnlockReference({
+    unlockReference,
+    fixtureId,
+  });
+
+  const isUnlocked = unlockValidation.valid;
 
   return (
     <main className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0b1220] text-white">
@@ -108,7 +257,11 @@ export default async function LockedPredictionPage({
           </Link>
 
           <div className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-red-400 sm:text-sm sm:tracking-[0.2em]">
-            {matchStarted ? "Prediction Closed" : "Locked Match Prediction"}
+            {isUnlocked
+              ? "Prediction Unlocked"
+              : matchStarted
+                ? "Prediction Closed"
+                : "Locked Match Prediction"}
           </div>
 
           <h1 className="mt-2 break-words text-2xl font-black tracking-tight sm:text-3xl md:text-5xl">
@@ -116,9 +269,11 @@ export default async function LockedPredictionPage({
           </h1>
 
           <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300 md:text-base">
-            {matchStarted
-              ? "This match has already kicked off, so the paid prediction window is now closed."
-              : "Unlock the model prediction, probability rating and confidence score before kick-off."}
+            {isUnlocked
+              ? "Your unlock reference has been verified for this fixture."
+              : matchStarted
+                ? "This match has already kicked off, so the paid prediction window is now closed."
+                : "Unlock the model prediction, probability rating and confidence score before kick-off."}
           </p>
         </div>
       </div>
@@ -160,7 +315,11 @@ export default async function LockedPredictionPage({
                 <div className="text-xs uppercase tracking-wide text-slate-400">
                   Prediction
                 </div>
-                <div className="mt-2 blur-sm text-lg font-black text-white">
+                <div
+                  className={`mt-2 text-lg font-black text-white ${
+                    isUnlocked ? "" : "blur-sm"
+                  }`}
+                >
                   Home Win
                 </div>
               </div>
@@ -169,7 +328,11 @@ export default async function LockedPredictionPage({
                 <div className="text-xs uppercase tracking-wide text-slate-400">
                   Probability
                 </div>
-                <div className="mt-2 blur-sm text-lg font-black text-white">
+                <div
+                  className={`mt-2 text-lg font-black text-white ${
+                    isUnlocked ? "" : "blur-sm"
+                  }`}
+                >
                   67%
                 </div>
               </div>
@@ -178,7 +341,11 @@ export default async function LockedPredictionPage({
                 <div className="text-xs uppercase tracking-wide text-slate-400">
                   Confidence
                 </div>
-                <div className="mt-2 blur-sm text-lg font-black text-white">
+                <div
+                  className={`mt-2 text-lg font-black text-white ${
+                    isUnlocked ? "" : "blur-sm"
+                  }`}
+                >
                   High
                 </div>
               </div>
@@ -186,7 +353,49 @@ export default async function LockedPredictionPage({
           </div>
         </section>
 
-        {matchStarted ? (
+        {isUnlocked ? (
+          <section className="mt-5 overflow-hidden rounded-2xl border border-emerald-400/20 bg-gradient-to-r from-emerald-500/10 via-[#111827] to-emerald-400/5 p-5 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <div className="mx-auto mb-4 inline-flex rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
+                ✓ Prediction unlocked
+              </div>
+
+              <h2 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+                Your paid prediction is unlocked
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
+                This unlock reference has been verified against fixture ID{" "}
+                {fixtureId}.
+              </p>
+
+              <div className="mt-6 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5 text-left">
+                <p className="text-xs font-black uppercase tracking-[0.25em] text-emerald-200">
+                  Unlock reference
+                </p>
+                <p className="mt-3 break-all font-mono text-sm font-black text-emerald-300">
+                  {unlockReference}
+                </p>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Link
+                  href="/predictions"
+                  className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
+                >
+                  View all predictions
+                </Link>
+
+                <Link
+                  href="/basket"
+                  className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-6 py-3 text-sm font-black text-emerald-100 transition hover:bg-emerald-400/20"
+                >
+                  View basket
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : matchStarted ? (
           <section className="mt-5 overflow-hidden rounded-2xl border border-yellow-400/20 bg-yellow-500/10 p-5 shadow-xl sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
             <div className="mx-auto max-w-3xl text-center">
               <div className="mx-auto mb-4 inline-flex rounded-full border border-yellow-400/20 bg-yellow-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-yellow-300">
@@ -219,7 +428,7 @@ export default async function LockedPredictionPage({
               </div>
 
               <p className="mt-5 text-xs leading-5 text-slate-500">
-                Fixture ID: {resolvedParams.fixtureId}. Provider: {provider}.
+                Fixture ID: {fixtureId}. Provider: {provider}.
               </p>
             </div>
           </section>
@@ -256,13 +465,64 @@ export default async function LockedPredictionPage({
                 </div>
               </div>
 
+              {unlockReference && unlockValidation.error ? (
+                <div className="mx-auto mt-5 max-w-xl rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100">
+                  {unlockValidation.error}
+                </div>
+              ) : null}
+
+              {unlockReference && !unlockValidation.valid ? (
+                <div className="mx-auto mt-5 max-w-xl rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-100">
+                  This unlock reference is valid only for the match or basket
+                  that was purchased. It does not unlock this fixture.
+                </div>
+              ) : null}
+
+              <form
+                action={`/predictions/${fixtureId}`}
+                method="get"
+                className="mx-auto mt-6 max-w-xl rounded-2xl border border-white/10 bg-black/20 p-4"
+              >
+                <input type="hidden" name="home" value={home} />
+                <input type="hidden" name="away" value={away} />
+                <input type="hidden" name="league" value={league} />
+                <input type="hidden" name="date" value={date} />
+                <input type="hidden" name="homeLogo" value={homeLogo} />
+                <input type="hidden" name="awayLogo" value={awayLogo} />
+                <input type="hidden" name="provider" value={provider} />
+
+                <label
+                  htmlFor="unlockReference"
+                  className="block text-left text-xs font-black uppercase tracking-[0.2em] text-slate-400"
+                >
+                  Already paid? Enter unlock reference
+                </label>
+
+                <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                  <input
+                    id="unlockReference"
+                    name="ref"
+                    defaultValue={unlockReference}
+                    placeholder="PFI_..."
+                    className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm font-bold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/60"
+                  />
+
+                  <button
+                    type="submit"
+                    className="rounded-xl border border-emerald-400/30 bg-emerald-400 px-5 py-3 text-sm font-black text-[#08101c] transition hover:bg-emerald-300"
+                  >
+                    Validate
+                  </button>
+                </div>
+              </form>
+
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <button
-                  type="button"
+                <a
+                  href={checkoutUrl}
                   className="rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-6 py-3 text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
                 >
                   Unlock this match – £3.99
-                </button>
+                </a>
 
                 <Link
                   href="/predictions"
@@ -273,9 +533,7 @@ export default async function LockedPredictionPage({
               </div>
 
               <p className="mt-5 text-xs leading-5 text-slate-500">
-                Payments are not active yet. This page prepares the premium
-                unlock flow before Stripe is connected. Fixture ID:{" "}
-                {resolvedParams.fixtureId}. Provider: {provider}.
+                Fixture ID: {fixtureId}. Provider: {provider}.
               </p>
             </div>
           </section>
