@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
+import { config } from "@/lib/config";
 import { apiFootballFetch } from "@/lib/api-football/client";
 import { buildMatchFeatures } from "@/lib/predictions/features";
 import { buildPrediction } from "@/lib/predictions/model";
@@ -467,7 +468,9 @@ export async function GET(request: NextRequest) {
     const leagueParam = request.nextUrl.searchParams.get("league");
     const dailyPickParam = request.nextUrl.searchParams.get("dailyPick");
     const dateParam = request.nextUrl.searchParams.get("date");
-    const season = Number(request.nextUrl.searchParams.get("season") || 2025);
+    const season = Number(
+      request.nextUrl.searchParams.get("season") || config.defaultSeason
+    );
 
     const shouldBuildDailyPick =
       dailyPickParam === "true" || leagueParam === "all";
