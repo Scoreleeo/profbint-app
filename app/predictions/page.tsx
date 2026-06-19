@@ -312,7 +312,7 @@ export default function PredictionsPage() {
     setError(null);
 
     try {
-      const res = await fetch(`/api/predictions?league=${id}&season=2025`);
+      const res = await fetch(`/api/predictions?league=${id}&season=${league.season}`);
 
       if (!res.ok) {
         throw new Error(`Failed to load predictions: ${res.status}`);
@@ -347,7 +347,7 @@ export default function PredictionsPage() {
       try {
         const responses = await Promise.all(
           TOP_EURO_LEAGUES.map((league) =>
-            fetch(`/api/predictions?league=${league.id}&season=2025`).then(
+            fetch(`/api/predictions?league=${league.id}&season=${league.season}`).then(
               (res) => res.json()
             )
           )

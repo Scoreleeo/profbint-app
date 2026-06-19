@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTeamFixtures } from "@/lib/api-football/services";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
 import { formatUKDateTime } from "@/lib/utils/date";
+import { config } from "@/lib/config";
 
 type Props = {
   params: Promise<{
@@ -121,7 +122,7 @@ export default async function TeamPage({ params, searchParams }: Props) {
 
   const parsedTeamId = Number(teamId);
   const leagueId = Number(query.league || TOP_EURO_LEAGUES[0].id);
-  const season = Number(query.season || 2025);
+  const season = Number(query.season || config.defaultSeason);
 
   if (!parsedTeamId || !leagueId || !season) {
     notFound();

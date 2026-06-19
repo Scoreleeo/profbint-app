@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
 import { formatUKDateTime } from "@/lib/utils/date";
+import { config } from "@/lib/config";
 
 type MatchRow = {
   fixtureId: number;
@@ -68,7 +69,7 @@ type DashboardPayload = {
   dailyPick?: DailyPick | null;
 };
 
-const SEASON = 2025;
+const SEASON = config.defaultSeason;
 
 function cleanLogoUrl(value?: string) {
   if (!value) {
