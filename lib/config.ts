@@ -9,5 +9,5 @@ function required(name: string): string {
 export const config = {
   apiFootballKey: required("API_FOOTBALL_KEY"),
   apiFootballBaseUrl: "https://v3.football.api-sports.io",
-  defaultSeason: 2025,
+  defaultSeason: Number(process.env.API_FOOTBALL_SEASON || 2025),
 };
