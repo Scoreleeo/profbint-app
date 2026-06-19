@@ -312,7 +312,10 @@ export default function PredictionsPage() {
     setError(null);
 
     try {
-      const res = await fetch(`/api/predictions?league=${id}&season=${league.season}`);
+      const selectedLeague = TOP_EURO_LEAGUES.find((league) => league.id === Number(id));
+const season = selectedLeague?.season || TOP_EURO_LEAGUES[0].season;
+
+const res = await fetch(`/api/predictions?league=${id}&season=${season}`);
 
       if (!res.ok) {
         throw new Error(`Failed to load predictions: ${res.status}`);
