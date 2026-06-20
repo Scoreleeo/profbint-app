@@ -287,6 +287,8 @@ export default function PredictionsPage() {
   const [leagueId, setLeagueId] = useState<number>(TOP_EURO_LEAGUES[0].id);
   const [error, setError] = useState<string | null>(null);
   const [basketIds, setBasketIds] = useState<number[]>([]);
+  const ENABLE_TEST_PREDICTION =
+  process.env.NEXT_PUBLIC_ENABLE_TEST_PREDICTION === "true";
 
   const selectedLeague =
     TOP_EURO_LEAGUES.find((league) => league.id === leagueId) ||
@@ -322,7 +324,35 @@ const res = await fetch(`/api/predictions?league=${id}&season=${season}`);
       }
 
       const data = await res.json();
-      setMatches(data.matches || []);
+
+if (ENABLE_TEST_PREDICTION) {
+  setMatches([
+    {
+      fixtureId: 999001,
+      home: "Arsenal",
+      away: "Chelsea",
+      league: "TEST FIXTURE",
+      date: new Date(
+        Date.now() + 30 * 24 * 60 * 60 * 1000
+      ).toISOString(),
+      prediction: {
+        winner: "Arsenal",
+        outcome: "HOME_WIN",
+        confidence: 75,
+        probabilities: {
+          home: 75,
+          draw: 15,
+          away: 10,
+        },
+        likelyScores: [],
+        insights: [],
+      },
+    },
+    ...(data.matches || []),
+  ]);
+} else {
+  setMatches(data.matches || []);
+}
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error(err);
