@@ -5,8 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getBasket, saveBasket } from "@/lib/basket";
 import { formatUKDateTime } from "@/lib/utils/date";
 
-const CHECKOUT_VALIDATE_URL =
-  "https://checkout.profbint.com/api/unlock/validate";
+const CHECKOUT_VALIDATE_URL = "/api/unlock/validate";
 
 type UnlockItem = {
   fixtureId: string | null;
