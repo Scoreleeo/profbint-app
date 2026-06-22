@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import UnlockedPredictionCard from "@/components/UnlockedPredictionCard";
 import { getBasket, saveBasket } from "@/lib/basket";
-import { formatUKDateTime } from "@/lib/utils/date";
 
 const CHECKOUT_VALIDATE_URL = "/api/unlock/validate";
 
@@ -20,23 +20,6 @@ type UnlockValidationResult = {
   error?: string;
   unlockReference?: string | null;
   items?: UnlockItem[];
-};
-
-type PredictionMatch = {
-  fixtureId: number;
-  home: string;
-  away: string;
-  league: string;
-  date: string;
-  prediction?: {
-    strongestPick?: string;
-    confidence?: string;
-    probabilities?: {
-      home?: number;
-      draw?: number;
-      away?: number;
-    };
-  };
 };
 
 function cleanReference(value: string | null) {
@@ -88,6 +71,19 @@ function splitMatchName(matchName: string | null) {
   };
 }
 
+function buildIndividualPredictionUrl(item: UnlockItem, reference: string) {
+  if (item.returnUrl) {
+    const separator = item.returnUrl.includes("?") ? "&" : "?";
+    return `${item.returnUrl}${separator}ref=${encodeURIComponent(reference)}`;
+  }
+
+  if (item.fixtureId) {
+    return `/predictions/${item.fixtureId}?ref=${encodeURIComponent(reference)}`;
+  }
+
+  return "/predictions";
+}
+
 async function validateUnlockReference(
   ref: string,
 ): Promise<UnlockValidationResult> {
@@ -108,34 +104,11 @@ async function validateUnlockReference(
   return response.json();
 }
 
-async function fetchCurrentPredictions(): Promise<PredictionMatch[]> {
-  try {
-    const response = await fetch("/api/predictions?dailyPick=true", {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return [];
-    }
-
-    const data = await response.json();
-
-    if (Array.isArray(data.matches)) {
-      return data.matches;
-    }
-
-    return [];
-  } catch {
-    return [];
-  }
-}
-
 export default function UnlockedPredictionsPage() {
   const [reference, setReference] = useState("");
   const [validation, setValidation] = useState<UnlockValidationResult | null>(
     null,
   );
-  const [predictions, setPredictions] = useState<PredictionMatch[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -159,9 +132,6 @@ export default function UnlockedPredictionsPage() {
 
       if (unlockValidation.valid && Array.isArray(unlockValidation.items)) {
         cleanBasketAfterUnlock(unlockValidation.items);
-
-        const currentPredictions = await fetchCurrentPredictions();
-        setPredictions(currentPredictions);
       }
 
       setLoading(false);
@@ -174,15 +144,7 @@ export default function UnlockedPredictionsPage() {
     return validation?.items ?? [];
   }, [validation]);
 
-  const predictionMap = useMemo(() => {
-    const map = new Map<number, PredictionMatch>();
-
-    predictions.forEach((prediction) => {
-      map.set(prediction.fixtureId, prediction);
-    });
-
-    return map;
-  }, [predictions]);
+  const unlockReference = validation?.unlockReference || reference;
 
   if (loading) {
     return (
@@ -209,9 +171,11 @@ export default function UnlockedPredictionsPage() {
           <p className="text-sm font-black uppercase tracking-[0.25em] text-red-300">
             Unlock not valid
           </p>
+
           <h1 className="mt-4 text-3xl font-black">
             We could not unlock these predictions.
           </h1>
+
           <p className="mt-3 text-slate-300">
             {validation?.error ||
               "This unlock reference could not be verified."}
@@ -263,7 +227,7 @@ export default function UnlockedPredictionsPage() {
               Unlock reference
             </p>
             <p className="mt-2 break-all font-mono text-sm font-black text-emerald-300">
-              {validation.unlockReference || reference}
+              {unlockReference}
             </p>
           </div>
         </section>
@@ -276,94 +240,24 @@ export default function UnlockedPredictionsPage() {
             </p>
           </section>
         ) : (
-          <section className="mt-6 grid gap-5">
-            {items.map((item) => {
-              const fixtureId = Number(item.fixtureId);
-              const prediction = predictionMap.get(fixtureId);
+          <section className="mt-6 grid gap-6">
+            {items.map((item, index) => {
+              const fixtureId = item.fixtureId || `purchased-${index + 1}`;
               const fallbackNames = splitMatchName(item.matchName);
 
-              const home = prediction?.home || fallbackNames.home;
-              const away = prediction?.away || fallbackNames.away;
-              const league = prediction?.league || "Purchased Prediction";
-              const date = prediction?.date || "";
-              const probabilities = prediction?.prediction?.probabilities;
-
               return (
-                <article
-                  key={`${item.fixtureId}-${item.matchName}`}
-                  className="rounded-3xl border border-white/10 bg-[#111827] p-5 shadow-xl"
-                >
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
-                        {league}
-                      </p>
-
-                      <h2 className="mt-2 text-2xl font-black text-white">
-                        {home} vs {away}
-                      </h2>
-
-                      <p className="mt-2 text-sm text-slate-400">
-                        {date ? formatUKDateTime(date) : "Kick-off details confirmed on prediction page"}
-                      </p>
-
-                      {item.fixtureId ? (
-                        <p className="mt-2 font-mono text-xs text-slate-500">
-                          Fixture ID: {item.fixtureId}
-                        </p>
-                      ) : null}
-                    </div>
-
-                    <div className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-sm font-black text-emerald-200">
-                      Unlocked
-                    </div>
-                  </div>
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-wide text-slate-400">
-                        Prediction
-                      </p>
-                      <p className="mt-2 text-lg font-black text-white">
-                        {prediction?.prediction?.strongestPick ||
-                          "Prediction unlocked"}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-wide text-slate-400">
-                        Home / Draw / Away
-                      </p>
-                      <p className="mt-2 text-lg font-black text-white">
-                        {probabilities
-                          ? `${probabilities.home ?? "-"}% / ${
-                              probabilities.draw ?? "-"
-                            }% / ${probabilities.away ?? "-"}%`
-                          : "Available via unlocked access"}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <p className="text-xs uppercase tracking-wide text-slate-400">
-                        Confidence
-                      </p>
-                      <p className="mt-2 text-lg font-black text-white">
-                        {prediction?.prediction?.confidence || "Unlocked"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {item.returnUrl ? (
-                    <a
-                      href={`${item.returnUrl}${
-                        item.returnUrl.includes("?") ? "&" : "?"
-                      }ref=${encodeURIComponent(reference)}`}
-                      className="mt-5 inline-flex rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-200 transition hover:bg-white/10"
-                    >
-                      Open individual prediction
-                    </a>
-                  ) : null}
-                </article>
+                <UnlockedPredictionCard
+                  key={`${fixtureId}-${item.matchName || index}`}
+                  fixtureId={fixtureId}
+                  home={fallbackNames.home}
+                  away={fallbackNames.away}
+                  league="Purchased Prediction"
+                  unlockReference={unlockReference}
+                  individualPredictionUrl={buildIndividualPredictionUrl(
+                    item,
+                    unlockReference,
+                  )}
+                />
               );
             })}
           </section>
