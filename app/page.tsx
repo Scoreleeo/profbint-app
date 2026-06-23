@@ -319,6 +319,15 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
           >
             Go to predictions →
           </Link>
+
+          <a
+            href="https://results.profbint.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+          >
+            Results Dashboard →
+          </a>
         </div>
       </div>
     </section>
@@ -608,29 +617,6 @@ export default function HomePage() {
         <QuickNav />
 
         <DailyPickCard dailyPick={data?.dailyPick} />
-
-        <section className="mt-4 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 sm:mt-5 sm:p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-wide text-slate-400">
-                New
-              </div>
-              <div className="truncate text-sm font-bold sm:text-base">
-                AI Match Predictions Now Live
-              </div>
-              <div className="text-xs leading-5 text-slate-300 sm:text-sm">
-                View all match predictions completely free.
-              </div>
-            </div>
-
-            <Link
-              href="/predictions"
-              className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2 text-sm font-semibold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
-            >
-              Match predictions →
-            </Link>
-          </div>
-        </section>
 
         <section className="mt-4 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 shadow-xl sm:mt-5 sm:rounded-3xl">
           <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
