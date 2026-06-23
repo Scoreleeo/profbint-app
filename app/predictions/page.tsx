@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { TOP_EURO_LEAGUES } from "@/lib/constants";
 import { formatUKDateTime } from "@/lib/utils/date";
-import { addToBasket, getBasket } from "@/lib/basket";
 
 type PredictionOption = {
   label: string;
@@ -67,27 +66,27 @@ function TeamLogo({ src, alt }: { src?: string; alt: string }) {
 
   if (!logoSrc) {
     return (
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] font-black text-white">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-[10px] font-black text-slate-800 shadow-[0_6px_14px_rgba(0,0,0,0.28)]">
         {initials || "?"}
       </div>
     );
   }
 
   return (
-    <div className="relative h-6 w-6 shrink-0 overflow-hidden rounded-full bg-white/5">
+    <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-white shadow-[0_6px_14px_rgba(0,0,0,0.28)]">
       <Image
         src={logoSrc}
         alt={alt}
         fill
         unoptimized
-        sizes="24px"
-        className="object-contain p-1"
+        sizes="32px"
+        className="object-contain p-1.5"
       />
     </div>
   );
 }
 
-function QuickNav({ basketCount }: { basketCount: number }) {
+function QuickNav() {
   const links = [
     { href: "/", label: "Home" },
     { href: "#best-pick", label: "Best Pick" },
@@ -112,13 +111,6 @@ function QuickNav({ basketCount }: { basketCount: number }) {
             {item.label}
           </Link>
         ))}
-
-        <Link
-          href="/basket"
-          className="shrink-0 rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2 text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
-        >
-          Basket ({basketCount})
-        </Link>
       </div>
     </section>
   );
@@ -263,19 +255,6 @@ function buildPredictionHref(match: PredictionMatch) {
   return `/predictions/${match.fixtureId}?${params.toString()}`;
 }
 
-function buildBasketItem(match: PredictionMatch) {
-  return {
-    fixtureId: match.fixtureId,
-    home: match.home,
-    away: match.away,
-    league: match.league,
-    date: match.date,
-    homeLogo: match.homeLogo,
-    awayLogo: match.awayLogo,
-    price: 3.99,
-  };
-}
-
 export default function PredictionsPage() {
   const [matches, setMatches] = useState<PredictionMatch[]>([]);
   const [allLeagueMatches, setAllLeagueMatches] = useState<PredictionMatch[]>(
@@ -286,9 +265,6 @@ export default function PredictionsPage() {
   const [dailyPickLoading, setDailyPickLoading] = useState(true);
   const [leagueId, setLeagueId] = useState<number>(TOP_EURO_LEAGUES[0].id);
   const [error, setError] = useState<string | null>(null);
-  const [basketIds, setBasketIds] = useState<number[]>([]);
-  const ENABLE_TEST_PREDICTION =
-  process.env.NEXT_PUBLIC_ENABLE_TEST_PREDICTION === "true";
 
   const selectedLeague =
     TOP_EURO_LEAGUES.find((league) => league.id === leagueId) ||
@@ -298,26 +274,18 @@ export default function PredictionsPage() {
     return findDailyPick(allLeagueMatches);
   }, [allLeagueMatches]);
 
-  function refreshBasket() {
-    const basket = getBasket();
-    setBasketIds(basket.map((item) => item.fixtureId));
-  }
-
-  function handleAddToBasket(match: PredictionMatch) {
-    const updated = addToBasket(buildBasketItem(match));
-    setBasketIds(updated.map((item) => item.fixtureId));
-  }
-
   async function loadPredictions(id: number) {
     setLoading(true);
     setFetchFinished(false);
     setError(null);
 
     try {
-      const selectedLeague = TOP_EURO_LEAGUES.find((league) => league.id === Number(id));
-const season = selectedLeague?.season || TOP_EURO_LEAGUES[0].season;
+      const selectedLeague = TOP_EURO_LEAGUES.find(
+        (league) => league.id === Number(id)
+      );
+      const season = selectedLeague?.season || TOP_EURO_LEAGUES[0].season;
 
-const res = await fetch(`/api/predictions?league=${id}&season=${season}`);
+      const res = await fetch(`/api/predictions?league=${id}&season=${season}`);
 
       if (!res.ok) {
         throw new Error(`Failed to load predictions: ${res.status}`);
@@ -325,34 +293,7 @@ const res = await fetch(`/api/predictions?league=${id}&season=${season}`);
 
       const data = await res.json();
 
-if (ENABLE_TEST_PREDICTION) {
-  setMatches([
-    {
-      fixtureId: 999001,
-      home: "Arsenal",
-      away: "Chelsea",
-      league: "TEST FIXTURE",
-      date: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000
-      ).toISOString(),
-      prediction: {
-        winner: "Arsenal",
-        outcome: "HOME_WIN",
-        confidence: 75,
-        probabilities: {
-          home: 75,
-          draw: 15,
-          away: 10,
-        },
-        likelyScores: [],
-        insights: [],
-      },
-    },
-    ...(data.matches || []),
-  ]);
-} else {
-  setMatches(data.matches || []);
-}
+      setMatches(data.matches || []);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error(err);
@@ -362,10 +303,6 @@ if (ENABLE_TEST_PREDICTION) {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    refreshBasket();
-  }, []);
 
   useEffect(() => {
     void loadPredictions(selectedLeague.id);
@@ -380,9 +317,9 @@ if (ENABLE_TEST_PREDICTION) {
       try {
         const responses = await Promise.all(
           TOP_EURO_LEAGUES.map((league) =>
-            fetch(`/api/predictions?league=${league.id}&season=${league.season}`).then(
-              (res) => res.json()
-            )
+            fetch(
+              `/api/predictions?league=${league.id}&season=${league.season}`
+            ).then((res) => res.json())
           )
         );
 
@@ -424,17 +361,10 @@ if (ENABLE_TEST_PREDICTION) {
             >
               ← Back to Home
             </Link>
-
-            <Link
-              href="/basket"
-              className="inline-flex rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2 text-sm font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
-            >
-              Basket ({basketIds.length})
-            </Link>
           </div>
 
           <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300 sm:text-xs">
-            Premium insights
+            Free football predictions
           </div>
 
           <h1 className="break-words text-xl font-black tracking-tight sm:text-2xl md:text-3xl">
@@ -442,8 +372,8 @@ if (ENABLE_TEST_PREDICTION) {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
-            Predictions are locked before kick-off. Add matches to your basket
-            for £3.99 each and keep access until those games end.
+            Every prediction is now freely visible. Review the model outcome,
+            probabilities, confidence and score ideas before kick-off.
           </p>
 
           <div className="mt-2 text-sm text-slate-400">
@@ -454,14 +384,9 @@ if (ENABLE_TEST_PREDICTION) {
           </div>
         </section>
 
-        <QuickNav basketCount={basketIds.length} />
+        <QuickNav />
 
-        <DailyPickSection
-          dailyPick={dailyPick}
-          loading={dailyPickLoading}
-          basketIds={basketIds}
-          onAddToBasket={handleAddToBasket}
-        />
+        <DailyPickSection dailyPick={dailyPick} loading={dailyPickLoading} />
 
         <section
           id="competitions"
@@ -505,7 +430,7 @@ if (ENABLE_TEST_PREDICTION) {
               Model status
             </div>
             <div className="mt-2 text-base font-bold sm:text-lg">
-              Locked premium
+              Open access
             </div>
           </div>
 
@@ -520,10 +445,10 @@ if (ENABLE_TEST_PREDICTION) {
 
           <div className="min-w-0 rounded-2xl border border-white/15 bg-[#172033] p-4">
             <div className="text-xs uppercase tracking-wide text-slate-400">
-              Basket price
+              Access
             </div>
             <div className="mt-2 text-base font-bold sm:text-lg">
-              £3.99 per match
+              Free for launch
             </div>
           </div>
         </section>
@@ -561,7 +486,7 @@ if (ENABLE_TEST_PREDICTION) {
             <section id="predictions-list" className="scroll-mt-20">
               <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
                 <h2 className="min-w-0 truncate text-base font-bold sm:text-xl">
-                  Locked Predictions
+                  Predictions
                 </h2>
                 <span className="shrink-0 text-sm font-semibold text-[#d6a94f]">
                   {matches.length} matches
@@ -570,12 +495,7 @@ if (ENABLE_TEST_PREDICTION) {
 
               <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {matches.map((match) => (
-                  <LockedPredictionCard
-                    key={match.fixtureId}
-                    match={match}
-                    inBasket={basketIds.includes(match.fixtureId)}
-                    onAddToBasket={handleAddToBasket}
-                  />
+                  <PredictionCard key={match.fixtureId} match={match} />
                 ))}
               </div>
             </section>
@@ -649,13 +569,9 @@ if (ENABLE_TEST_PREDICTION) {
 function DailyPickSection({
   dailyPick,
   loading,
-  basketIds,
-  onAddToBasket,
 }: {
   dailyPick: DailyPick | null;
   loading: boolean;
-  basketIds: number[];
-  onAddToBasket: (match: PredictionMatch) => void;
 }) {
   if (loading) {
     return (
@@ -693,8 +609,6 @@ function DailyPickSection({
   }
 
   const match = dailyPick.match;
-  const inBasket = basketIds.includes(match.fixtureId);
-  const matchStarted = hasMatchStarted(match.date);
 
   return (
     <section
@@ -712,8 +626,7 @@ function DailyPickSection({
           </h2>
 
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
-            This is the strongest match selection available right now. Add it to
-            your basket to unlock after checkout.
+            This is the strongest match selection available right now.
           </p>
 
           <div className="mt-4 rounded-2xl border border-white/15 bg-black/20 p-4">
@@ -746,56 +659,45 @@ function DailyPickSection({
 
             <div className="mt-4 rounded-xl border border-[#f3d98b]/20 bg-[#d6a94f]/10 p-3">
               <div className="text-[11px] font-bold uppercase tracking-wide text-[#f3d98b]">
-                Prediction locked
+                Strongest pick
               </div>
-              <div className="mt-2 text-sm leading-6 text-slate-300">
-                Outcome, probability and confidence are hidden until unlocked.
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <div className="text-xl font-black text-white">
+                    {dailyPick.option.label}
+                  </div>
+                  <div className="mt-1 text-sm text-slate-300">
+                    Confidence: {match.prediction.confidence}%
+                  </div>
+                </div>
+                <div className="text-left sm:text-right">
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                    Probability
+                  </div>
+                  <div className="text-2xl font-black text-white">
+                    {dailyPick.option.probability}%
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="grid gap-3 sm:min-w-[230px]">
-          <button
-            type="button"
-            disabled={matchStarted || inBasket}
-            onClick={() => onAddToBasket(match)}
-            className={[
-              "inline-flex justify-center rounded-xl border px-5 py-3 text-sm font-bold shadow-md shadow-black/30 transition disabled:cursor-not-allowed disabled:opacity-70",
-              inBasket
-                ? "border-green-400/20 bg-green-500/15 text-green-300"
-                : "border-[#f3d98b]/30 bg-[#d6a94f] text-[#08101c] hover:bg-[#c89635]",
-            ].join(" ")}
-          >
-            {matchStarted
-              ? "Prediction closed"
-              : inBasket
-                ? "Added to basket"
-                : "Add best pick — £3.99"}
-          </button>
-
-          <Link
-            href="/basket"
-            className="inline-flex justify-center rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-          >
-            View basket →
-          </Link>
-        </div>
+        <Link
+          href={buildPredictionHref(match)}
+          className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-5 py-3 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635] sm:min-w-[230px]"
+        >
+          View full prediction →
+        </Link>
       </div>
     </section>
   );
 }
 
-function LockedPredictionCard({
-  match,
-  inBasket,
-  onAddToBasket,
-}: {
-  match: PredictionMatch;
-  inBasket: boolean;
-  onAddToBasket: (match: PredictionMatch) => void;
-}) {
+function PredictionCard({ match }: { match: PredictionMatch }) {
   const matchStarted = hasMatchStarted(match.date);
+  const strongestOption = getStrongestOption(match);
+  const href = buildPredictionHref(match);
 
   return (
     <article className="block min-w-0 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-4 shadow-xl transition hover:bg-white/[0.04]">
@@ -832,8 +734,8 @@ function LockedPredictionCard({
             <div className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
               Prediction
             </div>
-            <div className="mt-2 blur-sm text-lg font-black text-white">
-              Home Win
+            <div className="mt-2 text-lg font-black text-white">
+              {strongestOption.label}
             </div>
           </div>
 
@@ -841,8 +743,37 @@ function LockedPredictionCard({
             <div className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
               Probability
             </div>
-            <div className="mt-2 blur-sm text-lg font-black text-white">
-              67%
+            <div className="mt-2 text-lg font-black text-white">
+              {strongestOption.probability}%
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-2">
+            <div className="text-[10px] font-bold uppercase text-slate-400">
+              Home
+            </div>
+            <div className="mt-1 text-sm font-black text-white">
+              {match.prediction.probabilities.home}%
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 p-2">
+            <div className="text-[10px] font-bold uppercase text-slate-400">
+              Draw
+            </div>
+            <div className="mt-1 text-sm font-black text-white">
+              {match.prediction.probabilities.draw}%
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-white/5 p-2">
+            <div className="text-[10px] font-bold uppercase text-slate-400">
+              Away
+            </div>
+            <div className="mt-1 text-sm font-black text-white">
+              {match.prediction.probabilities.away}%
             </div>
           </div>
         </div>
@@ -850,45 +781,43 @@ function LockedPredictionCard({
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {matchStarted ? (
             <span className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-500/10 px-2 py-1 text-xs font-bold text-yellow-300">
-              Prediction closed
+              Match started
             </span>
           ) : (
-            <span className="inline-flex rounded-full border border-[#f3d98b]/20 bg-[#d6a94f]/10 px-2 py-1 text-xs font-bold text-[#f3d98b]">
-              Locked prediction
+            <span className="inline-flex rounded-full border border-green-400/20 bg-green-500/10 px-2 py-1 text-xs font-bold text-green-300">
+              Prediction open
             </span>
           )}
 
           <span className="inline-flex rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs font-semibold text-slate-300">
-            {matchStarted ? "Match started" : "£3.99 per match"}
+            Confidence {match.prediction.confidence}%
           </span>
         </div>
 
-        <div className="mt-4 grid gap-2">
-          <button
-            type="button"
-            disabled={matchStarted || inBasket}
-            onClick={() => onAddToBasket(match)}
-            className={[
-              "inline-flex w-full justify-center rounded-xl border px-4 py-2.5 text-sm font-bold shadow-md shadow-black/30 transition disabled:cursor-not-allowed disabled:opacity-70",
-              inBasket
-                ? "border-green-400/20 bg-green-500/15 text-green-300"
-                : "border-[#f3d98b]/30 bg-[#d6a94f] text-[#08101c] hover:bg-[#c89635]",
-            ].join(" ")}
-          >
-            {matchStarted
-              ? "Prediction closed"
-              : inBasket
-                ? "Added to basket"
-                : "Add to basket — £3.99"}
-          </button>
+        {match.prediction.likelyScores.length > 0 ? (
+          <div className="mt-3">
+            <div className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
+              Likely scores
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {match.prediction.likelyScores.slice(0, 3).map((item) => (
+                <span
+                  key={`${match.fixtureId}-${item.score}`}
+                  className="inline-flex rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs font-semibold text-slate-200"
+                >
+                  {item.score} · {item.probability}%
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
-          <Link
-  href="/basket"
-  className="inline-flex w-full justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
->
-  View basket →
-</Link>
-        </div>
+        <Link
+          href={href}
+          className="mt-4 inline-flex w-full justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+        >
+          View full prediction →
+        </Link>
       </div>
     </article>
   );

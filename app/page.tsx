@@ -215,13 +215,6 @@ function QuickNav() {
             {item.label}
           </a>
         ))}
-
-        <Link
-          href="/basket"
-          className="shrink-0 rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-3 py-1.5 text-xs font-black text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635] sm:text-sm"
-        >
-          Basket
-        </Link>
       </div>
     </section>
   );
@@ -246,9 +239,8 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
           {dailyPick ? (
             <>
               <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-300 sm:text-sm">
-                This is the strongest match selection available right now. Add
-                matches from the predictions page to build your basket before
-                checkout.
+                This is the strongest match selection available right now. View
+                the full prediction details from the predictions page.
               </p>
 
               <div className="mt-3 rounded-2xl border border-white/15 bg-black/20 p-3 sm:p-4">
@@ -281,11 +273,11 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
 
                 <div className="mt-3 rounded-xl border border-[#f3d98b]/20 bg-[#d6a94f]/10 p-3">
                   <div className="text-[11px] font-bold uppercase tracking-wide text-[#f3d98b]">
-                    Prediction locked
+                    Prediction Available
                   </div>
                   <div className="mt-1.5 text-sm leading-6 text-slate-300">
-                    Outcome, probability and confidence are hidden until
-                    unlocked.
+                    View the full prediction, probabilities and confidence
+                    score.
                   </div>
                 </div>
               </div>
@@ -303,7 +295,7 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
                     Access
                   </div>
                   <div className="mt-1 text-sm font-bold text-white">
-                    Basket checkout
+                    Free Access
                   </div>
                 </div>
 
@@ -326,13 +318,6 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
             className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
           >
             Go to predictions →
-          </Link>
-
-          <Link
-            href="/basket"
-            className="inline-flex justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:bg-white/10"
-          >
-            View basket →
           </Link>
         </div>
       </div>
@@ -634,7 +619,7 @@ export default function HomePage() {
                 AI Match Predictions Now Live
               </div>
               <div className="text-xs leading-5 text-slate-300 sm:text-sm">
-                Add match predictions to your basket and checkout when ready.
+                View all match predictions completely free.
               </div>
             </div>
 
