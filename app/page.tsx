@@ -122,10 +122,7 @@ function TeamLogo({
   }
 
   return (
-    <div
-      className={shellClassName}
-      style={{ width: boxSize, height: boxSize }}
-    >
+    <div className={shellClassName} style={{ width: boxSize, height: boxSize }}>
       <Image
         src={logoSrc}
         alt={alt}
@@ -221,6 +218,9 @@ function QuickNav() {
 }
 
 function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
+  const destinationButtonClassName =
+    "inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]";
+
   return (
     <section
       id="best-pick"
@@ -313,20 +313,26 @@ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
         </div>
 
         <div className="grid gap-3 sm:min-w-[220px]">
-          <Link
-            href="/predictions"
-            className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
-          >
-            Go to predictions →
+          <Link href="/predictions" className={destinationButtonClassName}>
+            Go to Predictions →
           </Link>
 
           <a
             href="https://results.profbint.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
+            className={destinationButtonClassName}
           >
             Results Dashboard →
+          </a>
+
+          <a
+            href="https://players.profbint.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={destinationButtonClassName}
+          >
+            Player Database →
           </a>
         </div>
       </div>
