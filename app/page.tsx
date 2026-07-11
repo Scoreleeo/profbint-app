@@ -34,41 +34,20 @@ type StandingRow = {
   form: string;
 };
 
-type NewsItem = {
-  id: string;
-  title: string;
-  summary?: string;
-  source?: string;
-  date?: string;
-  link?: string;
-  kind?: "breaking" | "injury" | "transfer" | "news" | string;
-};
-
-type DailyPick = {
-  fixtureId: number;
-  home: string;
-  away: string;
-  homeLogo?: string;
-  awayLogo?: string;
-  league: string;
-  date: string;
-  label: string;
-  shortLabel: string;
-  type: "home" | "draw" | "away";
-  probability: number;
-  confidence: number;
-};
-
 type DashboardPayload = {
   standings: StandingRow[];
   fixtures: MatchRow[];
   results: MatchRow[];
   live: MatchRow[];
-  news?: NewsItem[];
-  dailyPick?: DailyPick | null;
 };
 
-const SEASON = 2025;
+const SEASON = 2026;
+
+const STANDARD_BUTTON =
+  "shrink-0 rounded-xl border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:border-amber-400 hover:text-amber-300 sm:text-sm";
+
+const ACTIVE_BUTTON =
+  "shrink-0 rounded-xl border border-amber-400 bg-amber-400 px-3 py-1.5 text-xs font-black text-slate-950 transition hover:bg-amber-300 sm:text-sm";
 
 function cleanLogoUrl(value?: string) {
   if (!value) {
@@ -149,10 +128,10 @@ function FormPills({ form }: { form?: string }) {
         .map((result, index) => {
           const styles =
             result === "W"
-              ? "bg-green-500/20 text-green-300"
+              ? "bg-emerald-500/15 text-emerald-300"
               : result === "D"
-                ? "bg-yellow-500/20 text-yellow-300"
-                : "bg-red-500/20 text-red-300";
+                ? "bg-amber-500/15 text-amber-300"
+                : "bg-red-500/15 text-red-300";
 
           return (
             <span
@@ -175,166 +154,61 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] shadow-xl sm:rounded-3xl">
-      <div className="border-b border-white/10 px-3 py-2.5 sm:px-4 sm:py-3">
-        <h2 className="truncate text-sm font-bold text-white sm:text-lg">
+    <section className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl sm:rounded-3xl">
+      <div className="border-b border-slate-800 px-3 py-2.5 sm:px-4 sm:py-3">
+        <h2 className="truncate text-sm font-black text-white sm:text-lg">
           {title}
         </h2>
       </div>
+
       <div className="p-3 sm:p-4">{children}</div>
     </section>
   );
 }
 
 function QuickNav() {
-  const links = [
-    { href: "#best-pick", label: "Best Pick" },
+  const internalLinks = [
     { href: "#live", label: "Live" },
     { href: "#standings", label: "Standings" },
     { href: "#fixtures", label: "Fixtures" },
-    { href: "#results", label: "Results" },
-    { href: "#news", label: "News" },
+    { href: "#results", label: "Latest Results" },
+  ];
+
+  const externalLinks = [
+    {
+      href: "https://players.profbint.com/",
+      label: "Player Database",
+    },
+    {
+      href: "https://predictions.profbint.com/",
+      label: "Predictions",
+    },
   ];
 
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 shadow-xl sm:mt-5 sm:rounded-3xl">
-      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+    <section className="mt-4 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-3 shadow-xl sm:mt-5 sm:rounded-3xl">
+      <div className="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">
         Jump to
       </div>
 
       <div className="flex max-w-full gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
-        {links.map((item) => (
+        {internalLinks.map((item) => (
+          <a key={item.href} href={item.href} className={STANDARD_BUTTON}>
+            {item.label}
+          </a>
+        ))}
+
+        {externalLinks.map((item) => (
           <a
             key={item.href}
             href={item.href}
-            className="shrink-0 rounded-xl border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-white/10 sm:text-sm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={STANDARD_BUTTON}
           >
             {item.label}
           </a>
         ))}
-      </div>
-    </section>
-  );
-}
-
-function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {
-  const destinationButtonClassName =
-    "inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]";
-
-  return (
-    <section
-      id="best-pick"
-      className="scroll-mt-20 mt-4 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 shadow-xl sm:mt-5 sm:rounded-3xl sm:p-4"
-    >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0">
-          <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-300 sm:text-[10px]">
-            Featured match
-          </div>
-
-          <h2 className="truncate text-base font-black tracking-tight text-white sm:text-xl">
-            Best Pick Right Now
-          </h2>
-
-          {dailyPick ? (
-            <>
-              <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-300 sm:text-sm">
-                This is the strongest match selection available right now. View
-                the full prediction details from the predictions page.
-              </p>
-
-              <div className="mt-3 rounded-2xl border border-white/15 bg-black/20 p-3 sm:p-4">
-                <div className="mb-3 flex min-w-0 flex-col gap-1 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:text-sm">
-                  <span className="min-w-0 truncate">{dailyPick.league}</span>
-                  <span className="shrink-0 text-xs">
-                    {formatUKDateTime(dailyPick.date)}
-                  </span>
-                </div>
-
-                <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <TeamLogo src={dailyPick.homeLogo} alt={dailyPick.home} />
-                    <span className="min-w-0 truncate text-sm font-semibold">
-                      {dailyPick.home}
-                    </span>
-                  </div>
-
-                  <div className="rounded-xl border border-white/15 bg-white/5 px-2 py-1.5 text-[10px] font-semibold uppercase text-slate-300 sm:px-3 sm:text-xs">
-                    vs
-                  </div>
-
-                  <div className="flex min-w-0 items-center justify-end gap-2">
-                    <span className="min-w-0 truncate text-right text-sm font-semibold">
-                      {dailyPick.away}
-                    </span>
-                    <TeamLogo src={dailyPick.awayLogo} alt={dailyPick.away} />
-                  </div>
-                </div>
-
-                <div className="mt-3 rounded-xl border border-[#f3d98b]/20 bg-[#d6a94f]/10 p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-[#f3d98b]">
-                    Prediction Available
-                  </div>
-                  <div className="mt-1.5 text-sm leading-6 text-slate-300">
-                    View the full prediction, probabilities and confidence
-                    score.
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-300 sm:text-sm">
-                No eligible fixtures are available right now. Check back when
-                the next suitable fixtures are available.
-              </p>
-
-              <div className="mt-3 grid gap-3 sm:flex sm:flex-wrap">
-                <div className="rounded-2xl border border-white/15 bg-white/5 px-3 py-2.5">
-                  <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                    Access
-                  </div>
-                  <div className="mt-1 text-sm font-bold text-white">
-                    Free Access
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-white/15 bg-white/5 px-3 py-2.5">
-                  <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-                    Status
-                  </div>
-                  <div className="mt-1 text-sm font-bold text-white">
-                    Waiting for eligible fixtures
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        <div className="grid gap-3 sm:min-w-[220px]">
-          <Link href="/predictions" className={destinationButtonClassName}>
-            Go to Predictions →
-          </Link>
-
-          <a
-            href="https://results.profbint.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={destinationButtonClassName}
-          >
-            Results Dashboard →
-          </a>
-
-          <a
-            href="https://players.profbint.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={destinationButtonClassName}
-          >
-            Player Database →
-          </a>
-        </div>
       </div>
     </section>
   );
@@ -349,7 +223,10 @@ function LiveTicker({
     awayTeam: string;
     homeLogo?: string;
     awayLogo?: string;
-    goals: { home: number | null; away: number | null };
+    goals: {
+      home: number | null;
+      away: number | null;
+    };
     elapsed?: number | null;
     leagueName: string;
   }>;
@@ -372,11 +249,13 @@ function LiveTicker({
     });
 
     if (changedIds.length > 0) {
-      setFlashingIds((prev) => Array.from(new Set([...prev, ...changedIds])));
+      setFlashingIds((previous) =>
+        Array.from(new Set([...previous, ...changedIds])),
+      );
 
       const timeout = window.setTimeout(() => {
-        setFlashingIds((prev) =>
-          prev.filter((id) => !changedIds.includes(id))
+        setFlashingIds((previous) =>
+          previous.filter((id) => !changedIds.includes(id)),
         );
       }, 4000);
 
@@ -394,16 +273,19 @@ function LiveTicker({
             awayTeam: "Check back soon",
             homeLogo: undefined,
             awayLogo: undefined,
-            goals: { home: null, away: null },
+            goals: {
+              home: null,
+              away: null,
+            },
             elapsed: null,
             leagueName: "Live Centre",
           },
         ];
 
   return (
-    <div className="sticky top-0 z-50 w-full max-w-full overflow-hidden border-b border-red-400/20 bg-[#09111d]/95 backdrop-blur">
+    <div className="sticky top-0 z-50 w-full max-w-full overflow-hidden border-b border-red-400/20 bg-slate-950/95 backdrop-blur">
       <div className="flex min-w-0 max-w-full items-center gap-2 px-3 py-2 sm:gap-4 sm:px-4">
-        <div className="shrink-0 rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white sm:px-3 sm:text-xs">
+        <div className="shrink-0 rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white sm:px-3 sm:text-xs">
           Live
         </div>
 
@@ -418,7 +300,7 @@ function LiveTicker({
                   key={`${match.fixtureId}-${index}`}
                   className="flex max-w-[86vw] shrink-0 items-center gap-1.5 rounded-lg px-1 py-1 text-[11px] text-white sm:max-w-none sm:gap-3 sm:px-2 sm:text-sm"
                 >
-                  <span className="max-w-[72px] truncate text-[10px] font-semibold uppercase tracking-wide text-slate-400 sm:max-w-[160px] sm:text-xs">
+                  <span className="max-w-[72px] truncate text-[10px] font-semibold uppercase tracking-wide text-slate-500 sm:max-w-[160px] sm:text-xs">
                     {match.leagueName}
                   </span>
 
@@ -430,13 +312,14 @@ function LiveTicker({
                           alt={match.homeTeam}
                           size={16}
                         />
+
                         <span className="max-w-[58px] truncate font-medium sm:max-w-[150px]">
                           {match.homeTeam}
                         </span>
                       </div>
 
                       <span
-                        className={`rounded-lg px-1.5 py-1 text-[10px] font-bold whitespace-nowrap transition sm:px-2 sm:text-xs ${
+                        className={`rounded-lg px-1.5 py-1 text-[10px] font-black whitespace-nowrap transition sm:px-2 sm:text-xs ${
                           isFlashing
                             ? "bg-red-500 text-white ticker-score-flash"
                             : "bg-white text-slate-950"
@@ -449,6 +332,7 @@ function LiveTicker({
                         <span className="max-w-[58px] truncate font-medium sm:max-w-[150px]">
                           {match.awayTeam}
                         </span>
+
                         <TeamLogo
                           src={match.awayLogo}
                           alt={match.awayTeam}
@@ -486,7 +370,7 @@ export default function HomePage() {
     () =>
       TOP_EURO_LEAGUES.find((league) => league.id === leagueId) ||
       TOP_EURO_LEAGUES[0],
-    [leagueId]
+    [leagueId],
   );
 
   async function loadData(id: number, background = false) {
@@ -506,6 +390,7 @@ export default function HomePage() {
       }
 
       const json: DashboardPayload = await res.json();
+
       setData(json);
       setLastUpdated(
         new Date().toLocaleTimeString("en-GB", {
@@ -514,7 +399,7 @@ export default function HomePage() {
           minute: "2-digit",
           second: "2-digit",
           hour12: false,
-        })
+        }),
       );
     } catch (err) {
       console.error(err);
@@ -529,44 +414,30 @@ export default function HomePage() {
   useEffect(() => {
     void loadData(leagueId, false);
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       void loadData(leagueId, true);
     }, 120000);
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [leagueId]);
 
-  function formatNewsDate(value?: string) {
-    if (!value) return "";
-    return formatUKDateTime(value);
-  }
-
-  const news = data?.news?.slice(0, 6) ?? [];
-
-  const kindClasses: Record<string, string> = {
-    breaking: "bg-red-500 text-white shadow-md shadow-red-500/30",
-    injury: "bg-yellow-500 text-black",
-    transfer: "bg-blue-500 text-white",
-    news: "bg-white/10 text-white",
-  };
-
   return (
-    <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden scroll-smooth bg-[#101827] text-white">
+    <main className="min-h-[100dvh] w-full max-w-full overflow-x-hidden scroll-smooth bg-slate-950 text-white">
       <LiveTicker matches={data?.live || []} />
 
-      <div className="border-b border-white/10 bg-[#101827]">
+      <div className="border-b border-slate-800 bg-slate-950">
         <div className="mx-auto max-w-7xl px-3 py-2 sm:px-4 sm:py-3 md:px-5 lg:px-8">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 sm:text-xs sm:tracking-[0.18em]">
+          <div className="text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 sm:text-xs sm:tracking-[0.18em]">
             Live Football Centre
           </div>
         </div>
       </div>
 
       <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-3 py-4 sm:px-4 sm:py-5 md:px-6 lg:px-8">
-        <section className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] shadow-xl sm:rounded-3xl">
+        <section className="overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 shadow-2xl sm:rounded-3xl">
           <div className="grid gap-3 px-3 py-3 sm:px-4 sm:py-4 md:px-5 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
             <div className="min-w-0">
-              <div className="mb-2 inline-flex rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-300 sm:text-[10px]">
+              <div className="mb-2 inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-300 sm:text-[10px]">
                 Matchday coverage
               </div>
 
@@ -575,57 +446,27 @@ export default function HomePage() {
               </h1>
 
               <p className="mt-2 max-w-xl text-xs leading-5 text-slate-300 sm:text-sm">
-                Data-driven football insights, live scores, and AI-powered match
-                predictions across Europe’s top leagues.
+                Data-driven football insights, live scores and match coverage
+                across Europe’s top leagues.
               </p>
             </div>
 
             <div className="grid min-w-0 grid-cols-2 gap-2">
-              <div className="min-w-0 rounded-xl border border-white/15 bg-white/5 p-2.5 sm:p-3">
-                <div className="text-[9px] uppercase tracking-wide text-slate-400 sm:text-[10px]">
-                  League
-                </div>
-                <div className="mt-1 truncate text-xs font-bold sm:text-sm">
-                  {selectedLeague.name}
-                </div>
-              </div>
-
-              <div className="min-w-0 rounded-xl border border-white/15 bg-white/5 p-2.5 sm:p-3">
-                <div className="text-[9px] uppercase tracking-wide text-slate-400 sm:text-[10px]">
-                  Season
-                </div>
-                <div className="mt-1 text-xs font-bold sm:text-sm">
-                  {SEASON}
-                </div>
-              </div>
-
-              <div className="min-w-0 rounded-xl border border-white/15 bg-white/5 p-2.5 sm:p-3">
-                <div className="text-[9px] uppercase tracking-wide text-slate-400 sm:text-[10px]">
-                  Live Games
-                </div>
-                <div className="mt-1 text-xs font-bold sm:text-sm">
-                  {data?.live?.length ?? 0}
-                </div>
-              </div>
-
-              <div className="min-w-0 rounded-xl border border-white/15 bg-white/5 p-2.5 sm:p-3">
-                <div className="text-[9px] uppercase tracking-wide text-slate-400 sm:text-[10px]">
-                  Updated
-                </div>
-                <div className="mt-1 truncate text-xs font-bold sm:text-sm">
-                  {lastUpdated || "--:--:--"}
-                </div>
-              </div>
+              <InfoCard label="League" value={selectedLeague.name} />
+              <InfoCard label="Season" value={String(SEASON)} />
+              <InfoCard
+                label="Live Games"
+                value={String(data?.live?.length ?? 0)}
+              />
+              <InfoCard label="Updated" value={lastUpdated || "--:--:--"} />
             </div>
           </div>
         </section>
 
         <QuickNav />
 
-        <DailyPickCard dailyPick={data?.dailyPick} />
-
-        <section className="mt-4 overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 shadow-xl sm:mt-5 sm:rounded-3xl">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <section className="mt-4 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-3 shadow-xl sm:mt-5 sm:rounded-3xl">
+          <div className="mb-2 text-xs font-black uppercase tracking-wide text-slate-500">
             Select competition
           </div>
 
@@ -636,13 +477,9 @@ export default function HomePage() {
               return (
                 <button
                   key={league.id}
+                  type="button"
                   onClick={() => setLeagueId(league.id)}
-                  className={[
-                    "shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold transition sm:text-sm",
-                    active
-                      ? "border border-[#f3d98b]/30 bg-[#d6a94f] text-[#08101c]"
-                      : "border border-white/15 bg-white/5 text-slate-200 hover:bg-white/10",
-                  ].join(" ")}
+                  className={active ? ACTIVE_BUTTON : STANDARD_BUTTON}
                 >
                   {league.name}
                 </button>
@@ -652,7 +489,7 @@ export default function HomePage() {
         </section>
 
         {loading ? (
-          <section className="mt-4 rounded-2xl border border-white/15 bg-[#172033] p-4 sm:mt-5 sm:rounded-3xl">
+          <section className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:mt-5 sm:rounded-3xl">
             <div className="text-sm text-slate-300">
               Loading {selectedLeague.name} data...
             </div>
@@ -660,7 +497,7 @@ export default function HomePage() {
         ) : null}
 
         {error ? (
-          <section className="mt-4 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 sm:mt-5 sm:rounded-3xl">
+          <section className="mt-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 sm:mt-5 sm:rounded-3xl">
             <div className="font-semibold text-red-200">{error}</div>
           </section>
         ) : null}
@@ -669,16 +506,17 @@ export default function HomePage() {
           <>
             <section id="live" className="scroll-mt-20 mt-4 sm:mt-5">
               <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
-                <h2 className="min-w-0 truncate text-base font-bold sm:text-lg">
+                <h2 className="min-w-0 truncate text-base font-black sm:text-lg">
                   Live Matches
                 </h2>
-                <span className="shrink-0 text-sm font-semibold text-red-400">
+
+                <span className="shrink-0 text-sm font-black text-red-400">
                   {data.live.length} LIVE
                 </span>
               </div>
 
               {data.live.length === 0 ? (
-                <div className="rounded-2xl border border-white/15 bg-[#172033] p-4 text-sm text-slate-300 sm:rounded-3xl">
+                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-300 sm:rounded-3xl">
                   No live matches right now.
                 </div>
               ) : (
@@ -686,12 +524,13 @@ export default function HomePage() {
                   {data.live.map((match) => (
                     <div
                       key={match.fixtureId}
-                      className="overflow-hidden rounded-2xl border border-white/15 bg-[#172033] p-3 shadow-lg transition hover:border-white/25"
+                      className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 p-3 shadow-lg transition hover:border-slate-700"
                     >
-                      <div className="mb-2 flex min-w-0 items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wide">
-                        <span className="min-w-0 truncate text-slate-400">
+                      <div className="mb-2 flex min-w-0 items-center justify-between gap-2 text-xs font-black uppercase tracking-wide">
+                        <span className="min-w-0 truncate text-slate-500">
                           {match.leagueName}
                         </span>
+
                         <span className="shrink-0 text-red-400">
                           LIVE {match.elapsed ?? ""}
                         </span>
@@ -699,7 +538,11 @@ export default function HomePage() {
 
                       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
                         <div className="flex min-w-0 items-center gap-2">
-                          <TeamLogo src={match.homeLogo} alt={match.homeTeam} />
+                          <TeamLogo
+                            src={match.homeLogo}
+                            alt={match.homeTeam}
+                          />
+
                           <span className="min-w-0 truncate text-sm font-semibold">
                             {match.homeTeam}
                           </span>
@@ -713,7 +556,11 @@ export default function HomePage() {
                           <span className="min-w-0 truncate text-right text-sm font-semibold">
                             {match.awayTeam}
                           </span>
-                          <TeamLogo src={match.awayLogo} alt={match.awayTeam} />
+
+                          <TeamLogo
+                            src={match.awayLogo}
+                            alt={match.awayTeam}
+                          />
                         </div>
                       </div>
                     </div>
@@ -735,17 +582,20 @@ export default function HomePage() {
                         <Link
                           key={row.teamId}
                           href={`/team/${row.teamId}?league=${leagueId}&season=${SEASON}&name=${encodeURIComponent(row.team)}&logo=${encodeURIComponent(row.logo || "")}&form=${encodeURIComponent(row.form || "")}`}
-                          className="flex min-h-[58px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:bg-white/10 sm:min-h-[64px]"
+                          className="flex min-h-[58px] min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800 bg-slate-950 p-3 transition hover:border-slate-700 sm:min-h-[64px]"
                         >
                           <div className="flex min-w-0 items-center gap-3">
-                            <span className="w-6 shrink-0 text-sm font-semibold text-slate-400">
+                            <span className="w-6 shrink-0 text-sm font-semibold text-slate-500">
                               {row.rank}
                             </span>
+
                             <TeamLogo src={row.logo} alt={row.team} />
+
                             <div className="min-w-0">
                               <span className="block min-w-0 truncate text-sm font-semibold">
                                 {row.team}
                               </span>
+
                               <FormPills form={row.form} />
                             </div>
                           </div>
@@ -775,15 +625,15 @@ export default function HomePage() {
                       {data.fixtures.map((match) => (
                         <div
                           key={match.fixtureId}
-                          className="block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:bg-white/10"
+                          className="block overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-3 transition hover:border-slate-700"
                         >
                           <div className="flex min-w-0 items-center justify-between gap-2">
-                            <div className="min-w-0 truncate text-sm text-slate-400">
+                            <div className="min-w-0 truncate text-sm text-slate-500">
                               {match.leagueName}
                             </div>
 
-                            <span className="shrink-0 rounded-full border border-[#f3d98b]/20 bg-[#d6a94f]/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[#f3d98b]">
-                              Prediction available
+                            <span className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-amber-300">
+                              Fixture scheduled
                             </span>
                           </div>
 
@@ -793,12 +643,13 @@ export default function HomePage() {
                                 src={match.homeLogo}
                                 alt={match.homeTeam}
                               />
+
                               <span className="min-w-0 truncate text-sm font-medium">
                                 {match.homeTeam}
                               </span>
                             </div>
 
-                            <span className="text-xs font-semibold uppercase text-slate-400">
+                            <span className="text-xs font-semibold uppercase text-slate-500">
                               vs
                             </span>
 
@@ -806,6 +657,7 @@ export default function HomePage() {
                               <span className="min-w-0 truncate text-right text-sm font-medium">
                                 {match.awayTeam}
                               </span>
+
                               <TeamLogo
                                 src={match.awayLogo}
                                 alt={match.awayTeam}
@@ -813,17 +665,8 @@ export default function HomePage() {
                             </div>
                           </div>
 
-                          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                            <div className="truncate text-sm text-slate-300">
-                              {formatUKDateTime(match.date)}
-                            </div>
-
-                            <Link
-                              href="/predictions"
-                              className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-3 py-2 text-xs font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"
-                            >
-                              Go to predictions →
-                            </Link>
+                          <div className="mt-2 truncate text-sm text-slate-300">
+                            {formatUKDateTime(match.date)}
                           </div>
                         </div>
                       ))}
@@ -845,9 +688,9 @@ export default function HomePage() {
                       <Link
                         key={match.fixtureId}
                         href={`/report/${match.fixtureId}`}
-                        className="block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-3 transition hover:bg-white/10"
+                        className="block overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 p-3 transition hover:border-slate-700"
                       >
-                        <div className="truncate text-sm text-slate-400">
+                        <div className="truncate text-sm text-slate-500">
                           {match.leagueName}
                         </div>
 
@@ -857,12 +700,13 @@ export default function HomePage() {
                               src={match.homeLogo}
                               alt={match.homeTeam}
                             />
+
                             <span className="min-w-0 truncate text-sm font-medium">
                               {match.homeTeam}
                             </span>
                           </div>
 
-                          <span className="min-w-[52px] rounded-xl bg-slate-950 px-2 py-2 text-center text-xs font-black leading-none whitespace-nowrap sm:min-w-[64px] sm:px-3 sm:text-sm">
+                          <span className="min-w-[52px] rounded-xl bg-slate-900 px-2 py-2 text-center text-xs font-black leading-none whitespace-nowrap sm:min-w-[64px] sm:px-3 sm:text-sm">
                             {match.goals.home ?? 0} - {match.goals.away ?? 0}
                           </span>
 
@@ -870,6 +714,7 @@ export default function HomePage() {
                             <span className="min-w-0 truncate text-right text-sm font-medium">
                               {match.awayTeam}
                             </span>
+
                             <TeamLogo
                               src={match.awayLogo}
                               alt={match.awayTeam}
@@ -886,138 +731,76 @@ export default function HomePage() {
                 )}
               </SectionCard>
             </div>
-
-            <div id="news" className="scroll-mt-20 mt-4 sm:mt-5">
-              <SectionCard title="Football News">
-                {news.length === 0 ? (
-                  <div className="rounded-2xl border border-white/15 bg-[#111a2b] p-4 text-sm text-slate-300">
-                    Football news feed unavailable right now.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="mb-1 flex items-center gap-2">
-                      <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500"></div>
-                      <span className="text-xs font-semibold uppercase tracking-[0.18em] text-red-400 sm:tracking-[0.2em]">
-                        Live Updates
-                      </span>
-                    </div>
-
-                    {news.map((article, i) => {
-                      const isFeatured = i === 0;
-                      const kind = article.kind?.toLowerCase() || "news";
-
-                      const cardClasses = isFeatured
-                        ? "block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-4 shadow-lg transition hover:bg-white/[0.04] sm:rounded-[28px] sm:p-6 md:p-7"
-                        : "block overflow-hidden rounded-2xl border border-white/15 bg-[#111a2b] p-4 transition hover:border-white/20 hover:bg-white/10 sm:p-5";
-
-                      const titleClasses = isFeatured
-                        ? "mt-3 max-w-4xl break-words text-lg font-black leading-tight text-white sm:mt-4 sm:text-3xl md:text-4xl"
-                        : "mt-2 break-words text-base font-bold leading-tight text-white sm:text-lg md:text-xl";
-
-                      const summaryClasses = isFeatured
-                        ? "mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:mt-4 sm:text-base md:leading-7"
-                        : "mt-3 text-sm leading-6 text-slate-300";
-
-                      const content = (
-                        <>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span
-                              className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
-                                kindClasses[kind] || kindClasses.news
-                              }`}
-                            >
-                              {kind}
-                            </span>
-
-                            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 sm:tracking-[0.22em]">
-                              {article.source || "Football News"}
-                            </span>
-                          </div>
-
-                          <div className={titleClasses}>{article.title}</div>
-
-                          {article.summary ? (
-                            <div className={summaryClasses}>
-                              {article.summary}
-                            </div>
-                          ) : null}
-
-                          {article.date ? (
-                            <div className="mt-4 text-xs font-medium text-slate-500">
-                              {formatNewsDate(article.date)}
-                            </div>
-                          ) : null}
-                        </>
-                      );
-
-                      if (article.link) {
-                        return (
-                          <a
-                            key={article.id}
-                            href={article.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={cardClasses}
-                          >
-                            {content}
-                          </a>
-                        );
-                      }
-
-                      return (
-                        <div key={article.id} className={cardClasses}>
-                          {content}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </SectionCard>
-            </div>
           </>
         ) : null}
 
-        <footer className="mt-8 border-t border-white/10 pt-5 pb-5 sm:mt-10 sm:pt-6 sm:pb-2">
+        <footer className="mt-8 border-t border-slate-800 pt-5 pb-5 sm:mt-10 sm:pt-6 sm:pb-2">
           <div className="flex flex-wrap items-center justify-center gap-4 text-center">
             <Link
               href="/"
-              className="text-sm text-slate-400 transition hover:text-white"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Home
             </Link>
-            <Link
-              href="/predictions"
-              className="text-sm text-slate-400 transition hover:text-white"
+
+            <a
+              href="https://predictions.profbint.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Predictions
-            </Link>
+            </a>
+
+            <a
+              href="https://players.profbint.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
+            >
+              Player Database
+            </a>
+
+            <a
+              href="https://results.profbint.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
+            >
+              Results Dashboard
+            </a>
+
             <Link
               href="/privacy"
-              className="text-sm text-slate-400 transition hover:text-white"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Privacy Policy
             </Link>
+
             <Link
               href="/terms"
-              className="text-sm text-slate-400 transition hover:text-white"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Terms of Service
             </Link>
+
             <Link
               href="/refunds"
-              className="text-sm text-slate-400 transition hover:text-white"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Refund Policy
             </Link>
+
             <Link
               href="/responsible-gambling"
-              className="text-sm text-slate-400 transition hover:text-white"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Responsible Gambling
             </Link>
+
             <Link
               href="/legal"
-              className="text-sm text-slate-400 transition hover:text-white"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Legal & Disclaimer
             </Link>
@@ -1025,5 +808,17 @@ export default function HomePage() {
         </footer>
       </div>
     </main>
+  );
+}
+
+function InfoCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0 rounded-xl border border-slate-800 bg-slate-950 p-2.5 sm:p-3">
+      <div className="text-[9px] font-black uppercase tracking-wide text-slate-500 sm:text-[10px]">
+        {label}
+      </div>
+
+      <div className="mt-1 truncate text-xs font-black sm:text-sm">{value}</div>
+    </div>
   );
 }
