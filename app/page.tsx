@@ -183,6 +183,10 @@ function QuickNav() {
       href: "https://predictions.profbint.com/",
       label: "Predictions",
     },
+    {
+      href: "https://results.profbint.com/",
+      label: "Results Dashboard",
+    },
   ];
 
   return (
