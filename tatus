@@ -1,0 +1,60 @@
+[1mdiff --git a/app/page.tsx b/app/page.tsx[m
+[1mindex 29c149a..5539216 100644[m
+[1m--- a/app/page.tsx[m
+[1m+++ b/app/page.tsx[m
+[36m@@ -122,10 +122,7 @@[m [mfunction TeamLogo({[m
+   }[m
+ [m
+   return ([m
+[31m-    <div[m
+[31m-      className={shellClassName}[m
+[31m-      style={{ width: boxSize, height: boxSize }}[m
+[31m-    >[m
+[32m+[m[32m    <div className={shellClassName} style={{ width: boxSize, height: boxSize }}>[m
+       <Image[m
+         src={logoSrc}[m
+         alt={alt}[m
+[36m@@ -221,6 +218,9 @@[m [mfunction QuickNav() {[m
+ }[m
+ [m
+ function DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {[m
+[32m+[m[32m  const destinationButtonClassName =[m
+[32m+[m[32m    "inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]";[m
+[32m+[m
+   return ([m
+     <section[m
+       id="best-pick"[m
+[36m@@ -313,21 +313,27 @@[m [mfunction DailyPickCard({ dailyPick }: { dailyPick?: DailyPick | null }) {[m
+         </div>[m
+ [m
+         <div className="grid gap-3 sm:min-w-[220px]">[m
+[31m-          <Link[m
+[31m-            href="/predictions"[m
+[31m-            className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"[m
+[31m-          >[m
+[31m-            Go to predictions →[m
+[32m+[m[32m          <Link href="/predictions" className={destinationButtonClassName}>[m
+[32m+[m[32m            Go to Predictions →[m
+           </Link>[m
+ [m
+           <a[m
+             href="https://results.profbint.com/"[m
+             target="_blank"[m
+             rel="noopener noreferrer"[m
+[31m-            className="inline-flex justify-center rounded-xl border border-[#f3d98b]/30 bg-[#d6a94f] px-4 py-2.5 text-sm font-bold text-[#08101c] shadow-md shadow-black/30 transition hover:bg-[#c89635]"[m
+[32m+[m[32m            className={destinationButtonClassName}[m
+           >[m
+             Results Dashboard →[m
+           </a>[m
+[32m+[m
+[32m+[m[32m          <a[m
+[32m+[m[32m            href="https://players.profbint.com/"[m
+[32m+[m[32m            target="_blank"[m
+[32m+[m[32m            rel="noopener noreferrer"[m
+[32m+[m[32m            className={destinationButtonClassName}[m
+[32m+[m[32m          >[m
+[32m+[m[32m            Player Database →[m
+[32m+[m[32m          </a>[m
+         </div>[m
+       </div>[m
+     </section>[m
