@@ -1,18 +1,25 @@
 import { NextResponse } from "next/server";
 import { getLiveMatches } from "@/lib/api-football/services";
-import { TOP_EURO_LEAGUES } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
+
+// API-Football league IDs
+const SUPPORTED_LEAGUE_IDS = new Set<number>([
+  39, // Premier League (England)
+  140, // La Liga
+  135, // Serie A
+  78, // Bundesliga
+  61, // Ligue 1
+  88, // Eredivisie
+  94, // Primeira Liga
+]);
 
 export async function GET() {
   try {
     const matches = await getLiveMatches();
-    const supportedLeagueNames = new Set<string>(
-      TOP_EURO_LEAGUES.map((league) => league.name)
-    );
 
-    const liveMatches = matches.filter((match) =>
-      supportedLeagueNames.has(match.leagueName)
+    const liveMatches = matches.filter(
+      (match) => match.leagueId && SUPPORTED_LEAGUE_IDS.has(match.leagueId)
     );
 
     return NextResponse.json(

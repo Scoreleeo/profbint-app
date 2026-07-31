@@ -6,6 +6,7 @@ export type MatchRow = {
   status: string;
   elapsed?: number | null;
   leagueName: string;
+  leagueId?: number;
   homeTeamId?: number;
   awayTeamId?: number;
   homeTeam: string;
@@ -79,6 +80,7 @@ export type FixtureDetail = {
   status: string;
   elapsed?: number | null;
   leagueName: string;
+  leagueId?: number;
   venue?: string;
   referee?: string;
   homeTeam: string;
