@@ -168,7 +168,8 @@ function SectionCard({
 
 function QuickNav() {
   const internalLinks = [
-    { href: "#live", label: "Live" },
+    { href: "/live", label: "Live Match Centre" },
+    { href: "#live", label: "Live on this page" },
     { href: "#standings", label: "Standings" },
     { href: "#fixtures", label: "Fixtures" },
     { href: "#results", label: "Latest Results" },
