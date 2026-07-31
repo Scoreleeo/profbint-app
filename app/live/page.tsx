@@ -37,6 +37,16 @@ const LEAGUE_ORDER = [
   "Primeira Liga",
 ] as const;
 
+const LEAGUE_LOGOS: Record<(typeof LEAGUE_ORDER)[number], string> = {
+  "Premier League": "https://media.api-sports.io/football/leagues/39.png",
+  "La Liga": "https://media.api-sports.io/football/leagues/140.png",
+  "Serie A": "https://media.api-sports.io/football/leagues/135.png",
+  Bundesliga: "https://media.api-sports.io/football/leagues/78.png",
+  "Ligue 1": "https://media.api-sports.io/football/leagues/61.png",
+  Eredivisie: "https://media.api-sports.io/football/leagues/88.png",
+  "Primeira Liga": "https://media.api-sports.io/football/leagues/94.png",
+};
+
 const APP_NAVIGATION = [
   { href: "/live", label: "Live Match Centre", icon: "⚡", external: false },
   { href: "/#live", label: "Live Worldwide", icon: "●", external: false },
@@ -410,10 +420,11 @@ export default function LiveMatchCentrePage() {
                 Live Match Centre
               </h1>
 
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:text-[15px]">
-                Live scores from the Premier League, La Liga, Serie A,
-                Bundesliga, Ligue 1, Eredivisie and Primeira Liga.
-              </p>
+              <div className="mt-3 max-w-full overflow-x-auto pb-1">
+                <p className="whitespace-nowrap text-sm leading-6 text-slate-300 sm:text-[15px]">
+                  Live scores from the Premier League, La Liga, Serie A, Bundesliga, Ligue 1, Eredivisie and Primeira Liga.
+                </p>
+              </div>
 
               {lastUpdated ? (
                 <p className="mt-4 inline-flex items-center gap-2 text-xs text-slate-400">
@@ -462,17 +473,20 @@ export default function LiveMatchCentrePage() {
             <button
               type="button"
               onClick={() => setSelectedLeague("All Live")}
-              className={`min-w-[130px] shrink-0 border-r border-white/10 px-4 py-4 text-left transition duration-200 ${
+              className={`flex min-h-[104px] min-w-[124px] shrink-0 flex-col items-center justify-center gap-2 border-r border-white/10 px-3 py-4 text-center transition duration-200 lg:flex-1 ${
                 selectedLeague === "All Live"
                   ? "bg-gradient-to-br from-emerald-500/25 to-cyan-500/15 text-white shadow-[inset_0_-2px_0_rgba(52,211,153,0.9)]"
                   : "bg-white/[0.02] text-slate-300 hover:bg-emerald-500/10 hover:text-white"
               }`}
             >
-              <span className="block text-lg text-emerald-300" aria-hidden="true">
-                ◉
-              </span>
-              <span className="mt-1 block text-xs font-black uppercase tracking-[0.12em]">
+              <span className="flex h-8 items-center justify-center whitespace-nowrap text-center text-xs font-black uppercase leading-tight tracking-[0.1em]">
                 All Live
+              </span>
+              <span
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-400/25 bg-emerald-500/10 text-xl text-emerald-300"
+                aria-hidden="true"
+              >
+                ◉
               </span>
             </button>
 
@@ -485,15 +499,22 @@ export default function LiveMatchCentrePage() {
                   key={league}
                   type="button"
                   onClick={() => setSelectedLeague(league)}
-                  className={`min-w-[140px] shrink-0 border-r px-4 py-4 text-left transition duration-200 last:border-r-0 hover:-translate-y-0.5 ${
+                  className={`flex min-h-[104px] min-w-[132px] shrink-0 flex-col items-center justify-center gap-2 border-r px-3 py-4 text-center transition duration-200 last:border-r-0 hover:-translate-y-0.5 lg:flex-1 ${
                     isSelected ? theme.filterActive : theme.filterIdle
                   }`}
                 >
-                  <span className="block text-[10px] font-black uppercase tracking-[0.18em] opacity-65">
-                    League
-                  </span>
-                  <span className="mt-1 block whitespace-nowrap text-xs font-black sm:text-sm">
+                  <span className="flex h-8 items-center justify-center whitespace-nowrap text-center text-xs font-black leading-tight sm:text-sm">
                     {league}
+                  </span>
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white p-2 shadow-[0_4px_18px_rgba(255,255,255,0.16)]">
+                    <img
+                      src={LEAGUE_LOGOS[league]}
+                      alt={`${league} logo`}
+                      width={38}
+                      height={38}
+                      loading="lazy"
+                      className="h-full w-full object-contain"
+                    />
                   </span>
                 </button>
               );
