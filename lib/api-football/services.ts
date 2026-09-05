@@ -43,7 +43,6 @@ async function fetchWithRetryIfEmpty(
   retries = 2
 ) {
   let lastData: any = null;
-  let lastError: unknown = null;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
@@ -58,11 +57,8 @@ async function fetchWithRetryIfEmpty(
         await sleep(700 + attempt * 500);
       }
     } catch (error) {
-      lastError = error;
-
-      if (attempt < retries) {
-        await sleep(700 + attempt * 500);
-      }
+      console.error(`${label} failed:`, error);
+      return emptyApiFootballResponse();
     }
   }
 
@@ -71,7 +67,6 @@ async function fetchWithRetryIfEmpty(
     return lastData;
   }
 
-  console.error(`${label} failed after retry:`, lastError);
   return emptyApiFootballResponse();
 }
 
@@ -154,7 +149,9 @@ export async function getDashboardData(leagueId: number, season: number) {
 
   const [injuryBlocks, transferBlocks] = await Promise.all([
     Promise.allSettled(
-      teamIds.map((teamId) => fetchTeamInjuriesRaw(teamId, leagueId, season))
+      teamIds.map((teamId) =>
+        fetchTeamInjuriesRaw(teamId, leagueId, season)
+      )
     ),
     Promise.allSettled(teamIds.map((teamId) => fetchTransfersRaw(teamId))),
   ]);
