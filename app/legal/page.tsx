@@ -79,9 +79,26 @@ export default function LegalPage() {
         </section>
 
         <section>
-          <h2 className="mb-2 text-xl font-bold">Contact</h2>
+          <h2 className="mb-2 text-xl font-bold">Contact & Trader Details</h2>
+
           <p className="text-slate-300">
-            For any questions regarding these terms:
+            Pro Football Intel is operated by Andrew Lee, a sole trader in the
+            United Kingdom.
+          </p>
+
+          <div className="mt-4 text-slate-300">
+            <p className="font-semibold text-white">Andrew Lee / Pro Football Intel</p>
+            <p>Unit 174749</p>
+            <p>Lytchett House</p>
+            <p>13 Freeland Park</p>
+            <p>Wareham Road</p>
+            <p>Poole, Dorset</p>
+            <p>BH16 6FA</p>
+            <p>United Kingdom</p>
+          </div>
+
+          <p className="mt-4 text-slate-300">
+            For support or questions regarding these terms:
           </p>
 
           <a

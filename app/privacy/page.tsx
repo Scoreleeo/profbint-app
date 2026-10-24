@@ -20,7 +20,9 @@ export default function PrivacyPolicyPage() {
             Privacy Policy
           </h1>
 
-          <p className="mt-2 text-sm text-slate-400">Last updated: May 2026</p>
+          <p className="mt-2 text-sm text-slate-400">
+            Last updated: October 2026
+          </p>
 
           <div className="mt-6 space-y-6 text-sm leading-7 text-slate-300 sm:text-base">
             <section>
@@ -28,6 +30,8 @@ export default function PrivacyPolicyPage() {
               <p className="mt-2">
                 Welcome to Pro Football Intel. This Privacy Policy explains how
                 we collect, use and protect information when you use profbint.com.
+                Pro Football Intel is operated by Andrew Lee, a sole trader in
+                the United Kingdom.
               </p>
             </section>
 
@@ -43,6 +47,10 @@ export default function PrivacyPolicyPage() {
                 <li>
                   Payment-related information processed securely by third-party
                   providers such as Stripe
+                </li>
+                <li>
+                  Contact and purchase information you provide when buying or
+                  accessing premium services
                 </li>
                 <li>Information you provide when contacting support</li>
               </ul>
@@ -125,8 +133,28 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white">Contact</h2>
+              <h2 className="text-lg font-bold text-white">
+                Contact & Data Controller
+              </h2>
               <p className="mt-2">
+                Andrew Lee, trading as Pro Football Intel, is the operator of
+                this service and the contact for privacy matters.
+              </p>
+
+              <div className="mt-3">
+                <p className="font-semibold text-white">
+                  Andrew Lee / Pro Football Intel
+                </p>
+                <p>Unit 174749</p>
+                <p>Lytchett House</p>
+                <p>13 Freeland Park</p>
+                <p>Wareham Road</p>
+                <p>Poole, Dorset</p>
+                <p>BH16 6FA</p>
+                <p>United Kingdom</p>
+              </div>
+
+              <p className="mt-3">
                 For support or privacy questions, contact{" "}
                 <a
                   href="mailto:support@profbint.com"

@@ -20,7 +20,7 @@ export default function TermsOfServicePage() {
             Terms of Service
           </h1>
 
-          <p className="mt-2 text-sm text-slate-400">Last updated: May 2026</p>
+          <p className="mt-2 text-sm text-slate-400">Last updated: October 2026</p>
 
           <div className="mt-6 space-y-6 text-sm leading-7 text-slate-300 sm:text-base">
             <section>
@@ -55,15 +55,20 @@ export default function TermsOfServicePage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white">Premium Access</h2>
+              <h2 className="text-lg font-bold text-white">7-Day Premium Access</h2>
               <p className="mt-2">
-                Premium purchases unlock prediction content for the selected
-                fixture only. Access to a paid match prediction remains available
-                until that match has ended, unless otherwise stated.
+                A premium purchase provides access for seven days to the premium
+                areas of Pro Football Intel: the Player Database, Predictions and
+                Results Dashboard.
               </p>
               <p className="mt-3">
-                A purchase does not unlock other matches, future fixtures,
-                divisions, competitions or subscription access.
+                Access begins when the purchase is successfully completed and
+                expires seven days later. The purchase is a one-time payment and
+                does not automatically renew.
+              </p>
+              <p className="mt-3">
+                Premium access is for the purchaser only and must not be shared,
+                resold or transferred to another person.
               </p>
             </section>
 
@@ -81,15 +86,19 @@ export default function TermsOfServicePage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white">Refunds</h2>
+              <h2 className="text-lg font-bold text-white">Cancellation & Refunds</h2>
               <p className="mt-2">
-                Due to the nature of digital prediction content, purchases are
-                generally non-refundable once access has been granted.
+                Premium access is supplied digitally and is intended to begin
+                immediately after a successful purchase. Where required by law,
+                we will obtain any consent or acknowledgement needed before
+                immediate digital access begins.
               </p>
               <p className="mt-3">
-                If you believe you were charged incorrectly, made a duplicate
-                purchase, or experienced a technical issue that prevented access,
-                contact support and we will review the issue.
+                Nothing in these Terms limits any cancellation, refund or other
+                consumer rights that you have under applicable law. If you believe
+                you were charged incorrectly, made a duplicate purchase, or
+                experienced a technical issue that prevented access, contact
+                support and we will review the issue.
               </p>
             </section>
 
@@ -156,8 +165,24 @@ export default function TermsOfServicePage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-white">Contact</h2>
+              <h2 className="text-lg font-bold text-white">Contact & Trader Details</h2>
               <p className="mt-2">
+                Pro Football Intel is operated by Andrew Lee, a sole trader in the
+                United Kingdom.
+              </p>
+
+              <div className="mt-3">
+                <p className="font-semibold text-white">Andrew Lee / Pro Football Intel</p>
+                <p>Unit 174749</p>
+                <p>Lytchett House</p>
+                <p>13 Freeland Park</p>
+                <p>Wareham Road</p>
+                <p>Poole, Dorset</p>
+                <p>BH16 6FA</p>
+                <p>United Kingdom</p>
+              </div>
+
+              <p className="mt-3">
                 For questions about these terms, contact{" "}
                 <a
                   href="mailto:support@profbint.com"
