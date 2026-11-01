@@ -181,6 +181,10 @@ function QuickNav() {
       label: "Player Database",
     },
     {
+      href: "https://predictions.profbint.com/",
+      label: "Predictions",
+    },
+    {
       href: "/strongest-picks",
       label: "Strongest Daily Picks",
     },
@@ -747,6 +751,15 @@ export default function HomePage() {
             >
               Home
             </Link>
+
+            <a
+              href="https://predictions.profbint.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
+            >
+              Predictions
+            </a>
 
             <Link
               href="/strongest-picks"
