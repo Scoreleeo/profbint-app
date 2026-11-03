@@ -83,9 +83,18 @@ export default function StrongestPicksPage() {
             ← Pro Football Intel
           </Link>
 
-          <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-300 sm:text-xs">
-            Model filtered
-          </span>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Link
+              href="/strongest-picks/results"
+              className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-amber-300 transition hover:bg-amber-400/15 sm:text-xs"
+            >
+              View verified results →
+            </Link>
+
+            <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-emerald-300 sm:text-xs">
+              Model filtered
+            </span>
+          </div>
         </div>
 
         <section className="overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 shadow-2xl">
