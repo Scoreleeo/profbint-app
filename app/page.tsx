@@ -189,6 +189,10 @@ function QuickNav() {
       label: "Strongest Daily Picks",
     },
     {
+      href: "/strongest-picks/results",
+      label: "Verified Pick Results",
+    },
+    {
       href: "https://results.profbint.com/",
       label: "Results Dashboard",
     },
@@ -766,6 +770,13 @@ export default function HomePage() {
               className="text-sm text-slate-400 transition hover:text-amber-300"
             >
               Strongest Daily Picks
+            </Link>
+
+            <Link
+              href="/strongest-picks/results"
+              className="text-sm text-slate-400 transition hover:text-amber-300"
+            >
+              Verified Pick Results
             </Link>
 
             <a
